@@ -1,23 +1,19 @@
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
 
 class NavbarController extends GetxController {
-  //TODO: Implement NavbarController
+final _currentIndex = 0.obs;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  int get currentIndex => _currentIndex.value;
+
+  set currentIndex(int index) => _currentIndex.value = index;
+  final advancedDrawerController = AdvancedDrawerController();
+
+  void openDrawer() {
+    advancedDrawerController.showDrawer();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void closeDrawer() {
+    advancedDrawerController.hideDrawer();
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

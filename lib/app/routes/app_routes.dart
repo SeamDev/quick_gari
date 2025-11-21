@@ -13,6 +13,9 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const AUTH = _Paths.AUTH;
   static const NOTIFICATION = _Paths.NOTIFICATION;
+  static const FAVOURITE = _Paths.FAVOURITE;
+  static const OFFER = _Paths.OFFER;
+  static const WALLET = _Paths.WALLET;
 }
 
 abstract class _Paths {
@@ -27,4 +30,7 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const AUTH = '/auth';
   static const NOTIFICATION = '/notification';
+  static const FAVOURITE = '/favourite';
+  static const OFFER = '/offer';
+  static const WALLET = '/wallet';
 }

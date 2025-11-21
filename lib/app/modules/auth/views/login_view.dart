@@ -101,7 +101,10 @@ class _SignInScreenState extends State<SignInScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () => Get.toNamed(Routes.HOME),
+                  onPressed: () {
+                    Get.toNamed(Routes.NAVBAR);
+                    Get.offAllNamed('/navbar');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00A86B),
                     shape: RoundedRectangleBorder(

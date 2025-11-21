@@ -12,20 +12,24 @@ class ProfileView extends GetView<ProfileController> {
     final TextEditingController addressController = TextEditingController();
 
     String selectedGender = 'Male';
-
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.black87),
-        ),
+        title: const Text('Profile', style: TextStyle(color: Colors.black87)),
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-          onPressed: () => Get.back(),
-        ),
+        automaticallyImplyLeading: false, // we will control manually
+        leading: Get.currentRoute != Get.previousRoute
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+                onPressed: () => Get.back(),
+              )
+            : null,
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+        //   onPressed: () => Get.back(),
+        // ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),

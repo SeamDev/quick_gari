@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,6 +18,7 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final drawerX = Get.find<NavbarController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -25,7 +27,7 @@ class HomeView extends GetView<HomeController> {
         ),
         leadingWidth: 70,
         leading: Padding(
-          padding: EdgeInsetsGeometry.only(left: 10,top: 5),
+          padding: EdgeInsetsGeometry.only(left: 10, top: 5),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: Image.asset('assets/icon.png', fit: BoxFit.fill),
@@ -37,8 +39,8 @@ class HomeView extends GetView<HomeController> {
             icon: Icon(Icons.notifications_none_outlined, size: 30),
           ),
           IconButton(
-            onPressed: () => Get.toNamed(Routes.PROFILE),
-            icon: Icon(Icons.account_circle_outlined, size: 30),
+            onPressed: () => drawerX.openDrawer(),
+            icon: Icon(Icons.menu, size: 30),
           ),
         ],
       ),

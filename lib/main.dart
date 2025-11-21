@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:quick_gari/app/modules/home/views/home_view.dart';
+import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
+import 'package:quick_gari/app/modules/navbar/views/navbar_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 
 void main() {
+  Get.put(NavbarController());
   runApp(const MyApp());
 }
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Quick Gari',
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
-      home: HomeView()
+      home: NavbarView(),
       );
   }
 }
