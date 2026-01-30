@@ -42,7 +42,7 @@ class NavbarView extends GetView<NavbarController> {
       // Menu
       return AdvancedDrawer(
         controller: controller.advancedDrawerController,
-      backdropColor: Colors.black.withValues(alpha: 0.2),
+      //backdropColor: Colors.black.withValues(alpha: 0.2),
       animationDuration: const Duration(milliseconds: 270),
       openRatio: 0.6,
       animateChildDecoration: true,
@@ -54,76 +54,79 @@ class NavbarView extends GetView<NavbarController> {
       drawer: const MenuView(),
 
       /// ---- MAIN SCREEN ----
-        child: Scaffold(
-          body: content,
-          bottomNavigationBar: SizedBox(
-            height: 100,
-            child: Stack(
-              children: [
-                // Background bar
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _navItem(Icons.home, "Home", 0),
-                        _navItem(Icons.favorite_border, "Favourite", 1),
-                        const SizedBox(width: 60), // Gap for floating button
-                        _navItem(Icons.local_offer_outlined, "Offer", 3),
-                        _navItem(Icons.person_outline, "Profile", 4),
-                      ],
-                    ),
-                  ),
-                ),
-        
-                // Center hexagon floating button
-                Positioned(
-                  bottom: 16,
-                  left: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: () => controller.currentIndex = 2,
-                    child: Column(
-                      children: [
-                        CustomPaint(
-                          size: const Size(70, 70),
-                          painter: HexagonPainter(color: Color(0xFF00A86B)),
-                        ),
-                        const SizedBox(height: 4),
-                      ],
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: Scaffold(
+            body: content,
+            bottomNavigationBar: SizedBox(
+              height: 100,
+              child: Stack(
+                children: [
+                  // Background bar
+                  Positioned(
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _navItem(Icons.home, "Home", 0),
+                          _navItem(Icons.favorite_border, "Favourite", 1),
+                          const SizedBox(width: 60), // Gap for floating button
+                          _navItem(Icons.local_offer_outlined, "Offer", 3),
+                          _navItem(Icons.person_outline, "Profile", 4),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-        
-                // Wallet icon inside hexagon
-                Positioned(
-                  bottom: 38,
-                  left: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: () => controller.currentIndex = 2,
-                    child: const Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: Colors.white,
-                      size: 28,
+          
+                  // Center hexagon floating button
+                  Positioned(
+                    bottom: 16,
+                    left: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () => controller.currentIndex = 2,
+                      child: Column(
+                        children: [
+                          CustomPaint(
+                            size: const Size(70, 70),
+                            painter: HexagonPainter(color: Color(0xFF00A86B)),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+          
+                  // Wallet icon inside hexagon
+                  Positioned(
+                    bottom: 38,
+                    left: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: () => controller.currentIndex = 2,
+                      child: const Icon(
+                        Icons.account_balance_wallet_outlined,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

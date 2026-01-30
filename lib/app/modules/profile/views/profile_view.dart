@@ -18,18 +18,7 @@ class ProfileView extends GetView<ProfileController> {
         title: const Text('Profile', style: TextStyle(color: Colors.black87)),
         backgroundColor: Colors.white,
         centerTitle: true,
-        elevation: 0,
-        automaticallyImplyLeading: false, // we will control manually
-        leading: Get.currentRoute != Get.previousRoute
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-                onPressed: () => Get.back(),
-              )
-            : null,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-        //   onPressed: () => Get.back(),
-        // ),
+        elevation: 0,  
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),

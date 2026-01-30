@@ -3,7 +3,8 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const HOME = _Paths.HOME;
+  //static const HOME = _Paths.HOME;
+  static const HOME = _Paths.NAVBAR;
   static const NAVBAR = _Paths.NAVBAR;
   static const RIDE = _Paths.RIDE;
   static const LOAD = _Paths.LOAD;
@@ -16,6 +17,7 @@ abstract class Routes {
   static const FAVOURITE = _Paths.FAVOURITE;
   static const OFFER = _Paths.OFFER;
   static const WALLET = _Paths.WALLET;
+  static const REGISTER_VEHICLE = _Paths.REGISTER_VEHICLE;
 }
 
 abstract class _Paths {
@@ -33,4 +35,5 @@ abstract class _Paths {
   static const FAVOURITE = '/favourite';
   static const OFFER = '/offer';
   static const WALLET = '/wallet';
+  static const REGISTER_VEHICLE = '/register-vehicle';
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 
-
-class MenuView extends StatelessWidget {
-
+class MenuView extends GetView<NavbarController> {
   const MenuView({super.key});
 
   @override
@@ -20,28 +21,50 @@ class MenuView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             const SizedBox(height: 20),
-
-            Center(
-              child: Column(
-                children: const [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage("assets/profile.png"),
+            Stack(
+              children: [
+                Center(
+                  child: Column(
+                    children: const [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: AssetImage("assets/profile.png"),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        "Nate Samson",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "nate@email.com",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                  Text("Nate Samson",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text("nate@email.com",
-                      style: TextStyle(color: Colors.grey)),
-                ],
-              ),
+                ),
+                Positioned(
+                  right: 0,
+                  child: IconButton(
+                    onPressed: () => controller.closeDrawer(),
+                    icon: Icon(Icons.close),
+                    iconSize: 30,
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 30),
 
-            _menuItem(Icons.history, "History"),
+            _menuItem(
+              Icons.app_registration,
+              "Register Your Vehicle",
+              route: Routes.REGISTER_VEHICLE,
+            ),
+            _menuItem(Icons.history, "New"),
             _menuItem(Icons.report_problem_outlined, "Complain"),
             _menuItem(Icons.group_add_outlined, "Referral"),
             _menuItem(Icons.info_outline, "About Us"),
@@ -57,11 +80,14 @@ class MenuView extends StatelessWidget {
     );
   }
 
-  Widget _menuItem(IconData icon, String title) {
+  Widget _menuItem(IconData icon, String title, {route = Routes.NAVBAR}) {
     return ListTile(
       leading: Icon(icon, size: 22),
       title: Text(title, style: const TextStyle(fontSize: 16)),
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(route);
+        controller.closeDrawer();
+      },
     );
   }
 }

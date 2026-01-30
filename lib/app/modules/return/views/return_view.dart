@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/return/views/filter_bottom.dart';
+import 'package:quick_gari/app/modules/return/views/vehicle_detail.dart';
 
 import '../controllers/return_controller.dart';
+
+void openSelectAddressSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => const SelectAddressBottomSheet(),
+  );
+}
 
 class ReturnView extends GetView<ReturnController> {
   const ReturnView({super.key});
@@ -25,34 +36,43 @@ class ReturnView extends GetView<ReturnController> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Color(0xFF1976D2),
+        backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: const [
-                Text('Trip Filter', style: TextStyle(color: Colors.black87)),
-                SizedBox(width: 6),
-                Icon(Icons.filter_list, color: Colors.black54),
-              ],
+          GestureDetector(
+            onTap: () => openSelectAddressSheet(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: const [
+                  Text('Trip Filter', style: TextStyle(color: Colors.black87)),
+                  SizedBox(width: 6),
+                  Icon(Icons.filter_list, color: Colors.black54),
+                ],
+              ),
             ),
           ),
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 12),
+          const Text(
+            "  18 cars found",
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
           // 🔹 Trip List
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(12),
               children: const [
                 TripCard(
-                  carName: 'Axio',
+                  carName: 'BMW  l  Cabrio',
                   rating: 2.0,
                   pickUp: 'মৌলভীবাজার, Bangladesh',
                   dropOff: 'মহাখালী, Dhaka, Bangladesh',
@@ -152,12 +172,12 @@ class TripCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      '• 4 Seats  •  AC',
+                      '4 Seats  •  AC',
                       style: TextStyle(color: Colors.black54),
                     ),
                     const Text(
-                      'Sedan',
-                      style: TextStyle(color: Colors.black87),
+                      '5km || Distance from your starting location',
+                      style: TextStyle(color: Colors.black54),
                     ),
                   ],
                 ),
@@ -177,16 +197,22 @@ class TripCard extends StatelessWidget {
                     // 🔹 Left side: timeline icons + line
                     Column(
                       children: [
-                        const Icon(
-                          Icons.circle,
-                          size: 12,
-                          color: Colors.black54,
+                        const Icon(Icons.circle, size: 18, color: Colors.red),
+                        Container(
+                          width: 4,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.red, Colors.green],
+                            ),
+                          ),
                         ),
-                        Container(width: 2, height: 32, color: Colors.black26),
                         const Icon(
                           Icons.location_on,
-                          size: 16,
-                          color: Colors.black54,
+                          size: 25,
+                          color: Colors.green,
                         ),
                       ],
                     ),
@@ -246,7 +272,7 @@ class TripCard extends StatelessWidget {
                 _fareRow(
                   'Total fare',
                   '৳ $total',
-                  color: Colors.blue,
+                  color: Colors.green,
                   isBold: true,
                 ),
               ],
@@ -258,16 +284,16 @@ class TripCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => Get.to(() => CarDetailsView()),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1976D2),
+                  backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: const Text(
-                  'Bid Your Fare',
+                  'Vehicle Details',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

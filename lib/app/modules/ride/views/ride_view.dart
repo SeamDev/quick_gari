@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_view_list.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
+//import 'package:quick_gari/app/modules/ride/views/ride_view_list.dart';
 import '../controllers/ride_controller.dart';
 
 class RideView extends GetView<RideController> {
@@ -43,21 +44,13 @@ class RideView extends GetView<RideController> {
             Expanded(
               child: ListView(
                 children: [
-                  _carCard(
-                    name: "BMW Cabrio",
-                    specs: "Automatic · 3 seats · Octane",
-                    distance: "800m (5mins away)",
-                    image: "assets/car1.png",
-                  ),
-
                   const SizedBox(height: 16),
-
-                  _carCard(
-                    name: "Mustang Shelby GT",
-                    specs: "Automatic · 3 seats · Octane",
-                    distance: "800m (5mins away)",
-                    image: "assets/car2.png",
-                  ),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -144,7 +137,7 @@ class RideView extends GetView<RideController> {
                 ),
               ),
               onPressed: () {
-                Get.to(() => RideViewList());
+                Get.to(() => CarDetailPage());
               },
               child: const Text(
                 "View car details",
@@ -156,4 +149,152 @@ class RideView extends GetView<RideController> {
       ),
     );
   }
+}
+
+Widget vehicleCard() {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFFE9F8E9),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.green),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        /// Car Image
+        Image.asset(
+          "assets/car1.png", // replace with your image
+          height: 120,
+          fit: BoxFit.contain,
+        ),
+
+        const SizedBox(height: 12),
+
+        /// Car Name
+        const Text(
+          "BMW 1 Cabrio",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+
+        const SizedBox(height: 4),
+
+        /// AC + Seat
+        const Text(
+          "AC | 3 Seat",
+          style: TextStyle(color: Colors.black87, fontSize: 13),
+        ),
+
+        const SizedBox(height: 6),
+
+        /// Distance
+        const Text(
+          "5 KM | Distance from your starting location",
+          style: TextStyle(color: Colors.black87, fontSize: 12),
+        ),
+
+        const SizedBox(height: 14),
+
+        /// Starting Area
+        _infoRow(
+          icon: Icons.circle,
+          iconColor: Colors.green,
+          title: "Starting Area",
+          value: "Rajshahi University",
+        ),
+
+        const SizedBox(height: 8),
+
+        /// Ending Area
+        _infoRow(
+          icon: Icons.location_on,
+          iconColor: Colors.green,
+          title: "Ending Area",
+          value: "Mirpur 11, Dhaka",
+        ),
+
+        const SizedBox(height: 8),
+
+        /// Date & Time
+        _infoRow(
+          icon: Icons.calendar_month,
+          iconColor: Colors.redAccent,
+          title: "Date & Time",
+          value: "29-06-2025   08:35 AM",
+        ),
+
+        const SizedBox(height: 14),
+
+        /// Fare
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.currency_exchange, color: Colors.green),
+            SizedBox(width: 8),
+            Text(
+              "Estimated Fare : ",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            Text(
+              "8500",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
+        /// Button
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF4CAF50),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            minimumSize: Size(300, 50)
+          ),
+          onPressed: () {
+            Get.to(() => CarDetailPage());
+          },
+          child: const Text(
+            "Vehicle Details & Booking",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _infoRow({
+  required IconData icon,
+  required Color iconColor,
+  required String title,
+  required String value,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, color: iconColor, size: 18),
+      const SizedBox(width: 10),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    ],
+  );
 }

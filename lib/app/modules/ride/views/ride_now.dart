@@ -80,7 +80,7 @@ class CarDetailPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Specifications Title
-            const Text(
+            /*const Text(
               "Specifications",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
@@ -98,24 +98,69 @@ class CarDetailPage extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 24),*/
 
             // Car features Title
             const Text(
               "Car features",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
             ),
 
             const SizedBox(height: 12),
 
             const FeatureItem(title: "Model", value: "GT5000"),
-            const FeatureItem(title: "Capacity", value: "760hp"),
-            const FeatureItem(title: "Color", value: "Red"),
+            const FeatureItem(title: "Seat Capacity", value: "3 seat"),
+            const FeatureItem(title: "AC Available", value: "Yes"),
             const FeatureItem(title: "Fuel type", value: "Octane"),
-            FeatureItem(
-              title: "Gear type",
-              value: "Automatic",
-              borderColor: Colors.deepPurple,
+            const FeatureItem(title: "Gear type", value: "Automatic"),
+
+            const SizedBox(height: 12),
+
+            // Driver Information
+            const Text(
+              "Driver Info.",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Image.asset("assets/driver.png", width: 100, height: 100),
+                    Text(
+                      "Driver Name :  Abdul  mannan",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    Text(
+                      " Experience :   4th year",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: 24),

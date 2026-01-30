@@ -18,6 +18,8 @@ import '../modules/offer/bindings/offer_binding.dart';
 import '../modules/offer/views/offer_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/register_vehicle/bindings/register_vehicle_binding.dart';
+import '../modules/register_vehicle/views/register_vehicle_view.dart';
 import '../modules/return/bindings/return_binding.dart';
 import '../modules/return/views/return_view.dart';
 import '../modules/ride/bindings/ride_binding.dart';
@@ -99,6 +101,11 @@ class AppPages {
       name: _Paths.WALLET,
       page: () => const WalletView(),
       binding: WalletBinding(),
+    ),
+    GetPage(
+      name: _Paths.REGISTER_VEHICLE,
+      page: () => const RegisterVehicleView(),
+      binding: RegisterVehicleBinding(),
     ),
   ];
 }
