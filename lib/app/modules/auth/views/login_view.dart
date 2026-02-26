@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/register_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -12,6 +13,22 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool hidePassword = true;
+
+  void login() async {
+    bool success = await ApiService.login(
+      "sajedulislamshagor@gmail.com",
+      "Shahin@123",
+    );
+
+    if (success) {
+      Get.toNamed(Routes.NAVBAR);
+      Get.offAllNamed(Routes.NAVBAR);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login Failed")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,8 +119,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.toNamed(Routes.NAVBAR);
-                    Get.offAllNamed('/navbar');
+                    login();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00A86B),
@@ -140,7 +156,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               // Gmail
               _socialButton(
-                icon: "assets/gmail.png",
+                icon: "assets/Gmail.png",
                 text: "Sign up with Gmail",
                 onTap: () {},
               ),
@@ -158,7 +174,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               // Apple
               _socialButton(
-                icon: "assets/apple.png",
+                icon: "assets/Apple.png",
                 text: "Sign up with Apple",
                 onTap: () {},
               ),

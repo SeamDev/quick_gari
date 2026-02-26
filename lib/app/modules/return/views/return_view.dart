@@ -3,17 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/return/views/filter_bottom.dart';
 import 'package:quick_gari/app/modules/return/views/vehicle_detail.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 
 import '../controllers/return_controller.dart';
-
-void openSelectAddressSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => const SelectAddressBottomSheet(),
-  );
-}
 
 class ReturnView extends GetView<ReturnController> {
   const ReturnView({super.key});
@@ -29,7 +21,7 @@ class ReturnView extends GetView<ReturnController> {
           icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 26),
         ),
         title: Text(
-          'Return Trip',
+          'Back',
           style: TextStyle(
             color: Colors.white,
             fontSize: 26,
@@ -40,7 +32,7 @@ class ReturnView extends GetView<ReturnController> {
         foregroundColor: Colors.white,
         actions: [
           GestureDetector(
-            onTap: () => openSelectAddressSheet(context),
+            onTap: () => showEditableAddressSheet(context, Routes.RETURN),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -58,248 +50,31 @@ class ReturnView extends GetView<ReturnController> {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          const Text(
-            "  18 cars found",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          // 🔹 Trip List
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: const [
-                TripCard(
-                  carName: 'BMW  l  Cabrio',
-                  rating: 2.0,
-                  pickUp: 'মৌলভীবাজার, Bangladesh',
-                  dropOff: 'মহাখালী, Dhaka, Bangladesh',
-                  dateTime: '29-06-2025 03:30 AM',
-                  fare: 4000,
-                  charge: 396,
-                  total: 4396,
-                  imagePath: 'assets/car1.png',
-                ),
-                TripCard(
-                  carName: 'X COROLLA',
-                  rating: 5.0,
-                  pickUp: 'Dhaka, Bangladesh',
-                  dropOff: 'Moulvibazar, Bangladesh',
-                  dateTime: '29-06-2025 05:00 PM',
-                  fare: 4200,
-                  charge: 399,
-                  total: 4599,
-                  imagePath: 'assets/car2.png',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// 🔹 Trip Card Widget
-class TripCard extends StatelessWidget {
-  final String carName;
-  final double rating;
-  final String pickUp;
-  final String dropOff;
-  final String dateTime;
-  final int fare;
-  final int charge;
-  final int total;
-  final String imagePath;
-
-  const TripCard({
-    super.key,
-    required this.carName,
-    required this.rating,
-    required this.pickUp,
-    required this.dropOff,
-    required this.dateTime,
-    required this.fare,
-    required this.charge,
-    required this.total,
-    required this.imagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 3,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔸 Header: Car info
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    imagePath,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          carName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.star, color: Colors.amber, size: 20),
-                        Text(
-                          rating.toString(),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      '4 Seats  •  AC',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    const Text(
-                      '5km || Distance from your starting location',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                  ],
-                ),
-              ],
+            const SizedBox(height: 10),
+
+            const Text(
+              "18 cars found",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
 
             const SizedBox(height: 12),
 
-            // 🔸 Pick up / Drop info
-            // 🔸 Pick up / Drop info (with timeline)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 🔹 Left side: timeline icons + line
-                    Column(
-                      children: [
-                        const Icon(Icons.circle, size: 18, color: Colors.red),
-                        Container(
-                          width: 4,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.red, Colors.green],
-                            ),
-                          ),
-                        ),
-                        const Icon(
-                          Icons.location_on,
-                          size: 25,
-                          color: Colors.green,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 8),
-
-                    // 🔹 Right side: pickup & drop text
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Pick Up Point',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          Text(
-                            pickUp,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Drop Off Point',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          Text(
-                            dropOff,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const Divider(height: 20, thickness: 1),
-
-            // 🔸 Fare Info
-            Column(
-              children: [
-                _fareRow('Date & Time', dateTime),
-                _fareRow('Driver Asking Fare', '৳ $fare', color: Colors.green),
-                _fareRow('Platform Charge', '৳ $charge', color: Colors.green),
-                const Divider(),
-                _fareRow(
-                  'Total fare',
-                  '৳ $total',
-                  color: Colors.green,
-                  isBold: true,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            // 🔸 Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Get.to(() => CarDetailsView()),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: const Text(
-                  'Vehicle Details',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+            Expanded(
+              child: ListView(
+                children: [
+                  const SizedBox(height: 16),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
+                  vehicleCard(),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
           ],
@@ -308,31 +83,151 @@ class TripCard extends StatelessWidget {
     );
   }
 
-  Widget _fareRow(
-    String title,
-    String value, {
-    Color? color,
-    bool isBold = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget vehicleCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9F8E9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 15, color: Colors.black87),
+          /// Car Image
+          Image.asset(
+            "assets/car1.png", // replace with your image
+            height: 120,
+            fit: BoxFit.contain,
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 15,
-              color: color ?? Colors.black,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+
+          const SizedBox(height: 12),
+
+          /// Car Name
+          const Text(
+            "BMW 1 Cabrio",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+
+          const SizedBox(height: 4),
+
+          /// AC + Seat
+          const Text(
+            "AC | 3 Seat",
+            style: TextStyle(color: Colors.black87, fontSize: 13),
+          ),
+
+          const SizedBox(height: 6),
+
+          /// Distance
+          const Text(
+            "5 KM | Distance from your starting location",
+            style: TextStyle(color: Colors.black87, fontSize: 12),
+          ),
+
+          const SizedBox(height: 14),
+
+          /// Starting Area
+          _infoRow(
+            icon: Icons.circle,
+            iconColor: Colors.green,
+            title: "Starting Area",
+            value: "Rajshahi University",
+          ),
+
+          const SizedBox(height: 8),
+
+          /// Ending Area
+          _infoRow(
+            icon: Icons.location_on,
+            iconColor: Colors.green,
+            title: "Ending Area",
+            value: "Mirpur 11, Dhaka",
+          ),
+
+          const SizedBox(height: 8),
+
+          /// Date & Time
+          _infoRow(
+            icon: Icons.calendar_month,
+            iconColor: Colors.redAccent,
+            title: "Date & Time",
+            value: "29-06-2025   08:35 AM",
+          ),
+
+          const SizedBox(height: 14),
+
+          /// Fare
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.currency_exchange, color: Colors.green),
+              SizedBox(width: 8),
+              Text(
+                "Estimated Fare : ",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                "8500",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          /// Button
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4CAF50),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              minimumSize: Size(300, 50),
+            ),
+            onPressed: () {
+              Get.to(() => CarDetailsView());
+            },
+            child: const Text(
+              "Vehicle Details & Booking",
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _infoRow({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: iconColor, size: 18),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

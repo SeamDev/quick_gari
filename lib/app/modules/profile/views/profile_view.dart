@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -11,24 +12,29 @@ class ProfileView extends GetView<ProfileController> {
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
 
-    String selectedGender = 'Male';
-    
+    final ProfileController controller = Get.put(ProfileController());
+
+    String selectedGender = controller.userInfo["gender"] ?? "male";
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile', style: TextStyle(color: Colors.black87)),
         backgroundColor: Colors.white,
         centerTitle: true,
-        elevation: 0,  
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                'Logout',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+        elevation: 0,
+        actions: [
+          GestureDetector(
+            onTap: () => Get.toNamed(Routes.AUTH),
+            child: Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Center(
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -63,8 +69,8 @@ class ProfileView extends GetView<ProfileController> {
             ),
 
             const SizedBox(height: 12),
-            const Text(
-              'Md. Naimul Islam',
+            Text(
+              controller.userInfo["name"] ?? "Unknown",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -77,7 +83,7 @@ class ProfileView extends GetView<ProfileController> {
             TextField(
               controller: emailController,
               decoration: InputDecoration(
-                hintText: 'nate456@email.com',
+                hintText: controller.userInfo["email"] ?? "Unknown",
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
@@ -114,7 +120,8 @@ class ProfileView extends GetView<ProfileController> {
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      hintText: '+880 Your mobile number',
+                      hintText:
+                          '+88${controller.userInfo["phoneNumber"] ?? "Unknown"}',
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(
@@ -130,11 +137,11 @@ class ProfileView extends GetView<ProfileController> {
 
             // 🔹 Gender Dropdown
             DropdownButtonFormField<String>(
-              value: selectedGender,
+              initialValue: selectedGender,
               items: const [
-                DropdownMenuItem(value: 'Male', child: Text('Male')),
-                DropdownMenuItem(value: 'Female', child: Text('Female')),
-                DropdownMenuItem(value: 'Other', child: Text('Other')),
+                DropdownMenuItem(value: 'male', child: Text('Male')),
+                DropdownMenuItem(value: 'female', child: Text('Female')),
+                DropdownMenuItem(value: 'other', child: Text('Other')),
               ],
               onChanged: (value) {
                 selectedGender = value!;

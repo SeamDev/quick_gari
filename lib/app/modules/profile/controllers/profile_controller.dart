@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
+import 'package:quick_gari/app/service/hive_service.dart';
 
 class ProfileController extends GetxController {
   //TODO: Implement ProfileController
 
-  final count = 0.obs;
+  dynamic userInfo;
   @override
   void onInit() {
+    userInfo = HiveService.get("user");
+    print(userInfo);
     super.onInit();
   }
 
@@ -16,8 +19,7 @@ class ProfileController extends GetxController {
 
   @override
   void onClose() {
+    print(0);
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

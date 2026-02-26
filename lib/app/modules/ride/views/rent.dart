@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 
 class RequestForRentPage extends StatelessWidget {
   RequestForRentPage({super.key});
@@ -231,9 +232,7 @@ class RequestForRentPage extends StatelessWidget {
             // -------- Confirm Booking Button --------
             ElevatedButton(
               onPressed: () {
-                if (controller.clicked()) {
-                  showBookingSuccessDialog(context, "Md. Sharif Ahmed");
-                }
+                showBookingSuccessDialog(context, "Md. Sharif Ahmed");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF007F4F),
@@ -303,7 +302,10 @@ void showBookingSuccessDialog(BuildContext context, String name) {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Get.toNamed(Routes.HOME);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF007F4F),
                     shape: RoundedRectangleBorder(
