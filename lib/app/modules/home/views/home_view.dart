@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/home_controller.dart';
@@ -159,12 +160,15 @@ showEditableAddressSheet(BuildContext context, String routes) {
   final dateCtrl = TextEditingController(text: "12-05-2025");
   final timeCtrl = TextEditingController(text: "12 : 05 AM");
 
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
+
   Get.bottomSheet(
     DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.35,
       maxChildSize: 0.85,
-      
+
       builder: (context, controller) {
         return Container(
           padding: const EdgeInsets.all(16),
@@ -236,6 +240,7 @@ showEditableAddressSheet(BuildContext context, String routes) {
                         "${picked.day.toString().padLeft(2, '0')}-"
                         "${picked.month.toString().padLeft(2, '0')}-"
                         "${picked.year}";
+                    selectedDate = picked;
                   }
                 },
               ),
@@ -255,7 +260,14 @@ showEditableAddressSheet(BuildContext context, String routes) {
                     initialTime: TimeOfDay.now(),
                   );
                   if (picked != null) {
-                    timeCtrl.text = picked.format(context);
+                    final hour = picked.hourOfPeriod == 0
+                        ? 12
+                        : picked.hourOfPeriod;
+                    final minute = picked.minute.toString().padLeft(2, '0');
+                    final period = picked.period == DayPeriod.am ? "AM" : "PM";
+
+                    timeCtrl.text = "$hour:$minute $period";
+                    selectedTime = picked;
                   }
                 },
               ),
@@ -271,14 +283,27 @@ showEditableAddressSheet(BuildContext context, String routes) {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () {
-                  Get.back();
-                  Get.toNamed(routes, arguments: {
-                    "start": startCtrl.text,
-                    "end": endCtrl.text,
-                    "date": dateCtrl.text,
-                    "time": timeCtrl.text,
-                  });
+                onPressed: () async {
+                  //Get.back();
+
+                  final combinedDateTime = DateTime(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day,
+                    selectedTime.hour,
+                    selectedTime.minute,
+                  );
+
+                  final requestBody = {
+                    "startLocation": "Rajshahi University",
+                    "endLocation": "Shaheb Bazar",
+                    "date":
+                        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                    "startTime": combinedDateTime.toUtc().toIso8601String(),
+                  };
+
+                  final response = await ApiService.rideSheet(requestBody);
+                  Get.toNamed(Routes.RIDE);
                 },
                 child: const Text(
                   "Continue",
@@ -323,13 +348,9 @@ Widget _editableField({
             decoration: InputDecoration(
               border: InputBorder.none,
               labelText: label,
-              labelStyle:
-                  const TextStyle(fontSize: 13, color: Colors.black54),
+              labelStyle: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
         ),
         if (controller.text.isNotEmpty)

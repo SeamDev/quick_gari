@@ -12,21 +12,25 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   bool hidePassword = true;
 
   void login() async {
-    bool success = await ApiService.login(
-      "sajedulislamshagor@gmail.com",
-      "Shahin@123",
-    );
+    final phone = phoneController.text.trim();
+    final password = passwordController.text.trim();
+    try {
+      bool success = await ApiService.login(phone, password);
 
-    if (success) {
-      Get.toNamed(Routes.NAVBAR);
-      Get.offAllNamed(Routes.NAVBAR);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Login Failed")));
+      if (success) {
+        Get.offAllNamed(Routes.NAVBAR);
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Login Failed")));
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -50,7 +54,10 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 30),
 
               // Email or Phone
-              _inputField(hint: "Email or Phone Number"),
+              _textField(
+                hint: "Email or Phone Number",
+                controller: phoneController,
+              ),
 
               const SizedBox(height: 15),
 
@@ -66,6 +73,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: passwordController,
                         obscureText: hidePassword,
                         decoration: const InputDecoration(
                           hintText: "Enter Your Password",
@@ -209,8 +217,13 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Input Field
-  Widget _inputField({required String hint}) {
+  // TextField with controller
+  Widget _textField({
+    required String hint,
+    TextEditingController? controller,
+    bool isPassword = false,
+    IconData? icon,
+  }) {
     return Container(
       height: 55,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -219,7 +232,13 @@ class _SignInScreenState extends State<SignInScreen> {
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: TextField(
-        decoration: InputDecoration(hintText: hint, border: InputBorder.none),
+        controller: controller,
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: InputBorder.none,
+          suffixIcon: icon != null ? Icon(icon) : null,
+        ),
       ),
     );
   }

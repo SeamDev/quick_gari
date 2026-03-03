@@ -2,11 +2,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveService {
   static const String _defaultBox = 'appBox';
+  static const String _tokenBox = 'appBox';
 
   /// Initialize Hive
   static Future<void> init() async {
     await Hive.initFlutter();
     await Hive.openBox(_defaultBox);
+    await Hive.openBox(_tokenBox);
   }
 
   /// Open custom box
@@ -60,5 +62,20 @@ class HiveService {
   /// Close box
   static Future<void> closeBox({String boxName = _defaultBox}) async {
     await Hive.box(boxName).close();
+  }
+  ////
+  ///
+  ///
+  static Future<void> setToken(String value) async {
+    await Hive.box(_tokenBox).put("token", value);
+  }
+  static Future<void> setRToken(String value) async {
+    await Hive.box(_tokenBox).put("Rtoken", value);
+  }
+  static Future<String> getToken() async {
+    return await Hive.box(_tokenBox).get("token");
+  }
+  static Future<String> getRToken() async {
+    return await Hive.box(_tokenBox).get("Rtoken");
   }
 }

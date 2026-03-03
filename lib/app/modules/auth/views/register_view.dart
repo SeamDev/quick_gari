@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
+
+import 'package:quick_gari/app/service/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -10,7 +14,103 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  String selectedGender = "Gender";
+  // Controllers for input fields
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  bool hidePassword = true;
+
+  String selectedGender = "male";
+  Uint8List? selectedImageBytes;
+  String? selectedImageName;
+
+  @override
+  void dispose() {
+    // Dispose controllers
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  // Pick profile image
+  Future<void> pickImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        withData: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          selectedImageBytes = result.files.first.bytes;
+          selectedImageName = result.files.first.name;
+        });
+      }
+    } catch (e) {
+      debugPrint("Image pick error: $e");
+    }
+  }
+
+  // Example register function
+  void register() async {
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "All fields are required",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (selectedGender == "Gender") {
+      Get.snackbar(
+        "Error",
+        "Please select gender",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    if (selectedImageBytes == null) {
+      Get.snackbar(
+        "Error",
+        "Please upload a profile image",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    // Navigate to OTP verify screen (example)
+    //Get.to(() => VerifyOtpScreen(phoneNumber: phone));
+    bool success = await ApiService.register(
+      name,
+      email,
+      "0$phone",
+      selectedGender,
+      selectedImageBytes,
+      password,
+    );
+
+    if (success) {
+      //Get.offAllNamed(Routes.NAVBAR);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login Failed")));
+    }
+
+    // TODO: Add your API call here with:
+    // name, email, phone, password, selectedGender, selectedImageBytes
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,29 +122,19 @@ class _SignupScreenState extends State<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               const SizedBox(height: 30),
               const Text(
                 "Sign up with your email or phone number",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
-
               const SizedBox(height: 25),
 
-              // Name
-              _textField(hint: "Name"),
-
+              _textField(hint: "Name", controller: nameController),
+              const SizedBox(height: 15),
+              _textField(hint: "Email", controller: emailController),
               const SizedBox(height: 15),
 
-              // Email
-              _textField(hint: "Email"),
-
-              const SizedBox(height: 15),
-
-              // Phone Number (Bangladesh Flag + +880)
+              // Phone Number
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
@@ -54,15 +144,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 55,
                 child: Row(
                   children: [
-                    Image.asset(
-                      "assets/bd_flag.png",
-                      width: 28,
-                      height: 18,
-                    ),
+                    Image.asset("assets/bd_flag.png", width: 28, height: 18),
                     const SizedBox(width: 8),
                     const Icon(Icons.keyboard_arrow_down_rounded),
                     const SizedBox(width: 10),
-
                     const Text(
                       "+880",
                       style: TextStyle(
@@ -70,59 +155,145 @@ class _SignupScreenState extends State<SignupScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-
                     const SizedBox(width: 10),
-
                     Expanded(
                       child: TextField(
+                        controller: phoneController,
                         decoration: const InputDecoration(
                           hintText: "Your mobile number",
                           border: InputBorder.none,
                         ),
                         keyboardType: TextInputType.phone,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 15),
 
-              // Gender Dropdown
+              // Gender + Profile Image Row
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 55,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedGender,
+                          isExpanded: true,
+                          items: const [
+                            DropdownMenuItem(
+                              value: "male",
+                              child: Text("Male"),
+                            ),
+                            DropdownMenuItem(
+                              value: "female",
+                              child: Text("Female"),
+                            ),
+                            DropdownMenuItem(
+                              value: "other",
+                              child: Text("Other"),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              selectedGender = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Profile Image
+                  Expanded(
+                    child: Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: selectedImageBytes != null
+                                ? MemoryImage(selectedImageBytes!)
+                                : null,
+                            child: selectedImageBytes == null
+                                ? const Icon(
+                                    Icons.person,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  )
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: GestureDetector(
+                              onTap: pickImage,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF00A86B),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.all(6),
+                                child: const Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
               Container(
+                height: 55,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey.shade300),
                 ),
-                height: 55,
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selectedGender,
-                    items: const [
-                      DropdownMenuItem(value: "Gender", child: Text("Gender")),
-                      DropdownMenuItem(value: "Male", child: Text("Male")),
-                      DropdownMenuItem(value: "Female", child: Text("Female")),
-                      DropdownMenuItem(value: "Other", child: Text("Other")),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedGender = value!;
-                      });
-                    },
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: passwordController,
+                        obscureText: hidePassword,
+                        decoration: const InputDecoration(
+                          hintText: "Enter Your Password",
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          hidePassword = !hidePassword;
+                        });
+                      },
+                      child: Icon(
+                        hidePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 15),
-
-              // Password
-              _textField(
-                hint: "Password",
-                isPassword: true,
-                icon: Icons.lock_outline,
-              ),
-
               const SizedBox(height: 20),
 
               Row(
@@ -149,15 +320,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 25),
 
-              // Sign Up Button
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: register,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00A86B),
                     shape: RoundedRectangleBorder(
@@ -170,14 +339,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 22),
-
-              Center(child: Text("or", style: TextStyle(color: Colors.grey.shade600))),
-
+              Center(
+                child: Text(
+                  "or",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
               const SizedBox(height: 22),
-
-              // Social buttons in one row (icons only)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -186,25 +355,25 @@ class _SignupScreenState extends State<SignupScreen> {
                   _socialCircle("assets/apple.png"),
                 ],
               ),
-
               const SizedBox(height: 25),
-
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account? "),
                     GestureDetector(
-                      onTap: () =>  Get.to(()=> SignInScreen()),
+                      onTap: () => Get.to(() => SignInScreen()),
                       child: Text(
                         "Sign in",
-                        style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 30),
             ],
           ),
@@ -213,8 +382,13 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Custom TextField Widget
-  Widget _textField({required String hint, bool isPassword = false, IconData? icon}) {
+  // TextField with controller
+  Widget _textField({
+    required String hint,
+    TextEditingController? controller,
+    bool isPassword = false,
+    IconData? icon,
+  }) {
     return Container(
       height: 55,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -223,6 +397,7 @@ class _SignupScreenState extends State<SignupScreen> {
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
@@ -233,7 +408,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  // Social Circle Button
   Widget _socialCircle(String asset) {
     return Container(
       width: 48,
