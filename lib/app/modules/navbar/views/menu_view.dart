@@ -64,7 +64,7 @@ class MenuView extends GetView<NavbarController> {
               "Register Your Vehicle",
               route: Routes.REGISTER_VEHICLE,
             ),
-            _menuItem(Icons.history, "New"),
+            _menuItem(Icons.car_rental, "My Vehicle", route: Routes.MY_VEHICLE),
             _menuItem(Icons.report_problem_outlined, "Complain"),
             _menuItem(Icons.group_add_outlined, "Referral"),
             _menuItem(Icons.info_outline, "About Us"),

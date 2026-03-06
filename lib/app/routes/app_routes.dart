@@ -18,6 +18,7 @@ abstract class Routes {
   static const OFFER = _Paths.OFFER;
   static const WALLET = _Paths.WALLET;
   static const REGISTER_VEHICLE = _Paths.REGISTER_VEHICLE;
+  static const MY_VEHICLE = _Paths.MY_VEHICLE;
 }
 
 abstract class _Paths {
@@ -36,4 +37,5 @@ abstract class _Paths {
   static const OFFER = '/offer';
   static const WALLET = '/wallet';
   static const REGISTER_VEHICLE = '/register-vehicle';
+  static const MY_VEHICLE = '/my-vehicle';
 }

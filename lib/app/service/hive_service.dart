@@ -72,10 +72,10 @@ class HiveService {
   static Future<void> setRToken(String value) async {
     await Hive.box(_tokenBox).put("Rtoken", value);
   }
-  static Future<String> getToken() async {
+  static Future<String?> getToken() async {
     return await Hive.box(_tokenBox).get("token");
   }
-  static Future<String> getRToken() async {
+  static Future<String?> getRToken() async {
     return await Hive.box(_tokenBox).get("Rtoken");
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../controllers/register_vehicle_controller.dart';
 
 class RegisterVehicleView extends GetView<RegisterVehicleController> {
@@ -9,9 +8,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF8F6F9,
-      ), // Light background like screenshot
+      backgroundColor: const Color(0xFFF8F6F9),
 
       appBar: AppBar(
         title: const Text(
@@ -27,29 +24,53 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ================= OWNER INFO =================
             buildSectionCard(
               title: "Owner Information",
               children: [
-                appInput("Full Name"),
-                appInput("Phone Number", keyboard: TextInputType.phone),
-                appInput("Email", keyboard: TextInputType.emailAddress),
-                appInput("Address", maxLines: 3),
-                uploadButton("NID Card Photo (Optional)"),
+                appInput(
+                  "Full Name",
+                  onChanged: (v) => controller.fullName.value = v,
+                ),
+                appInput(
+                  "Phone Number",
+                  keyboard: TextInputType.phone,
+                  onChanged: (v) => controller.phone.value = v,
+                ),
+                appInput(
+                  "Email",
+                  keyboard: TextInputType.emailAddress,
+                  onChanged: (v) => controller.email.value = v,
+                ),
+                appInput(
+                  "Address",
+                  maxLines: 3,
+                  onChanged: (v) => controller.address.value = v,
+                ),
+
+                uploadButton("NID Card Photo (Optional)", "nid"),
               ],
             ),
 
+            // ================= VEHICLE BASIC =================
             buildSectionCard(
               title: "Vehicle Basic Information",
               children: [
                 dropdownField("Vehicle Type", [
-                  "Car",
-                  "Microbus",
+                  "Sedan",
                   "SUV",
-                  "Truck",
+                  "Hatchback",
+                  "Convertible",
+                  "Coupe",
                   "Pickup",
-                ]),
+                  "Minivan",
+                  "Crossover",
+                  "Van",
+                  "Truck",
+                  "Bus",
+                ], (v) => controller.vehicleType.value = v!),
+
                 dropdownField("Brand", [
                   "Toyota",
                   "Nissan",
@@ -57,15 +78,21 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                   "Suzuki",
                   "Hyundai",
                   "BMW",
-                ]),
-                appInput("Model"),
-                dropdownField("Seat Capacity", ["2", "4", "5", "7", "9", "12"]),
+                ], (v) => controller.brand.value = v!),
+
+                appInput("Model", onChanged: (v) => controller.model.value = v),
+
+                dropdownField(
+                  "Seat Capacity",
+                  List.generate(12, (i) => "${i + 1}"),
+                  (v) => controller.seatCapacity.value = v!,
+                ),
 
                 // AC Switch
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("AC Available?", style: TextStyle(fontSize: 16)),
+                    const Text("AC Available?"),
                     Obx(
                       () => Switch(
                         activeColor: const Color(0xFF00804B),
@@ -77,60 +104,90 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                 ),
 
                 dropdownField("Fuel Type", [
-                  "Petrol",
-                  "Octane",
-                  "Diesel",
-                  "CNG",
-                ]),
-                dropdownField("Gear Type", ["Automatic", "Manual"]),
+                  'Petrol',
+                  'Diesel',
+                  'Hybrid',
+                  'Electric',
+                ], (v) => controller.fuelType.value = v!),
+
+                dropdownField("Gear Type", [
+                  "Automatic",
+                  "Manual",
+                ], (v) => controller.gearType.value = v!),
+
                 dropdownField(
                   "Manufacture Year",
                   List.generate(26, (i) => (2000 + i).toString()),
+                  (v) => controller.manufactureYear.value = v!,
                 ),
               ],
             ),
 
+            // ================= REGISTRATION =================
             buildSectionCard(
               title: "Vehicle Registration Details",
               children: [
-                appInput("Registration Number"),
+                appInput(
+                  "Registration Number",
+                  onChanged: (v) => controller.registrationNumber.value = v,
+                ),
+
                 dropdownField(
                   "Registration Year",
                   List.generate(26, (i) => (2000 + i).toString()),
+                  (v) => controller.registrationYear.value = v!,
                 ),
-                uploadButton("Tax Token Photo"),
-                uploadButton("Registration Card Photo"),
+
+                uploadButton("Tax Token Photo", "tax"),
+
+                uploadButton("Registration Card Photo", "reg"),
               ],
             ),
 
+            // ================= DRIVER INFO =================
             buildSectionCard(
               title: "Driver Information",
               children: [
-                appInput("Driver Name"),
-                appInput("Driver Phone", keyboard: TextInputType.phone),
-                appInput("License Number"),
-                uploadButton("License Photo (Optional)"),
-                uploadButton("Driver Photo (Optional)"),
+                appInput(
+                  "Driver Name",
+                  onChanged: (v) => controller.driverName.value = v,
+                ),
+
+                appInput(
+                  "Driver Phone",
+                  keyboard: TextInputType.phone,
+                  onChanged: (v) => controller.driverPhone.value = v,
+                ),
+
+                appInput(
+                  "License Number",
+                  onChanged: (v) => controller.licenseNumber.value = v,
+                ),
+
+                uploadButton("License Photo (Optional)", "lic"),
+
+                uploadButton("Driver Photo (Optional)", "dri"),
               ],
             ),
 
+            // ================= VEHICLE IMAGES =================
             buildSectionCard(
               title: "Upload Vehicle Images",
               children: [
-                uploadButton("Front View"),
-                uploadButton("Side View"),
-                uploadButton("Back View"),
-                uploadButton("Interior"),
+                uploadButton("Front View", "front"),
+                uploadButton("Side View", "side"),
+                uploadButton("Back View", "back"),
+                uploadButton("Interior", "interior"),
               ],
             ),
 
             const SizedBox(height: 20),
 
-            // Submit Button
+            // ================= SUBMIT =================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Get.toNamed("/vehicle-register-success"),
+                onPressed: () => controller.uploadVehicle(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00804B),
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -153,7 +210,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
   }
 
   // ===========================================================
-  // Reusable SECTION CARD widget
+  // SECTION CARD
   // ===========================================================
 
   Widget buildSectionCard({
@@ -161,9 +218,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
     required List<Widget> children,
   }) {
     return Container(
-      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 20),
-
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -172,7 +227,6 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 1)),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -192,42 +246,43 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
   }
 
   // ===========================================================
-  // TextField
+  // INPUT FIELD
   // ===========================================================
 
   Widget appInput(
     String hint, {
     TextInputType keyboard = TextInputType.text,
     int maxLines = 1,
+    required Function(String) onChanged,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         keyboardType: keyboard,
         maxLines: maxLines,
+        onChanged: onChanged,
         decoration: InputDecoration(
           labelText: hint,
-          labelStyle: const TextStyle(color: Colors.black87),
           filled: true,
           fillColor: const Color(0xFFF5F5F5),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF00804B), width: 1.5),
-          ),
         ),
       ),
     );
   }
 
   // ===========================================================
-  // Dropdown
+  // DROPDOWN
   // ===========================================================
 
-  Widget dropdownField(String title, List<String> items) {
+  Widget dropdownField(
+    String title,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: DropdownButtonFormField(
+      child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           labelText: title,
           filled: true,
@@ -237,39 +292,36 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
         items: items
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
             .toList(),
-        onChanged: (v) {},
+        onChanged: onChanged,
       ),
     );
   }
 
   // ===========================================================
-  // Upload Button UI
+  // FILE UPLOAD BUTTON
   // ===========================================================
 
-  Widget uploadButton(String label) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF00804B),
-          style: BorderStyle.solid,
+  Widget uploadButton(String label, String key) {
+    return GestureDetector(
+      onTap: () async {
+        controller.filePICK(key);
+      },
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF00804B)),
+          color: const Color(0xFFE8F7EF),
         ),
-        color: const Color(0xFFE8F7EF),
-      ),
-
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-          const Icon(Icons.cloud_upload, color: Color(0xFF00804B), size: 28),
-        ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            const Icon(Icons.cloud_upload, color: Color(0xFF00804B)),
+          ],
+        ),
       ),
     );
   }

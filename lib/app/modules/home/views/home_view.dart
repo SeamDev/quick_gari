@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/home_controller.dart';
@@ -85,7 +84,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: () => showEditableAddressSheet(context, Routes.RIDE),
+              onPressed: () => Get.toNamed(Routes.RIDE),
               child: const Text(
                 'Ride',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -99,7 +98,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: () => showEditableAddressSheet(context, Routes.RIDE),
+              onPressed: () => Get.toNamed( Routes.RIDE),
               child: const Text(
                 'Load',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -154,211 +153,3 @@ class HomeView extends GetView<HomeController> {
   }
 }
 
-showEditableAddressSheet(BuildContext context, String routes) {
-  final startCtrl = TextEditingController(text: "Adabor Dhaka");
-  final endCtrl = TextEditingController(text: "Malopara Rajshahi");
-  final dateCtrl = TextEditingController(text: "12-05-2025");
-  final timeCtrl = TextEditingController(text: "12 : 05 AM");
-
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
-
-  Get.bottomSheet(
-    DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.35,
-      maxChildSize: 0.85,
-
-      builder: (context, controller) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: ListView(
-            controller: controller,
-            children: [
-              /// drag handle
-              Center(
-                child: Container(
-                  height: 5,
-                  width: 60,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-
-              const Text(
-                "Select address",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// Starting Point
-              _editableField(
-                icon: Icons.location_on,
-                iconColor: Colors.green,
-                label: "Starting Point",
-                controller: startCtrl,
-                borderColor: Colors.green,
-              ),
-
-              const SizedBox(height: 12),
-
-              /// Arrival Point
-              _editableField(
-                icon: Icons.location_on_outlined,
-                iconColor: Colors.red,
-                label: "Arrival Point",
-                controller: endCtrl,
-              ),
-
-              const SizedBox(height: 12),
-
-              /// Date Picker
-              _editableField(
-                icon: Icons.calendar_month,
-                iconColor: Colors.redAccent,
-                label: "Date",
-                controller: dateCtrl,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                    initialDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    dateCtrl.text =
-                        "${picked.day.toString().padLeft(2, '0')}-"
-                        "${picked.month.toString().padLeft(2, '0')}-"
-                        "${picked.year}";
-                    selectedDate = picked;
-                  }
-                },
-              ),
-
-              const SizedBox(height: 12),
-
-              /// Time Picker
-              _editableField(
-                icon: Icons.access_time,
-                iconColor: Colors.green,
-                label: "Time",
-                controller: timeCtrl,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    final hour = picked.hourOfPeriod == 0
-                        ? 12
-                        : picked.hourOfPeriod;
-                    final minute = picked.minute.toString().padLeft(2, '0');
-                    final period = picked.period == DayPeriod.am ? "AM" : "PM";
-
-                    timeCtrl.text = "$hour:$minute $period";
-                    selectedTime = picked;
-                  }
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              /// Continue Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007F4F),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: () async {
-                  //Get.back();
-
-                  final combinedDateTime = DateTime(
-                    selectedDate.year,
-                    selectedDate.month,
-                    selectedDate.day,
-                    selectedTime.hour,
-                    selectedTime.minute,
-                  );
-
-                  final requestBody = {
-                    "startLocation": "Rajshahi University",
-                    "endLocation": "Shaheb Bazar",
-                    "date":
-                        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
-                    "startTime": combinedDateTime.toUtc().toIso8601String(),
-                  };
-
-                  final response = await ApiService.rideSheet(requestBody);
-                  Get.toNamed(Routes.RIDE);
-                },
-                child: const Text(
-                  "Continue",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    ),
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    isDismissible: true,
-  );
-}
-
-Widget _editableField({
-  required IconData icon,
-  required Color iconColor,
-  required String label,
-  required TextEditingController controller,
-  bool readOnly = false,
-  VoidCallback? onTap,
-  Color borderColor = const Color(0xFFE0E0E0),
-}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      border: Border.all(color: borderColor),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      children: [
-        Icon(icon, color: iconColor),
-        const SizedBox(width: 12),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            readOnly: readOnly,
-            onTap: onTap,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              labelText: label,
-              labelStyle: const TextStyle(fontSize: 13, color: Colors.black54),
-            ),
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          ),
-        ),
-        if (controller.text.isNotEmpty)
-          GestureDetector(
-            onTap: () => controller.clear(),
-            child: const Icon(Icons.close, color: Colors.red, size: 18),
-          ),
-      ],
-    ),
-  );
-}

@@ -1,33 +1,86 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:quick_gari/app/modules/auth/views/verify.dart';
 import 'package:quick_gari/app/service/config.dart';
+import 'package:quick_gari/app/service/dio_logger.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
 import 'package:quick_gari/app/service/user.dart';
 
-var client = http.Client();
+// ==========================================
+// 1. DIO INITIALIZATION & INTERCEPTOR SETUP
+// ==========================================
+final dio =
+    Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+          contentType: Headers.jsonContentType,
+        ),
+      )
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) async {
+            // Check if this request opted out of needing auth (defaults to true)
+            bool requiresAuth = options.extra['requiresAuth'] ?? true;
 
+            // Only attach token if requiresAuth is true AND it doesn't already have one
+            if (requiresAuth && !options.headers.containsKey('Authorization')) {
+              final token = await HiveService.getToken();
+              if (token != null && token.toString().isNotEmpty) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+            }
+            return handler.next(options);
+          },
+          onError: (DioException error, handler) async {
+            // You can handle global 401 token refreshes here in the future
+            return handler.next(error);
+          },
+        ),
+      )
+      ..interceptors.add(DioLogger());
+
+// ==========================================
+// 2. API SERVICE CLASS
+// ==========================================
 class ApiService {
   static Future<bool> g() async {
     try {
-      var url = Uri.parse(Config.baseUrl + Config.apiVersion + Config.loginAPI);
+      var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
+      var response = await dio.post(url, data: {});
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({}),
-          )
-          .timeout(const Duration(seconds: 15));
+  // ==========================================
+  // Auth
+  // ==========================================
+
+  // Login (NO TOKEN NEEDED)
+  static Future<bool> login(String email, String password) async {
+    try {
+      var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
+      var response = await dio.post(
+        url,
+        data: {"email": email, "password": password},
+        options: Options(extra: {'requiresAuth': false}),
+      );
+
       if (response.statusCode == 200) {
+        final data = response.data;
+        User.fromJson(data["data"]);
+        HiveService.setToken(data["token"]["accessToken"]);
+        HiveService.setRToken(data["token"]["refreshToken"]);
+        HiveService.put("user", data["data"]);
         return true;
       } else {
+        debugPrint("Login failed");
         return false;
       }
     } catch (e) {
@@ -36,38 +89,8 @@ class ApiService {
     }
   }
 
-  //                                Auth
-  //Login
-  static Future<bool> login(String email, String password) async {
-    try {
-      var url = Uri.parse(Config.baseUrl + Config.apiVersion + Config.loginAPI);
+  // Register (NO TOKEN NEEDED)
 
-      var response = await client
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({"email": email, "password": password}),
-          )
-          .timeout(const Duration(seconds: 15));
-      print(response.body);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        User.fromJson(data["data"]);
-        HiveService.setToken(data["token"]["accessToken"]);
-        HiveService.setRToken(data["token"]["refreshToken"]);
-        HiveService.put("user", data["data"]);
-        return true;
-      } else {
-        print("Login failed");
-        return false;
-      }
-    } catch (e) {
-      print("ERROR: $e");
-      return false;
-    }
-  }
-
-  //Rigister
   static Future<bool> register(
     String name,
     String email,
@@ -77,28 +100,30 @@ class ApiService {
     String password,
   ) async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.registerAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.registerAPI;
+
+      // 1. Convert the image bytes to a Base64 string if it exists
+      String? base64Image;
+      if (image != null) {
+        // Sometimes backends require the data URI prefix: "data:image/jpeg;base64,"
+        base64Image = "data:image/jpeg;base64,${base64Encode(image)}";
+      }
+
+      var response = await dio.post(
+        url,
+        data: {
+          "name": name,
+          "email": email,
+          "password": password,
+          "phoneNumber": number,
+          "gender": gender,
+          "avater": base64Image, // Send as a string!
+        },
+        options: Options(extra: {'requiresAuth': false}),
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              "name": name,
-              "email": email,
-              "password": password,
-              "phoneNumber": number,
-              "gender": gender,
-              "avater": image,
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-
       if (response.statusCode == 201) {
-        Map data = jsonDecode(response.body);
-
+        Map data = response.data;
         Get.to(
           () => VerifyOtpScreen(
             phoneNumber: email,
@@ -106,655 +131,426 @@ class ApiService {
           ),
         );
         return true;
-      } else {
-        print("Login failed ${response.body}");
-        return false;
       }
+      return false;
     } catch (e) {
-      print("ERROR: $e");
+      if (e is DioException) {
+        debugPrint("Backend Error Data: ${e.response?.data}");
+      } else {
+        debugPrint("ERROR: $e");
+      }
       return false;
     }
   }
 
-  //verify Code
+  // Verify Code (USES SPECIFIC TOKEN)
   static Future<bool> verifyOTP(String token, String otp) async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.verifyOTPAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.verifyOTPAPI;
+
+      var response = await dio.post(
+        url,
+        options: Options(
+          // Since we manually add Authorization here, the interceptor will NOT overwrite it
+          headers: {'Authorization': 'Bearer $token'},
+        ),
+        data: {"otp": otp},
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode({"otp": otp}),
-          )
-          .timeout(const Duration(seconds: 15));
-
-      print(response.body);
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      debugPrint("${response.data}");
+      return response.statusCode == 200;
     } catch (e) {
-      print("ERROR: $e");
+      debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Resend Code
+  // Resend Code (USES SPECIFIC TOKEN)
   static Future<bool> reSendOTP(String token) async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.reSendOTPAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.reSendOTPAPI;
+
+      var response = await dio.post(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
-      print("ERROR: $e");
+      debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //getUser
+  // Get User (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getUser() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.getUserAPI,
-      );
+      var url = Config.baseUrl + Config.apiVersion + Config.getUserAPI;
+      var response = await dio.get(url);
 
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = response.data;
         User.fromJson(data["data"]);
         HiveService.put("user", data["data"]);
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //                              Car
-  //Register Car
-  static Future<bool> registerCar() async {
+  // ==========================================
+  // Car
+  // ==========================================
+
+  // Register Car (TOKEN AUTOMATICALLY INJECTED)
+  static Future<bool> registerCar(Map body) async {
     try {
-      var url = Uri.parse(Config.baseUrl + Config.apiVersion + Config.carAPI);
+      var url = Config.baseUrl + Config.apiVersion + Config.carAPI;
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "taxTokenPhoto": "",
-              "drivingLicensePhoto": "",
-              "images": "",
-              "registrationCardPhoto": "",
-              "data": {
-                "carName": "Toyota Corolla 2020",
-                "features": {
-                  "vehicleType": "Sedan",
-                  "model": "Corolla",
-                  "brand": "Toyota",
-                  "fuelType": "Petrol",
-                  "gearType": "Automatic",
-                  "seatCapacity": 5,
-                  "manufactureYear": 2020,
-                },
-                "vehicleRegistration": {
-                  "registrationNumber": "DHAKA-MA-11-2234",
-                  "registration": 2020,
-                },
-              },
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
+      Map<String, dynamic> formDataMap = {};
+
+      // Text Data
+      formDataMap['data'] = jsonEncode(body["data"]);
+
+      // File helper
+      void addFileToMap(Map<String, dynamic>? file, String fieldName) {
+        if (file != null && file['bytes'] != null) {
+          final Uint8List bytes = file['bytes'];
+          final String ext = file['extension'] ?? 'jpg';
+          formDataMap[fieldName] = MultipartFile.fromBytes(
+            bytes,
+            filename: "$fieldName.$ext",
+          );
+        }
       }
+
+      addFileToMap(body["taxTokenPhoto"], "taxTokenPhoto");
+      addFileToMap(body["registrationCardPhoto"], "registrationCardPhoto");
+      addFileToMap(body["drivingLicensePhoto"], "drivingLicensePhoto");
+
+      // Multiple Images
+      List images = body["images"] ?? [];
+      List<MultipartFile> imageFiles = [];
+
+      for (var img in images) {
+        if (img != null && img['bytes'] != null) {
+          final Uint8List bytes = img['bytes'];
+          final String ext = img['extension'] ?? 'jpg';
+          imageFiles.add(
+            MultipartFile.fromBytes(bytes, filename: "car_image.$ext"),
+          );
+        }
+      }
+
+      if (imageFiles.isNotEmpty) {
+        formDataMap["images"] = imageFiles;
+      }
+
+      FormData formData = FormData.fromMap(formDataMap);
+
+      var response = await dio.post(url, data: formData);
+
+      debugPrint("Status: ${response.statusCode}");
+      debugPrint("Response: ${response.data}");
+
+      return response.statusCode == 201;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Update a Car
+  // Update a Car (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> updateCar() async {
     try {
-      var url = Uri.parse(
-        "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/id--",
+      var url = "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/id--";
+
+      var response = await dio.patch(
+        url,
+        data: {
+          "taxTokenPhoto": "",
+          "drivingLicensePhoto": "",
+          "images": "",
+          "registrationCardPhoto": "",
+          "data": {
+            "carName": "Toyota Corolla 2020",
+            "features": {
+              "vehicleType": "Sedan",
+              "model": "Corolla",
+              "brand": "Toyota",
+              "fuelType": "Petrol",
+              "gearType": "Automatic",
+              "seatCapacity": 5,
+              "manufactureYear": 2020,
+            },
+            "vehicleRegistration": {
+              "registrationNumber": "DHAKA-MA-11-2234",
+              "registration": 2020,
+            },
+          },
+        },
       );
 
-      var response = await client
-          .patch(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "taxTokenPhoto": "",
-              "drivingLicensePhoto": "",
-              "images": "",
-              "registrationCardPhoto": "",
-              "data": {
-                "carName": "Toyota Corolla 2020",
-                "features": {
-                  "vehicleType": "Sedan",
-                  "model": "Corolla",
-                  "brand": "Toyota",
-                  "fuelType": "Petrol",
-                  "gearType": "Automatic",
-                  "seatCapacity": 5,
-                  "manufactureYear": 2020,
-                },
-                "vehicleRegistration": {
-                  "registrationNumber": "DHAKA-MA-11-2234",
-                  "registration": 2020,
-                },
-              },
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // Get All Car List
+  // Get All Car List (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getAllCar() async {
     try {
-      var url = Uri.parse(Config.baseUrl + Config.apiVersion + Config.carAPI);
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url = Config.baseUrl + Config.apiVersion + Config.carAPI;
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Approved a Car
+  // Approved a Car (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> approvedCar() async {
     try {
-      var url = Uri.parse("${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/698b0d428a0e47d876e665a7/approve");
-
-      var response = await client
-          .patch(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ',
-            },
-            body: jsonEncode({}),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/698b0d428a0e47d876e665a7/approve";
+      var response = await dio.patch(url, data: {});
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // GEt Approved Car List
+  // GEt Approved Car List (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getApprovedCar() async {
     try {
-      var url = Uri.parse("${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/approved");
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/approved";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // Get Car BY ID
+  // Get Car BY ID (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getCarByID() async {
     try {
-      var url = Uri.parse("${Config.baseUrl}${Config.apiVersion}${Config.loginAPI}/697edd2e776ffda4ab3d5b84");
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.loginAPI}/697edd2e776ffda4ab3d5b84";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // Get Car BY ID
+  // Get Car BY ID For Admin (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getCarByIDForAdmin() async {
     try {
-      var url = Uri.parse("${Config.baseUrl}${Config.apiVersion}${Config.loginAPI}/admin/698ad1e0f7e407ff0cacab2c");
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.loginAPI}/admin/698ad1e0f7e407ff0cacab2c";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //                              Ride
-  // Request For a Ride
+  // ==========================================
+  // Ride
+  // ==========================================
+
+  // Request For a Ride (TOKEN AUTOMATICALLY INJECTED)
   static Future<dynamic> rideSheet(dynamic body) async {
     try {
-      var url = Uri.parse(Config.baseUrl + Config.apiVersion + Config.rideAPI);
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${await HiveService.getToken()}',
-            },
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 15));
+      var url = Config.baseUrl + Config.apiVersion + Config.rideAPI;
+      var response = await dio.post(url, data: body);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        //HiveService.put("user", data["data"]);
-        print(data);
-        return true;
-      } else {
-        print("Login failed ${response.body}");
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
-      print("ERROR: $e");
+      debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // Send Proposal For a Ride
+  // Send Proposal For a Ride (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> sendProposalForRide() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.rideProposalAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.rideProposalAPI;
+
+      var response = await dio.post(
+        url,
+        data: {
+          "rideId": "69a2cf2d0e9808e22b83289c",
+          "fare": "200",
+          "message": "Hello There i am available for this period",
+        },
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "rideId": "69a2cf2d0e9808e22b83289c",
-              "fare": "200",
-              "message": "Hello There i am available for this period",
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  // Send Proposal For a Ride
+  // Accept Proposal (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> acceptProposal() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.acceptProposalAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.acceptProposalAPI;
+
+      var response = await dio.post(
+        url,
+        data: {
+          "rideId": "69a31106061621a0432d5c99",
+          "proposalId": "69a31131061621a0432d5ca2",
+        },
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "rideId": "69a31106061621a0432d5c99",
-              "proposalId": "69a31131061621a0432d5ca2",
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Get MY Ride Proposal
-  static Future<bool> getMyRideProposal() async {
+  // Get MY Ride Proposal (TOKEN AUTOMATICALLY INJECTED)
+  static Future<bool> getMyRideProposal(String rideID) async {
     try {
-      var url = Uri.parse(
-        "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/69a31106061621a0432d5c99/proposals/",
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/$rideID/proposals/";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Get MY Ride Proposal
-  static Future<bool> getRideByIDProposal() async {
+  // Get Ride BY ID Proposal (TOKEN AUTOMATICALLY INJECTED)
+  static Future<bool> getRideByID(String rideID) async {
     try {
-      var url = Uri.parse(
-        "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/69a31106061621a0432d5c99/",
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/$rideID/";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //                    Return
-  //ReturnTrip
+  // ==========================================
+  // Return
+  // ==========================================
+
+  // ReturnTrip (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> returnTrip() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.returnTripAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
+
+      var response = await dio.post(
+        url,
+        data: {
+          "startLocation": "Rajshahi University",
+          "endLocation": "Shaheb Bazar",
+          "date": "2026-02-10",
+          "startTime": "2026-02-01T10:30:00.000Z",
+          "fare": 500,
+        },
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "startLocation": "Rajshahi University",
-              "endLocation": "Shaheb Bazar",
-              "date": "2026-02-10",
-              "startTime": "2026-02-01T10:30:00.000Z",
-              "fare": 500,
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //GetAllAvailable Trip
+  // GetAllAvailable Trip (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> returnAllTrip() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.returnTripAPI,
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //                  Share Vehicle
-  //Create Share Vehicle
+  // ==========================================
+  // Share Vehicle
+  // ==========================================
+
+  // Create Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> createShareVehicle() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.shareVehicleAPI,
+      var url = Config.baseUrl + Config.apiVersion + Config.shareVehicleAPI;
+
+      var response = await dio.post(
+        url,
+        data: {
+          "journeyDate": "2026-02-25",
+          "stops": [
+            {"location": "Rajshahi", "arrivalTime": "08:00 AM", "order": 0},
+            {"location": "Natore", "arrivalTime": "09:30 AM", "order": 1},
+            {"location": "Bogura", "arrivalTime": "11:00 AM", "order": 2},
+          ],
+          "perSeatFare": 250,
+        },
       );
 
-      var response = await client
-          .post(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-            body: jsonEncode({
-              "journeyDate": "2026-02-25",
-              "stops": [
-                {"location": "Rajshahi", "arrivalTime": "08:00 AM", "order": 0},
-                {"location": "Natore", "arrivalTime": "09:30 AM", "order": 1},
-                {"location": "Bogura", "arrivalTime": "11:00 AM", "order": 2},
-              ],
-              "perSeatFare": 250,
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //Get Available Share Vehicle
+  // Get Available Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getAvShVehicle() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.shareVAvailableAPI,
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url = Config.baseUrl + Config.apiVersion + Config.shareVAvailableAPI;
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //get Driver Share Vehicle
+  // Get Driver Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getDrShVehicle() async {
     try {
-      var url = Uri.parse(
-        Config.baseUrl + Config.apiVersion + Config.shareVDriverAPI,
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url = Config.baseUrl + Config.apiVersion + Config.shareVDriverAPI;
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
 
-  //get Share Vehicle BY ID
+  // Get Share Vehicle BY ID (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getShVehicleByID() async {
     try {
-      var url = Uri.parse(
-        "${Config.baseUrl}${Config.apiVersion}${Config.shareVehicleAPI}/699bf590be2911b89c1b23da",
-      );
-
-      var response = await client
-          .get(
-            url,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ${HiveService.getToken()}',
-            },
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.shareVehicleAPI}/699bf590be2911b89c1b23da";
+      var response = await dio.get(url);
+      return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
     }
   }
-
-  ///
-  ///
 }

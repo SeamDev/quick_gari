@@ -37,9 +37,10 @@ dependencies:
   get: ^4.7.2
   url_launcher: ^6.3.2
   flutter_advanced_drawer: ^1.5.0
-  http: ^1.6.0
   hive_flutter: ^1.1.0
   file_picker: ^10.3.10
+  dio: ^5.9.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

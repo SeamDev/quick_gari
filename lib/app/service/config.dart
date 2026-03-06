@@ -1,6 +1,6 @@
 class Config {
   static const String appName = "";
-  static const String baseUrl = "http://127.0.0.1:3000";
+  static const String baseUrl = "https://quick-gari.onrender.com";//"http://127.0.0.1:3000";
   static const String apiVersion = "/api/v1";
   //Auth
   static const String loginAPI = "/auth/signin";

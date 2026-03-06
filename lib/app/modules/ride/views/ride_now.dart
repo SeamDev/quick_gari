@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/ride/controllers/ride_now_controller.dart';
 import 'package:quick_gari/app/modules/ride/views/rent.dart';
 
 class CarDetailPage extends StatelessWidget {
-  const CarDetailPage({super.key});
-
+  CarDetailPage({super.key});
+  final controller = Get.put(RideNowController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,63 +25,68 @@ class CarDetailPage extends StatelessWidget {
         title: const Text("Back", style: TextStyle(color: Colors.black)),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title
-            const Text(
-              "Mustang Shelby GT",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            ),
-
-            const SizedBox(height: 6),
-
-            // Rating
-            Row(
-              children: const [
-                Icon(Icons.star, color: Colors.amber, size: 18),
-                SizedBox(width: 4),
-                Text("4.9", style: TextStyle(fontSize: 14)),
-                SizedBox(width: 4),
-                Text(
-                  "(531 reviews)",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Car image + arrows
-            SizedBox(
-              height: 180,
-              child: Row(
+      body: controller.isLoading.value
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Left arrow
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.arrow_left, size: 40),
+                  // Title
+                  const Text(
+                    "Mustang Shelby GT",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                   ),
 
-                  Expanded(
-                    child: Image.asset("assets/car3.png", fit: BoxFit.contain),
+                  const SizedBox(height: 6),
+
+                  // Rating
+                  Row(
+                    children: const [
+                      Icon(Icons.star, color: Colors.amber, size: 18),
+                      SizedBox(width: 4),
+                      Text("4.9", style: TextStyle(fontSize: 14)),
+                      SizedBox(width: 4),
+                      Text(
+                        "(531 reviews)",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ],
                   ),
 
-                  // Right arrow
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.arrow_right, size: 40),
+                  const SizedBox(height: 20),
+
+                  // Car image + arrows
+                  SizedBox(
+                    height: 180,
+                    child: Row(
+                      children: [
+                        // Left arrow
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.arrow_left, size: 40),
+                        ),
+
+                        Expanded(
+                          child: Image.asset(
+                            "assets/car3.png",
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+
+                        // Right arrow
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.arrow_right, size: 40),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
 
-            const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-            // Specifications Title
-            /*const Text(
+                  // Specifications Title
+                  /*const Text(
               "Specifications",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
@@ -100,117 +106,124 @@ class CarDetailPage extends StatelessWidget {
 
             const SizedBox(height: 24),*/
 
-            // Car features Title
-            const Text(
-              "Car features",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            const FeatureItem(title: "Model", value: "GT5000"),
-            const FeatureItem(title: "Seat Capacity", value: "3 seat"),
-            const FeatureItem(title: "AC Available", value: "Yes"),
-            const FeatureItem(title: "Fuel type", value: "Octane"),
-            const FeatureItem(title: "Gear type", value: "Automatic"),
-
-            const SizedBox(height: 12),
-
-            // Driver Information
-            const Text(
-              "Driver Info.",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Image.asset("assets/driver.png", width: 100, height: 100),
-                    Text(
-                      "Driver Name :  Abdul  mannan",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    Text(
-                      " Experience :   4th year",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF007F4F)),
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Get.to("");
-                    },
-                    child: const Text(
-                      "Book later",
-                      style: TextStyle(fontSize: 16, color: Color(0xFF007F4F)),
+                  // Car features Title
+                  const Text(
+                    "Car features",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black54,
                     ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF007F4F),
 
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    onPressed: () => Get.to(() => RequestForRentPage()),
-                    child: const Text(
-                      'Ride Now',
-                      style: TextStyle(fontSize: 22, color: Colors.white),
+                  const SizedBox(height: 12),
+
+                  const FeatureItem(title: "Model", value: "GT5000"),
+                  const FeatureItem(title: "Seat Capacity", value: "3 seat"),
+                  const FeatureItem(title: "AC Available", value: "Yes"),
+                  const FeatureItem(title: "Fuel type", value: "Octane"),
+                  const FeatureItem(title: "Gear type", value: "Automatic"),
+
+                  const SizedBox(height: 12),
+
+                  // Driver Information
+                  const Text(
+                    "Driver Info.",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black54,
                     ),
                   ),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
+                  const SizedBox(height: 12),
+
+                  Center(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.green),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            "assets/driver.png",
+                            width: 100,
+                            height: 100,
+                          ),
+                          Text(
+                            "Driver Name :  Abdul  mannan",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Text(
+                            " Experience :   4th year",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF007F4F)),
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            Get.to("");
+                          },
+                          child: const Text(
+                            "Book later",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF007F4F),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF007F4F),
+
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: () => Get.to(() => RequestForRentPage()),
+                          child: const Text(
+                            'Ride Now',
+                            style: TextStyle(fontSize: 22, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
     );
   }
 }
