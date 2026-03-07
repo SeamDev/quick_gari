@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:quick_gari/app/modules/return/views/filter_bottom.dart';
 import 'package:quick_gari/app/modules/return/views/vehicle_detail.dart';
-import 'package:quick_gari/app/routes/app_pages.dart';
 
 import '../controllers/return_controller.dart';
 
@@ -15,10 +15,13 @@ class ReturnView extends GetView<ReturnController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
       appBar: AppBar(
-        leadingWidth: 20,
+        leadingWidth: 30,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 26),
+          icon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.arrow_back_ios, color: Colors.white, size: 26),
+          ),
         ),
         title: Text(
           'Back',
@@ -32,7 +35,7 @@ class ReturnView extends GetView<ReturnController> {
         foregroundColor: Colors.white,
         actions: [
           GestureDetector(
-            onTap: () => showEditableAddressSheet(context, Routes.RETURN),
+            onTap: () => showEditableAddressSheet(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -41,49 +44,50 @@ class ReturnView extends GetView<ReturnController> {
               ),
               child: Row(
                 children: const [
-                  Text('Trip Filter', style: TextStyle(color: Colors.black87)),
+                  Text('Create', style: TextStyle(color: Colors.black87)),
                   SizedBox(width: 6),
-                  Icon(Icons.filter_list, color: Colors.black54),
+                  Icon(Icons.add, color: Colors.black54),
+                  SizedBox(width: 6),
                 ],
               ),
             ),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
+      body: GetBuilder<ReturnController>(
+        builder: (_) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
 
-            const Text(
-              "18 cars found",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+                Text(
+                  "${controller.data.length} cars found",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+
+                const SizedBox(height: 12),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: controller.data.length,
+                    itemBuilder: (context, index) {
+                      final data = controller.data[index];
+                      return vehicleCard(data);
+                    },
+                  ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 12),
-
-            Expanded(
-              child: ListView(
-                children: [
-                  const SizedBox(height: 16),
-                  vehicleCard(),
-                  const SizedBox(height: 16),
-                  vehicleCard(),
-                  const SizedBox(height: 16),
-                  vehicleCard(),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget vehicleCard() {
+  Widget vehicleCard(Map<dynamic, dynamic> data) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -95,8 +99,8 @@ class ReturnView extends GetView<ReturnController> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           /// Car Image
-          Image.asset(
-            "assets/car1.png", // replace with your image
+          Image.network(
+            data["car"]?["features"]?["images"]?[0] ?? "assets/car1.png",
             height: 120,
             fit: BoxFit.contain,
           ),
@@ -104,16 +108,16 @@ class ReturnView extends GetView<ReturnController> {
           const SizedBox(height: 12),
 
           /// Car Name
-          const Text(
-            "BMW 1 Cabrio",
+          Text(
+            "${data["car"]["carName"]}",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 4),
 
           /// AC + Seat
-          const Text(
-            "AC | 3 Seat",
+          Text(
+            "${data["car"]?["features"]?["seatCapacity"]} Seat",
             style: TextStyle(color: Colors.black87, fontSize: 13),
           ),
 
@@ -132,7 +136,7 @@ class ReturnView extends GetView<ReturnController> {
             icon: Icons.circle,
             iconColor: Colors.green,
             title: "Starting Area",
-            value: "Rajshahi University",
+            value: "${data["startLocation"]}",
           ),
 
           const SizedBox(height: 8),
@@ -142,7 +146,7 @@ class ReturnView extends GetView<ReturnController> {
             icon: Icons.location_on,
             iconColor: Colors.green,
             title: "Ending Area",
-            value: "Mirpur 11, Dhaka",
+            value: "${data["endLocation"]}",
           ),
 
           const SizedBox(height: 8),
@@ -152,7 +156,11 @@ class ReturnView extends GetView<ReturnController> {
             icon: Icons.calendar_month,
             iconColor: Colors.redAccent,
             title: "Date & Time",
-            value: "29-06-2025   08:35 AM",
+            value: DateFormat("dd-MM-yyyy   hh:mm a").format(
+              DateTime.parse(
+                data["startTime"] ?? "2026-03-04T13:23:00.000Z",
+              ).toLocal(),
+            ),
           ),
 
           const SizedBox(height: 14),
@@ -160,7 +168,7 @@ class ReturnView extends GetView<ReturnController> {
           /// Fare
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(Icons.currency_exchange, color: Colors.green),
               SizedBox(width: 8),
               Text(
@@ -168,7 +176,7 @@ class ReturnView extends GetView<ReturnController> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               Text(
-                "8500",
+                "${data["fare"]}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.green,
@@ -191,7 +199,7 @@ class ReturnView extends GetView<ReturnController> {
               minimumSize: Size(300, 50),
             ),
             onPressed: () {
-              Get.to(() => CarDetailsView());
+              Get.to(() => CarDetailsView(data));
             },
             child: const Text(
               "Vehicle Details & Booking",

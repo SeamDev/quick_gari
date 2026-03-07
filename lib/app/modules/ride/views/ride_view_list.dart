@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
 import '../controllers/ride_controller.dart';
 
 class RideViewList extends GetView<RideController> {
@@ -173,7 +172,7 @@ class RideViewList extends GetView<RideController> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () => Get.to(() => CarDetailPage()),
+                  onPressed: (){},
                   child: const Text(
                     'Ride Now',
                     style: TextStyle(fontSize: 22, color: Colors.white),

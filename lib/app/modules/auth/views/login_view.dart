@@ -19,18 +19,17 @@ class _SignInScreenState extends State<SignInScreen> {
   void login() async {
     final phone = phoneController.text.trim();
     final password = passwordController.text.trim();
-    try {
-      bool success = await ApiService.login(phone, password);
 
-      if (success) {
-        Get.offAllNamed(Routes.NAVBAR);
-      } else {
+    bool success = await ApiService.login(phone, password);
+
+    if (success) {
+      Get.offAllNamed(Routes.NAVBAR);
+    } else {
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Login Failed")));
+        ).showSnackBar(SnackBar(content: Text("Invalid email or password")));
       }
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -164,7 +163,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               // Gmail
               _socialButton(
-                icon: "assets/Gmail.png",
+                icon: "assets/gmail.png",
                 text: "Sign up with Gmail",
                 onTap: () {},
               ),
@@ -182,7 +181,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               // Apple
               _socialButton(
-                icon: "assets/Apple.png",
+                icon: "assets/apple.png",
                 text: "Sign up with Apple",
                 onTap: () {},
               ),

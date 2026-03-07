@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:get/utils.dart';
+import 'package:intl/intl.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 
-
-void showPaymentSuccessDialog(BuildContext context) {
+void showPaymentSuccessDialog(BuildContext context, int data) {
   showDialog(
     context: context,
-    //barrierDismissible: false,
-    builder: (_) => const PaymentSuccessDialog(),
+    barrierDismissible: false,
+    builder: (_) => PaymentSuccessDialog(data),
   );
 }
 
-
 class ConfirmBookingView extends StatelessWidget {
-  const ConfirmBookingView({super.key});
+  final Map<dynamic, dynamic> data;
+  const ConfirmBookingView(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leadingWidth: 30,
         leading: const BackButton(),
-        title: const Text(''),
+        title: const Text('Booking'),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -42,33 +46,37 @@ class ConfirmBookingView extends StatelessWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'Toyota Axio II Sedan',
+                          '${data["car"]["carName"]}',
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.star,
-                                color: Colors.orange, size: 14),
+                            Icon(Icons.star, color: Colors.orange, size: 14),
                             SizedBox(width: 4),
                             Text(
                               '4.9 (531 reviews)',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  Image.asset(
-                    'assets/car3.png',
+                  Image.network(
+                    data["car"]?["features"]?["images"]?[0] ??
+                        'assets/car3.png',
                     height: 45,
                     fit: BoxFit.contain,
-                  )
+                  ),
                 ],
               ),
             ),
@@ -80,7 +88,7 @@ class ConfirmBookingView extends StatelessWidget {
               icon: Icons.location_on,
               iconColor: Colors.red,
               title: 'Starting point',
-              value: 'Rajshahi university',
+              value: '${data["startLocation"]}',
             ),
 
             const SizedBox(height: 12),
@@ -90,7 +98,7 @@ class ConfirmBookingView extends StatelessWidget {
               icon: Icons.location_on,
               iconColor: Colors.green,
               title: 'Ending point',
-              value: 'Dhaka mirpur 11',
+              value: '${data["endLocation"]}',
               trailing: const Text(
                 '1.1km',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -99,9 +107,19 @@ class ConfirmBookingView extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            _infoBox('Date', '05-07-2025'),
+            _infoBox(
+              'Date',
+              DateFormat('dd-MM-yyyy').format(
+                DateTime.parse(data["startTime"] ?? "2000-01-01T00:00:00.000Z"),
+              ),
+            ),
             const SizedBox(height: 10),
-            _infoBox('Time', '11:30 AM'),
+            _infoBox(
+              'Time',
+              DateFormat('hh-mm a').format(
+                DateTime.parse(data["startTime"] ?? "2000-01-01T00:00:00.000Z"),
+              ),
+            ),
 
             const SizedBox(height: 16),
 
@@ -131,15 +149,10 @@ class ConfirmBookingView extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _fareRow('Driver Fare', '৳', '4500'),
-                  _fareRow('Service Fee', '৳', '225'),
+                  _fareRow('Driver Fare', '৳', '${data["fare"]}'),
+                  _fareRow('Service Fee', '৳', '${data["fare"]}'),
                   const Divider(),
-                  _fareRow(
-                    'Total',
-                    '৳',
-                    '4725',
-                    bold: true,
-                  ),
+                  _fareRow('Total', '৳', '${data["fare"]}', bold: true),
                 ],
               ),
             ),
@@ -157,10 +170,11 @@ class ConfirmBookingView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () => showPaymentSuccessDialog(context),
+                onPressed: () =>
+                    showPaymentSuccessDialog(context, data["fare"]),
                 child: const Text(
                   'Confirm Booking',
-                  style: TextStyle(fontSize: 16,color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ),
@@ -188,12 +202,12 @@ class ConfirmBookingView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 12, color: Colors.grey)),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
               const SizedBox(height: 2),
-              Text(value,
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
             ],
           ),
         ),
@@ -232,16 +246,21 @@ class ConfirmBookingView extends StatelessWidget {
     );
   }
 
-  Widget _fareRow(String title, String symbol, String value,
-      {bool bold = false}) {
+  Widget _fareRow(
+    String title,
+    String symbol,
+    String value, {
+    bool bold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style:
-                  TextStyle(fontWeight: bold ? FontWeight.w600 : null)),
+          Text(
+            title,
+            style: TextStyle(fontWeight: bold ? FontWeight.w600 : null),
+          ),
           Text(
             '$symbol $value',
             style: TextStyle(fontWeight: bold ? FontWeight.w600 : null),
@@ -252,9 +271,9 @@ class ConfirmBookingView extends StatelessWidget {
   }
 }
 
-
 class PaymentSuccessDialog extends StatelessWidget {
-  const PaymentSuccessDialog({super.key});
+  final int data;
+  const PaymentSuccessDialog(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -287,10 +306,7 @@ class PaymentSuccessDialog extends StatelessWidget {
 
                 const Text(
                   'Payment Success',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 8),
@@ -303,18 +319,12 @@ class PaymentSuccessDialog extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                const Text(
-                  'Amount',
-                  style: TextStyle(color: Colors.grey),
-                ),
+                const Text('Amount', style: TextStyle(color: Colors.grey)),
                 const SizedBox(height: 6),
 
-                const Text(
-                  '\$220',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Text(
+                  '\$${data.toString()}',
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 20),
@@ -338,10 +348,7 @@ class PaymentSuccessDialog extends StatelessWidget {
 
                 const Text(
                   'How is your trip?',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 ),
 
                 const SizedBox(height: 6),
@@ -366,25 +373,15 @@ class PaymentSuccessDialog extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Get.offAllNamed(Routes.NAVBAR);
                     },
                     child: const Text(
                       'Please Feedback',
-                      style: TextStyle(fontSize: 16,color: Colors.white),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-
-          // Close button
-          Positioned(
-            top: 10,
-            right: 10,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              child: const Icon(Icons.close, size: 22),
             ),
           ),
         ],

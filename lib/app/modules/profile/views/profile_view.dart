@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/hive_service.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -24,7 +25,10 @@ class ProfileView extends GetView<ProfileController> {
         elevation: 0,
         actions: [
           GestureDetector(
-            onTap: () => Get.toNamed(Routes.AUTH),
+            onTap: () {
+              HiveService.clear();
+              Get.offAllNamed(Routes.AUTH);
+            },
             child: Padding(
               padding: EdgeInsets.only(right: 16),
               child: Center(

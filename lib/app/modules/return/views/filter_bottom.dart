@@ -1,12 +1,17 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 
-showEditableAddressSheet(BuildContext context, String routes) {
+showEditableAddressSheet(BuildContext context) {
   final startCtrl = TextEditingController(text: "Adabor Dhaka");
   final endCtrl = TextEditingController(text: "Malopara Rajshahi");
+  final fareCtrl = TextEditingController(text: "01");
   final dateCtrl = TextEditingController(text: "12-05-2025");
   final timeCtrl = TextEditingController(text: "12 : 05 AM");
+
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
   Get.bottomSheet(
     Container(
@@ -54,6 +59,15 @@ showEditableAddressSheet(BuildContext context, String routes) {
             iconColor: Colors.red,
             label: "Arrival Point",
             controller: endCtrl,
+          ),
+
+          const SizedBox(height: 12),
+
+          _editableField(
+            icon: Icons.money,
+            iconColor: Colors.green,
+            label: "Fare",
+            controller: fareCtrl,
           ),
 
           const SizedBox(height: 12),
@@ -109,17 +123,30 @@ showEditableAddressSheet(BuildContext context, String routes) {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            onPressed: () {
-              Get.back();
-              Get.toNamed(
-                routes,
-                arguments: {
-                  "start": startCtrl.text,
-                  "end": endCtrl.text,
-                  "date": dateCtrl.text,
-                  "time": timeCtrl.text,
-                },
+            onPressed: () async {
+              final combinedDateTime = DateTime(
+                selectedDate.year,
+                selectedDate.month,
+                selectedDate.day,
+                selectedTime.hour,
+                selectedTime.minute,
               );
+
+              final requestBody = {
+                "startLocation": startCtrl.text,
+                "endLocation": endCtrl.text,
+                "fare": int.parse(fareCtrl.text),
+                "date":
+                    "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                "startTime": combinedDateTime.toUtc().toIso8601String(),
+              };
+              bool res = await ApiService.createReturnTrip(requestBody);
+              if (res) {
+                Get.snackbar("Create Return", "Return Created Successfully !");
+              } else {
+                Get.snackbar("Create Return", "Return Creating Failed !");
+              }
+              Get.offAllNamed(Routes.NAVBAR);
             },
             child: const Text(
               "Continue",

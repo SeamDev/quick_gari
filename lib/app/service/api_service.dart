@@ -7,7 +7,6 @@ import 'package:quick_gari/app/modules/auth/views/verify.dart';
 import 'package:quick_gari/app/service/config.dart';
 import 'package:quick_gari/app/service/dio_logger.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
-import 'package:quick_gari/app/service/user.dart';
 
 // ==========================================
 // 1. DIO INITIALIZATION & INTERCEPTOR SETUP
@@ -74,7 +73,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        User.fromJson(data["data"]);
         HiveService.setToken(data["token"]["accessToken"]);
         HiveService.setRToken(data["token"]["refreshToken"]);
         HiveService.put("user", data["data"]);
@@ -122,8 +120,8 @@ class ApiService {
         options: Options(extra: {'requiresAuth': false}),
       );
 
+      Map data = response.data;
       if (response.statusCode == 201) {
-        Map data = response.data;
         Get.to(
           () => VerifyOtpScreen(
             phoneNumber: email,
@@ -133,12 +131,9 @@ class ApiService {
         return true;
       }
       return false;
+
     } catch (e) {
-      if (e is DioException) {
-        debugPrint("Backend Error Data: ${e.response?.data}");
-      } else {
         debugPrint("ERROR: $e");
-      }
       return false;
     }
   }
@@ -190,7 +185,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        User.fromJson(data["data"]);
         HiveService.put("user", data["data"]);
         return true;
       }
@@ -382,6 +376,41 @@ class ApiService {
     }
   }
 
+  // Ride - Get User All Created PRoposal List
+  static Future<List<Map<String, String>>> getUserRideList() async {
+    try {
+      var url = Config.baseUrl + Config.apiVersion + Config.getUserRideListAPI;
+
+      var response = await dio.get(url);
+
+      //debugPrint("${response.data["data"]}");
+
+      List data = response.data["data"];
+
+      return data
+          .map<Map<String, String>>((e) => Map<String, String>.from(e))
+          .toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  // Get Ride BY ID Proposal (TOKEN AUTOMATICALLY INJECTED)
+  static Future<Map<String, dynamic>> getUserRideProposalList(
+    String rideID,
+  ) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/$rideID/";
+      var response = await dio.get(url);
+      return response.data["data"];
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
   // Send Proposal For a Ride (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> sendProposalForRide() async {
     try {
@@ -436,40 +465,18 @@ class ApiService {
     }
   }
 
-  // Get Ride BY ID Proposal (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> getRideByID(String rideID) async {
-    try {
-      var url =
-          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/$rideID/";
-      var response = await dio.get(url);
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint("ERROR: $e");
-      return false;
-    }
-  }
-
   // ==========================================
   // Return
   // ==========================================
 
   // ReturnTrip (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> returnTrip() async {
+  static Future<bool> createReturnTrip(Map<String, dynamic> body) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
 
-      var response = await dio.post(
-        url,
-        data: {
-          "startLocation": "Rajshahi University",
-          "endLocation": "Shaheb Bazar",
-          "date": "2026-02-10",
-          "startTime": "2026-02-01T10:30:00.000Z",
-          "fare": 500,
-        },
-      );
+      var response = await dio.post(url, data: body);
 
-      return response.statusCode == 200;
+      return response.statusCode == 201;
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
@@ -477,7 +484,7 @@ class ApiService {
   }
 
   // GetAllAvailable Trip (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> returnAllTrip() async {
+  static Future<bool> getAllReturnTrip() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
       var response = await dio.get(url);

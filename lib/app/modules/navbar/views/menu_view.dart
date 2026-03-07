@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/hive_service.dart';
 
 class MenuView extends GetView<NavbarController> {
   const MenuView({super.key});
@@ -72,7 +73,14 @@ class MenuView extends GetView<NavbarController> {
             _menuItem(Icons.help_outline, "Help & Support"),
 
             const Spacer(),
-            _menuItem(Icons.logout, "Logout"),
+            ListTile(
+              leading: Icon(Icons.logout, size: 22),
+              title: Text("Log Out", style: const TextStyle(fontSize: 16)),
+              onTap: () {
+                HiveService.clear();
+                Get.offAllNamed(Routes.AUTH);
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),

@@ -7,7 +7,6 @@ class RideNowController extends GetxController {
 
   @override
   void onInit() {
-    proposalInfo();
     super.onInit();
   }
 

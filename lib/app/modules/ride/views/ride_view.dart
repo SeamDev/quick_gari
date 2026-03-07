@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 import '../controllers/ride_controller.dart';
 
@@ -37,7 +38,7 @@ class RideView extends GetView<RideController> {
 
       body: GetBuilder<RideController>(
         builder: (_) {
-          return controller.isLoading.value
+          return controller.isLoading
               ? Center(child: CircularProgressIndicator(color: Colors.green))
               : controller.dataList.isEmpty
               ? Center(child: Text("No Proposal Created"))
@@ -131,7 +132,7 @@ Widget vehicleCard(Map<String, String> data) {
             Get.to(() => RideProposalView(id: data["_id"] ??"00"));
           },
           child: const Text(
-            "Vehicle Details",
+            "See Proposal",
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -310,15 +311,15 @@ showEditableAddressSheet(BuildContext context) {
                   );
 
                   final requestBody = {
-                    "startLocation": "Rajshahi University",
-                    "endLocation": "Shaheb Bazar",
+                    "startLocation": startCtrl.text,
+                    "endLocation": endCtrl.text,
                     "date":
                         "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
                     "startTime": combinedDateTime.toUtc().toIso8601String(),
                   };
 
                   await ApiService.rideSheet(requestBody);
-                  Get.back();
+                  Get.offAllNamed(Routes.NAVBAR);
                 },
                 child: const Text(
                   "Continue",

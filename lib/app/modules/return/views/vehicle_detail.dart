@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/return/views/book_now.dart';
 
 class CarDetailsView extends StatelessWidget {
-  const CarDetailsView({super.key});
+  final Map<dynamic, dynamic> data;
+  const CarDetailsView(this.data, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,8 @@ class CarDetailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            const Text(
-              'Toyota Axio II Sedan',
+            Text(
+              '${data["car"]["carName"]}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 4),
@@ -38,34 +39,9 @@ class CarDetailsView extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Image
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  height: 160,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Image.asset('assets/car3.png', fit: BoxFit.contain),
-                ),
-                Positioned(
-                  left: 0,
-                  child: IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 32),
-                    onPressed: () {},
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  child: IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 32),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
+            // Car image + arrows
+            CarCarousel(
+              images: List<String>.from(data["car"]["features"]["images"]),
             ),
 
             const SizedBox(height: 16),
@@ -76,11 +52,11 @@ class CarDetailsView extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            _featureRow('Model', 'GT5000'),
-            _featureRow('Seat Capacity', '3 seat'),
+            _featureRow('Model', '${data["car"]["features"]["model"]}'),
+            _featureRow('Seat Capacity', '${data["car"]["features"]["seatCapacity"]} seat'),
             _featureRow('AC Available', 'Yes/No'),
-            _featureRow('Fuel type', 'Octane'),
-            _featureRow('Gear type', 'Automatic'),
+            _featureRow('Fuel type', '${data["car"]["features"]["fuelType"]}'),
+            _featureRow('Gear type', '${data["car"]["features"]["gearType"]}'),
 
             const SizedBox(height: 16),
 
@@ -100,18 +76,18 @@ class CarDetailsView extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 28,
-                    backgroundImage: AssetImage('assets/driver.png'),
+                    backgroundImage: NetworkImage( data["driver"]["avatar"] ??'assets/driver.png'),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text('Driver Name : Abdul mannan'),
+                    children: [
+                      Text('Driver Name : ${data["driver"]?["name"]}'),
                       SizedBox(height: 4),
                       Text(
-                        'Experience : 4th year',
+                        'Phone : ${data["driver"]?["phoneNumber"]}',
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -128,14 +104,16 @@ class CarDetailsView extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color.fromRGBO(0, 137, 85, 1)),
+                      side: const BorderSide(
+                        color: Color.fromRGBO(0, 137, 85, 1),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      fixedSize: Size(0,50),
+                      fixedSize: Size(0, 50),
                     ),
-                    onPressed: () {},
+                    onPressed: () => Get.back(),
                     child: const Text(
                       'book late',
                       style: TextStyle(color: Color.fromRGBO(0, 137, 85, 1)),
@@ -151,11 +129,14 @@ class CarDetailsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      fixedSize: Size(0,50),
+                      fixedSize: Size(0, 50),
                     ),
-                    
-                    onPressed: () => Get.to(()=> ConfirmBookingView()),
-                    child: const Text('Book Now',style: TextStyle(color: Colors.white),),
+
+                    onPressed: () => Get.to(() => ConfirmBookingView(data)),
+                    child: const Text(
+                      'Book Now',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -180,6 +161,86 @@ class CarDetailsView extends StatelessWidget {
         children: [
           Text(title),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+class CarCarousel extends StatefulWidget {
+  final List<String> images; // List of image paths
+  const CarCarousel({super.key, required this.images});
+  @override
+  State<CarCarousel> createState() => _CarCarouselState();
+}
+
+class _CarCarouselState extends State<CarCarousel> {
+  final PageController _pageController = PageController();
+  int currentIndex = 0;
+
+  void _previousImage() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      _pageController.animateToPage(
+        currentIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      setState(() {}); // Update UI to hide/show buttons
+    }
+  }
+
+  void _nextImage() {
+    if (currentIndex < widget.images.length - 1) {
+      currentIndex++;
+      _pageController.animateToPage(
+        currentIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      setState(() {}); // Update UI to hide/show buttons
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200, // Adjust as needed
+      child: Row(
+        children: [
+          // Previous button: hide if first image
+          if (currentIndex != 0)
+            IconButton(
+              onPressed: _previousImage,
+              icon: const Icon(Icons.arrow_left, size: 40),
+            )
+          else
+            const SizedBox(width: 40), // Keep spacing
+          // Carousel
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: widget.images.length,
+              onPageChanged: (index) {
+                setState(() => currentIndex = index);
+              },
+              itemBuilder: (context, index) {
+                return Image.network(
+                  widget.images[currentIndex],
+                  fit: BoxFit.contain,
+                );
+              },
+            ),
+          ),
+
+          // Next button: hide if last image
+          if (currentIndex != widget.images.length - 1)
+            IconButton(
+              onPressed: _nextImage,
+              icon: const Icon(Icons.arrow_right, size: 40),
+            )
+          else
+            const SizedBox(width: 40), // Keep spacing
         ],
       ),
     );

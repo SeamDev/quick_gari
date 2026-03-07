@@ -103,13 +103,14 @@ class _SignupScreenState extends State<SignupScreen> {
     if (success) {
       //Get.offAllNamed(Routes.NAVBAR);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Login Failed")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("User Already Exist or Password length must be 8"),
+          ),
+        );
+      }
     }
-
-    // TODO: Add your API call here with:
-    // name, email, phone, password, selectedGender, selectedImageBytes
   }
 
   @override
@@ -350,9 +351,9 @@ class _SignupScreenState extends State<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _socialCircle("assets/gmail.png"),
-                  _socialCircle("assets/facebook.png"),
                   _socialCircle("assets/apple.png"),
+                  _socialCircle("assets/facebook.png"),
+                  _socialCircle("assets/gmail.png"),
                 ],
               ),
               const SizedBox(height: 25),
@@ -417,7 +418,7 @@ class _SignupScreenState extends State<SignupScreen> {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.grey.shade300),
       ),
-      child: Image.asset(asset),
+      child: Image.asset(asset, width: 48, height: 48),
     );
   }
 }

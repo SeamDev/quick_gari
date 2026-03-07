@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/service/hive_service.dart';
 
 class RequestForRentPage extends StatelessWidget {
-  RequestForRentPage({super.key});
+  final Map<String, dynamic> data;
+  final List<String> mainList;
+  RequestForRentPage(this.data, this.mainList, {super.key});
   final RentController controller = Get.put(RentController());
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,7 @@ class RequestForRentPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Toyota Axio ll Sedan",
+                        "${data["car"]["carName"]} || ${data["car"]["features"]["vehicleType"]}",
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
@@ -68,7 +71,10 @@ class RequestForRentPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Image.asset("assets/car3.png", width: 110),
+                  Image.network(
+                    data["car"]["features"]["images"][0] ?? "assets/car3.png",
+                    width: 110,
+                  ),
                 ],
               ),
             ),
@@ -85,7 +91,7 @@ class RequestForRentPage extends StatelessWidget {
                       "Starting point",
                       style: TextStyle(fontSize: 18, color: Colors.black54),
                     ),
-                    Text("Rajshahi university", style: TextStyle(fontSize: 16)),
+                    Text(mainList[0], style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ],
@@ -101,7 +107,7 @@ class RequestForRentPage extends StatelessWidget {
                       "Ending point",
                       style: TextStyle(fontSize: 18, color: Colors.black54),
                     ),
-                    Text("Dhaka university", style: TextStyle(fontSize: 16)),
+                    Text(mainList[1], style: TextStyle(fontSize: 16)),
                   ],
                 ),
                 Spacer(),
@@ -121,7 +127,7 @@ class RequestForRentPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Date :  05-07-2025",
+                "Date          :  ${mainList[3]}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
@@ -134,7 +140,7 @@ class RequestForRentPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Date :  05-07-2025",
+                "Start Time :  ${mainList[2]}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
@@ -174,7 +180,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  "1500",
+                  data["fare"].toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -197,7 +203,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  "1500",
+                  data["fare"].toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -220,7 +226,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  "1500",
+                  data["fare"].toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -232,7 +238,8 @@ class RequestForRentPage extends StatelessWidget {
             // -------- Confirm Booking Button --------
             ElevatedButton(
               onPressed: () {
-                showBookingSuccessDialog(context, "Md. Sharif Ahmed");
+                final user =  HiveService.get("user");
+                showBookingSuccessDialog(context, user["name"] ?? "User");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF007F4F),
@@ -303,8 +310,7 @@ void showBookingSuccessDialog(BuildContext context, String name) {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    Get.toNamed(Routes.HOME);
+                    Get.offAllNamed(Routes.HOME);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF007F4F),
