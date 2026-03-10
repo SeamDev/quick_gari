@@ -18,13 +18,15 @@ class AuthView extends GetView<AuthController> {
       body: SafeArea(
         child: GetBuilder<AuthController>(
           builder: (_) {
-            return controller.isSplash ? Center(
-              child: Lottie.asset(
-                'assets/splash.json',
-                fit: BoxFit.contain,
-              ),
-            ) : AuthWidget();
-          }
+            return controller.isSplash
+                ? Center(
+                    child: Lottie.asset(
+                      'assets/splash.json',
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                : AuthWidget();
+          },
         ),
       ),
     );
@@ -32,16 +34,14 @@ class AuthView extends GetView<AuthController> {
 }
 
 class AuthWidget extends StatelessWidget {
-  const AuthWidget({
-    super.key,
-  });
+  const AuthWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 40),
-    
+
         /// Top Illustration
         SizedBox(
           height: 250,
@@ -50,9 +50,9 @@ class AuthWidget extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ),
-    
+
         const SizedBox(height: 20),
-    
+
         /// Title
         const Text(
           "Welcome",
@@ -62,18 +62,18 @@ class AuthWidget extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-    
+
         const SizedBox(height: 6),
-    
+
         /// Subtitle
         const Text(
           "Have a better sharing experience",
           style: TextStyle(fontSize: 14, color: Colors.grey),
           textAlign: TextAlign.center,
         ),
-    
+
         const Spacer(),
-    
+
         /// Create Account Button
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -95,9 +95,9 @@ class AuthWidget extends StatelessWidget {
             ),
           ),
         ),
-    
+
         const SizedBox(height: 12),
-    
+
         /// Login Button (Outline)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -119,7 +119,7 @@ class AuthWidget extends StatelessWidget {
             ),
           ),
         ),
-    
+
         const SizedBox(height: 40),
       ],
     );

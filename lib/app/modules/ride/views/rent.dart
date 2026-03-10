@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
-import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
 class RequestForRentPage extends StatelessWidget {
   final Map<String, dynamic> data;
   final List<String> mainList;
-  RequestForRentPage(this.data, this.mainList, {super.key});
+  final String id;
+  RequestForRentPage(this.data, this.mainList, this.id, {super.key});
   final RentController controller = Get.put(RentController());
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,7 @@ class RequestForRentPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Image.asset("assets/bkash.png", height: 90),
-                Image.asset("assets/cash.png", height: 90),
+                //Image.asset("assets/cash.png", height: 90),
               ],
             ),
             const SizedBox(height: 24),
@@ -238,8 +238,17 @@ class RequestForRentPage extends StatelessWidget {
             // -------- Confirm Booking Button --------
             ElevatedButton(
               onPressed: () {
-                final user =  HiveService.get("user");
-                showBookingSuccessDialog(context, user["name"] ?? "User");
+                String name = data['driver']?['name'];
+                String number = data['driver']?['phoneNumber'];
+                String fare = data['fare'].toString();
+                Get.to(
+                  () => PaymentView(
+                    name: name,
+                    number: number,
+                    fare: fare,
+                    id: id,
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF007F4F),
@@ -264,71 +273,4 @@ class RequestForRentPage extends StatelessWidget {
       ),
     );
   }
-}
-
-void showBookingSuccessDialog(BuildContext context, String name) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 25),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ---------- Checkmark Image ----------
-              Image.asset("assets/check.png", width: 120, height: 120),
-
-              const SizedBox(height: 25),
-
-              // ---------- Title ----------
-              const Text(
-                "Thank you",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // ---------- Subtitle ----------
-              Text(
-                "Your booking has been placed sent to\n$name",
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
-              ),
-
-              const SizedBox(height: 35),
-
-              // ---------- Close Button ----------
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.offAllNamed(Routes.HOME);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF007F4F),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text(
-                    "Okay",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
 }

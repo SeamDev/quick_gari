@@ -12,6 +12,10 @@ class ReturnView extends GetView<ReturnController> {
 
   @override
   Widget build(BuildContext context) {
+    void refresh() {
+      controller.dataRefresh();
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
       appBar: AppBar(
@@ -35,7 +39,7 @@ class ReturnView extends GetView<ReturnController> {
         foregroundColor: Colors.white,
         actions: [
           GestureDetector(
-            onTap: () => showEditableAddressSheet(context),
+            onTap: () => showEditableAddressSheet(context,refresh),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -56,32 +60,36 @@ class ReturnView extends GetView<ReturnController> {
       ),
       body: GetBuilder<ReturnController>(
         builder: (_) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
+          return controller.isLoading
+              ? Center(child: CircularProgressIndicator())
+              : controller.data.isEmpty
+              ? Center(child: Text("NO Return Car Found"),)
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
 
-                Text(
-                  "${controller.data.length} cars found",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+                      Text(
+                        "${controller.data.length} cars found",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
 
-                const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: controller.data.length,
-                    itemBuilder: (context, index) {
-                      final data = controller.data[index];
-                      return vehicleCard(data);
-                    },
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: controller.data.length,
+                          itemBuilder: (context, index) {
+                            final data = controller.data[index];
+                            return vehicleCard(data);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
+                );
         },
       ),
     );
@@ -90,6 +98,7 @@ class ReturnView extends GetView<ReturnController> {
   Widget vehicleCard(Map<dynamic, dynamic> data) {
     return Container(
       padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFE9F8E9),
         borderRadius: BorderRadius.circular(16),

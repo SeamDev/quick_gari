@@ -22,4 +22,8 @@ class Config {
   static const String shareVehicleAPI = "/share-vehicle";
   static const String shareVAvailableAPI = "/share-vehicle";
   static const String shareVDriverAPI = "/share-vehicle/driver";
+
+  // Payment
+  static const String paymentAPI = "/payment/submit";
+
 }

@@ -9,6 +9,7 @@ class MenuView extends GetView<NavbarController> {
 
   @override
   Widget build(BuildContext context) {
+    controller;
     return Container(
       width: MediaQuery.of(context).size.width * .75,
       decoration: const BoxDecoration(
@@ -27,21 +28,18 @@ class MenuView extends GetView<NavbarController> {
               children: [
                 Center(
                   child: Column(
-                    children: const [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: AssetImage("assets/profile.png"),
-                      ),
+                    children: [
+                      CircleAvatar(radius: 40, backgroundImage: NetworkImage(controller.profile)),
                       SizedBox(height: 10),
                       Text(
-                        "Nate Samson",
+                        controller.name,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "nate@email.com",
+                        controller.email,
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -78,7 +76,7 @@ class MenuView extends GetView<NavbarController> {
               title: Text("Log Out", style: const TextStyle(fontSize: 16)),
               onTap: () {
                 HiveService.clear();
-                Get.offAllNamed(Routes.AUTH);
+                Get.offAllNamed(Routes.AUTH , arguments: {"isInit": false});
               },
             ),
             const SizedBox(height: 20),

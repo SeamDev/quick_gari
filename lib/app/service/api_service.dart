@@ -62,7 +62,7 @@ class ApiService {
   // ==========================================
 
   // Login (NO TOKEN NEEDED)
-  static Future<bool> login(String email, String password) async {
+  static Future<Map> login(String email, String password) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
       var response = await dio.post(
@@ -76,20 +76,26 @@ class ApiService {
         HiveService.setToken(data["token"]["accessToken"]);
         HiveService.setRToken(data["token"]["refreshToken"]);
         HiveService.put("user", data["data"]);
-        return true;
+        return response.data;
       } else {
         debugPrint("Login failed");
-        return false;
+        return response.data;
       }
+    } on DioException catch (e) {
+      debugPrint("ERROR: $e");
+      return {
+        'success': false,
+        'message': e.response?.data["message"].toString(),
+      };
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return {'success': false, 'message': e.toString()};
     }
   }
 
   // Register (NO TOKEN NEEDED)
 
-  static Future<bool> register(
+  static Future<Map> register(
     String name,
     String email,
     String number,
@@ -100,27 +106,28 @@ class ApiService {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.registerAPI;
 
-      // 1. Convert the image bytes to a Base64 string if it exists
-      String? base64Image;
-      if (image != null) {
-        // Sometimes backends require the data URI prefix: "data:image/jpeg;base64,"
-        base64Image = "data:image/jpeg;base64,${base64Encode(image)}";
-      }
+      FormData formData = FormData.fromMap({
+        "name": name,
+        "email": email,
+        "password": password,
+        "phoneNumber": number,
+        "gender": gender,
+        if (image != null)
+          "avatar": MultipartFile.fromBytes(image, filename: "avatar.png"),
+      });
 
       var response = await dio.post(
         url,
-        data: {
-          "name": name,
-          "email": email,
-          "password": password,
-          "phoneNumber": number,
-          "gender": gender,
-          "avater": base64Image, // Send as a string!
-        },
-        options: Options(extra: {'requiresAuth': false}),
+        data: formData,
+        options: Options(
+          contentType: "multipart/form-data",
+          extra: {'requiresAuth': false},
+        ),
       );
 
-      Map data = response.data;
+      Map data =
+          response.data ?? {'success': false, 'message': 'Error Null Return'};
+
       if (response.statusCode == 201) {
         Get.to(
           () => VerifyOtpScreen(
@@ -128,13 +135,16 @@ class ApiService {
             token: data["data"]["verifyToken"],
           ),
         );
-        return true;
-      }
-      return false;
 
+        return data;
+      }
+
+      return data;
+    } on DioException catch (e) {
+      return e.response?.data;
     } catch (e) {
-        debugPrint("ERROR: $e");
-      return false;
+      debugPrint("❌ Register ERROR: $e");
+      return {'success': false, 'message': e.toString()};
     }
   }
 
@@ -470,28 +480,52 @@ class ApiService {
   // ==========================================
 
   // ReturnTrip (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> createReturnTrip(Map<String, dynamic> body) async {
+  static Future<Map> createReturnTrip(Map<String, dynamic> body) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
 
       var response = await dio.post(url, data: body);
 
-      return response.statusCode == 201;
+      return response.data;
+    } on DioException catch (e) {
+      // Get response message if available
+      String errorMessage = "Something went wrong";
+
+      if (e.response != null && e.response?.data != null) {
+        if (e.response!.data is Map<String, dynamic> &&
+            e.response!.data['message'] != null) {
+          errorMessage = e.response!.data['message'];
+        } else {
+          errorMessage = e.response!.data.toString();
+        }
+      } else if (e.message != null) {
+        errorMessage = e.message!;
+      }
+
+      debugPrint("Dio ERROR: $errorMessage");
+
+      return {
+        'success': false,
+        'message': errorMessage,
+        'statusCode': e.response?.statusCode,
+      };
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return {'success': false};
     }
   }
 
   // GetAllAvailable Trip (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> getAllReturnTrip() async {
+  static Future<List<Map>> getAllReturnTrip() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
       var response = await dio.get(url);
-      return response.statusCode == 200;
+      List data = response.data["data"];
+
+      return data.map<Map>((e) => Map.from(e)).toList();
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return [];
     }
   }
 
@@ -558,6 +592,21 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
+    }
+  }
+
+  ///Paymnt -----------------------------------------
+  /// Post - Payment
+  static Future<Map> postPayment(String trx, Map<String, String> body) async {
+    try {
+      var url = Config.baseUrl + Config.apiVersion + Config.paymentAPI;
+      var response = await dio.post(url, data: body);
+      return response.data;
+    } on DioException catch (e) {
+      return e.response?.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {'success': false};
     }
   }
 }

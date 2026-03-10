@@ -15,21 +15,44 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool hidePassword = true;
+  bool isLoading = false;
 
   void login() async {
     final phone = phoneController.text.trim();
     final password = passwordController.text.trim();
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Email is Empty")));
+      return;
+    }
+    if (password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Password is Empty")));
+      return;
+    } else if (password.length <= 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password length must be greater than 7")),
+      );
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    Map response = await ApiService.login(phone, password);
 
-    bool success = await ApiService.login(phone, password);
-
-    if (success) {
+    if (!mounted) return;
+    if (response["success"]) {
       Get.offAllNamed(Routes.NAVBAR);
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Invalid email or password")));
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response["message"])));
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -46,17 +69,14 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 35),
 
               const Text(
-                "Sign in with your email or phone number",
+                "Sign in with your email",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
 
               const SizedBox(height: 30),
 
               // Email or Phone
-              _textField(
-                hint: "Email or Phone Number",
-                controller: phoneController,
-              ),
+              _textField(hint: "Enter Your Email", controller: phoneController),
 
               const SizedBox(height: 15),
 
@@ -121,25 +141,37 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 25),
 
               // Sign In Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    login();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00A86B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              isLoading
+                  ? Container(
+                      height: 55,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00A86B),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      ),
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          login();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00A86B),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "Sign In",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    "Sign In",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 25),
 

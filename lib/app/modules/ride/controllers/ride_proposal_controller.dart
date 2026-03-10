@@ -7,6 +7,8 @@ class RideProposalController extends GetxController {
   Map<String, dynamic> dataList = <String, dynamic>{};
   List<String> mainList = [];
 
+
+
   final String id;
   RideProposalController(this.id);
 

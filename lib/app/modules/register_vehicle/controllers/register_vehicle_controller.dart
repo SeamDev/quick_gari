@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 
@@ -7,30 +11,30 @@ class RegisterVehicleController extends GetxController {
   // TEXT CONTROLLERS
   // =============================
 
-  final fullName = ''.obs;
-  final phone = ''.obs;
-  final email = ''.obs;
-  final address = ''.obs;
+  String? fullName;
+  String? phone;
+  String? email;
+  String? address;
 
-  final model = ''.obs;
-  final registrationNumber = ''.obs;
-  final driverName = ''.obs;
-  final driverPhone = ''.obs;
-  final licenseNumber = ''.obs;
+  String? model;
+  String? registrationNumber;
+  String? driverName;
+  String? driverPhone;
+  String? licenseNumber;
 
   // =============================
   // DROPDOWNS
   // =============================
 
-  final vehicleType = ''.obs;
-  final brand = ''.obs;
-  final seatCapacity = ''.obs;
-  final fuelType = ''.obs;
-  final gearType = ''.obs;
-  final manufactureYear = ''.obs;
-  final registrationYear = ''.obs;
+  String? vehicleType;
+  String? brand;
+  String? seatCapacity;
+  String? fuelType;
+  String? gearType;
+  String? manufactureYear;
+  String? registrationYear;
 
-  final isAC = false.obs;
+  bool isAC = false;
 
   // =============================
   // FILE VARIABLES
@@ -47,6 +51,8 @@ class RegisterVehicleController extends GetxController {
   Map? backView;
   Map? interiorView;
 
+  void checkValid() {}
+
   // =============================
   // FILE PICKER FUNCTION
   // =============================
@@ -57,12 +63,25 @@ class RegisterVehicleController extends GetxController {
       withData: true, // important
     );
 
-    if (result != null) {
-      return {
-            "bytes": result.files.first.bytes,
-            "extension": result.files.first.extension ?? "jpg",
-          }
-          as Map<String, dynamic>;
+    if (result != null && result.files.isNotEmpty) {
+      Uint8List? imageBytes = result.files.first.bytes;
+
+      if (imageBytes != null) {
+        if (!kIsWeb) {
+          imageBytes = await FlutterImageCompress.compressWithList(
+            imageBytes,
+            quality: 60,
+            minWidth: 512,
+            minHeight: 512,
+          );
+        }
+
+        return {
+              "bytes": imageBytes,
+              "extension": result.files.first.extension ?? "jpg",
+            }
+            as Map<String, dynamic>;
+      }
     }
     return null;
   }
@@ -99,49 +118,60 @@ class RegisterVehicleController extends GetxController {
     }
   }
 
+  bool checkRequiredFiles() {
+    // Map of file variable to its friendly name
+    final Map<dynamic, String> files = {
+      taxTokenPhoto: "Tax Token Photo",
+      registrationCardPhoto: "Registration Card Photo",
+      licensePhoto: "License Photo",
+      frontView: "Front View",
+      sideView: "Side View",
+      backView: "Back View",
+      interiorView: "Interior View",
+    };
+
+    for (var entry in files.entries) {
+      final file = entry.key;
+      final name = entry.value;
+
+      // Check null or empty (if it's a String path)
+      if (file == null || (file is String && file.trim().isEmpty)) {
+        Get.snackbar(
+          "Required",
+          "$name is required",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
   void uploadVehicle() async {
+    if (!checkRequiredFiles()) return;
     Map body = {
       "taxTokenPhoto": taxTokenPhoto,
       "drivingLicensePhoto": licensePhoto,
       "images": [frontView, sideView, backView, interiorView],
       "registrationCardPhoto": registrationCardPhoto,
       "data": {
-        "carName": fullName.value,
+        "carName": fullName,
         "features": {
-          "vehicleType": vehicleType.value,
-          "model": model.value,
-          "brand": brand.value,
-          "fuelType": fuelType.value,
-          "gearType": gearType.value,
-          "seatCapacity": int.parse(seatCapacity.value),
-          "manufactureYear": int.parse(manufactureYear.value),
+          "vehicleType": vehicleType,
+          "model": model,
+          "brand": brand,
+          "fuelType": fuelType,
+          "gearType": gearType,
+          "seatCapacity": int.parse(seatCapacity ?? '0'),
+          "manufactureYear": int.parse(manufactureYear ?? '0'),
         },
         "vehicleRegistration": {
-          "registrationNumber": registrationNumber.value,
-          "registration": int.parse(registrationYear.value),
+          "registrationNumber": registrationNumber,
+          "registration": int.parse(registrationYear ?? '0'),
         },
       },
     };
-    bool hasNull(dynamic value) {
-      if (value == null) return true;
 
-      if (value is Map) {
-        // Check all values in the Map
-        return value.values.any((v) => hasNull(v));
-      }
-
-      if (value is List) {
-        // Check all elements in the List
-        return value.any((v) => hasNull(v));
-      }
-
-      // Primitive value (int, String, bool, etc.) is not null
-      return false;
-    }
-
-    if (hasNull(body)) {
-      Get.snackbar("Empty", "Fill all Required Field");
-    }
     bool res = await ApiService.registerCar(body);
     if (res) {
       Get.back();

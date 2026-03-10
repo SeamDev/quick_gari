@@ -70,7 +70,7 @@ class HomeView extends GetView<HomeController> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _launchDialer('+8801700000000'),
+                    onPressed: () => _launchDialer('+8801780613284'),
                     icon: Image.asset("assets/call.png"),
                   ),
                 ],
@@ -98,7 +98,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: (){},
+              onPressed: ()=> Get.toNamed(Routes.EMERGENCY),
               child: const Text(
                 'Load',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -112,7 +112,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: (){},
+              onPressed: ()=> Get.toNamed(Routes.EMERGENCY),
               child: const Text(
                 'Emergency',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -140,7 +140,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: (){},
+              onPressed: ()=> Get.toNamed(Routes.SHARE_VEHICLE),
               child: const Text(
                 'Share Vehicle',
                 style: TextStyle(fontSize: 22, color: Colors.white),

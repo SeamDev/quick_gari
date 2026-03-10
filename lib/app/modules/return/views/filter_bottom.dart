@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 
-showEditableAddressSheet(BuildContext context) {
-  final startCtrl = TextEditingController(text: "Adabor Dhaka");
-  final endCtrl = TextEditingController(text: "Malopara Rajshahi");
-  final fareCtrl = TextEditingController(text: "01");
-  final dateCtrl = TextEditingController(text: "12-05-2025");
-  final timeCtrl = TextEditingController(text: "12 : 05 AM");
+showEditableAddressSheet(BuildContext context, void Function() refresh) {
+  final startCtrl = TextEditingController();
+  final endCtrl = TextEditingController();
+  final fareCtrl = TextEditingController();
+  final dateCtrl = TextEditingController();
+  final timeCtrl = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
@@ -90,6 +89,7 @@ showEditableAddressSheet(BuildContext context) {
                     "${picked.day.toString().padLeft(2, '0')}-"
                     "${picked.month.toString().padLeft(2, '0')}-"
                     "${picked.year}";
+                selectedDate = picked;
               }
             },
           ),
@@ -108,7 +108,14 @@ showEditableAddressSheet(BuildContext context) {
                 initialTime: TimeOfDay.now(),
               );
               if (picked != null) {
-                timeCtrl.text = picked.format(context);
+                final hour = picked.hourOfPeriod == 0
+                    ? 12
+                    : picked.hourOfPeriod;
+                final minute = picked.minute.toString().padLeft(2, '0');
+                final period = picked.period == DayPeriod.am ? "AM" : "PM";
+
+                timeCtrl.text = "$hour:$minute $period";
+                selectedTime = picked;
               }
             },
           ),
@@ -131,22 +138,35 @@ showEditableAddressSheet(BuildContext context) {
                 selectedTime.hour,
                 selectedTime.minute,
               );
-
-              final requestBody = {
-                "startLocation": startCtrl.text,
-                "endLocation": endCtrl.text,
-                "fare": int.parse(fareCtrl.text),
-                "date":
-                    "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
-                "startTime": combinedDateTime.toUtc().toIso8601String(),
-              };
-              bool res = await ApiService.createReturnTrip(requestBody);
-              if (res) {
-                Get.snackbar("Create Return", "Return Created Successfully !");
+              if (startCtrl.text.isEmpty ||
+                  endCtrl.text.isEmpty ||
+                  startCtrl.text.isEmpty) {
+                Get.snackbar("Info", "Fill all input field");
               } else {
-                Get.snackbar("Create Return", "Return Creating Failed !");
+                Get.back();
+                final requestBody = {
+                  "startLocation": startCtrl.text,
+                  "endLocation": endCtrl.text,
+                  "fare": int.parse(fareCtrl.text),
+                  "date":
+                      "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                  "startTime": combinedDateTime.toUtc().toIso8601String(),
+                };
+                Map res = await ApiService.createReturnTrip(requestBody);
+                if (res["success"]) {
+                  Get.snackbar(
+                    "Create Return",
+                    res["message"] ?? "Return Created Successfully !",
+                  );
+                  refresh();
+                } else {
+                  Get.snackbar(
+                    "Create Return",
+                    res["message"] ??
+                        "Return Creating Failed !\nYor are not driver",
+                  );
+                }
               }
-              Get.offAllNamed(Routes.NAVBAR);
             },
             child: const Text(
               "Continue",

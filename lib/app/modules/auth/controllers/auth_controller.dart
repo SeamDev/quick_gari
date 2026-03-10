@@ -5,9 +5,18 @@ import 'package:quick_gari/app/service/hive_service.dart';
 
 class AuthController extends GetxController {
   bool isSplash = true;
+  bool isInit = true;
   @override
   void onInit() {
-    checkAuth();
+    if (Get.arguments != null) {
+      isInit = Get.arguments["isInit"] ?? true;
+    }
+    if (isInit) {
+      checkAuth();
+    } else {
+      isSplash = false;
+    }
+    update();
     super.onInit();
   }
 
@@ -27,7 +36,7 @@ class AuthController extends GetxController {
       isSplash = false;
     } else {
       if (await ApiService.getUser()) {
-        Get.offAllNamed(Routes.NAVBAR,);
+        Get.offAllNamed(Routes.NAVBAR);
       } else {
         isSplash = false;
       }

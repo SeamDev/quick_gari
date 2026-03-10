@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
-import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 import '../controllers/ride_controller.dart';
 
@@ -11,6 +10,10 @@ class RideView extends GetView<RideController> {
 
   @override
   Widget build(BuildContext context) {
+    void refresh() {
+      controller.dataRefresh();
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -29,7 +32,7 @@ class RideView extends GetView<RideController> {
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () => showEditableAddressSheet(context),
+            onPressed: () => showEditableAddressSheet(context, refresh),
             icon: Icon(Icons.add_circle, size: 30),
           ),
           SizedBox(width: 5),
@@ -111,9 +114,11 @@ Widget vehicleCard(Map<String, String> data) {
           icon: Icons.calendar_month,
           iconColor: Colors.redAccent,
           title: "Date & Time",
-          value: DateFormat(
-            "dd-MM-yyyy   hh:mm a",
-          ).format(DateTime.parse(data["startTime"] ?? "2026-03-04T13:23:00.000Z").toLocal()),
+          value: DateFormat("dd-MM-yyyy   hh:mm a").format(
+            DateTime.parse(
+              data["startTime"] ?? "2026-03-04T13:23:00.000Z",
+            ).toLocal(),
+          ),
         ),
 
         const SizedBox(height: 16),
@@ -129,7 +134,7 @@ Widget vehicleCard(Map<String, String> data) {
             minimumSize: Size(300, 50),
           ),
           onPressed: () {
-            Get.to(() => RideProposalView(id: data["_id"] ??"00"));
+            Get.to(() => RideProposalView(id: data["_id"] ?? "00"));
           },
           child: const Text(
             "See Proposal",
@@ -140,7 +145,6 @@ Widget vehicleCard(Map<String, String> data) {
     ),
   );
 }
-
 
 Widget _infoRow({
   required IconData icon,
@@ -170,11 +174,11 @@ Widget _infoRow({
   );
 }
 
-showEditableAddressSheet(BuildContext context) {
-  final startCtrl = TextEditingController(text: "Adabor Dhaka");
-  final endCtrl = TextEditingController(text: "Malopara Rajshahi");
-  final dateCtrl = TextEditingController(text: "12-05-2025");
-  final timeCtrl = TextEditingController(text: "12 : 05 AM");
+showEditableAddressSheet(BuildContext context, void Function() refresh) {
+  final startCtrl = TextEditingController();
+  final endCtrl = TextEditingController();
+  final dateCtrl = TextEditingController();
+  final timeCtrl = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
@@ -185,7 +189,7 @@ showEditableAddressSheet(BuildContext context) {
       minChildSize: 0.35,
       maxChildSize: 0.85,
 
-      builder: (context, controller) {
+      builder: (context, cont) {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: const BoxDecoration(
@@ -193,7 +197,7 @@ showEditableAddressSheet(BuildContext context) {
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: ListView(
-            controller: controller,
+            controller: cont,
             children: [
               /// drag handle
               Center(
@@ -319,7 +323,8 @@ showEditableAddressSheet(BuildContext context) {
                   };
 
                   await ApiService.rideSheet(requestBody);
-                  Get.offAllNamed(Routes.NAVBAR);
+                  refresh();
+                  Get.back();
                 },
                 child: const Text(
                   "Continue",

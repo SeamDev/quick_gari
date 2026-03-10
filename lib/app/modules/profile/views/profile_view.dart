@@ -27,7 +27,7 @@ class ProfileView extends GetView<ProfileController> {
           GestureDetector(
             onTap: () {
               HiveService.clear();
-              Get.offAllNamed(Routes.AUTH);
+              Get.offAllNamed(Routes.AUTH,arguments: {"isInit": false});
             },
             child: Padding(
               padding: EdgeInsets.only(right: 16),
@@ -59,7 +59,7 @@ class ProfileView extends GetView<ProfileController> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
-                  backgroundImage: const AssetImage('assets/profile.png'),
+                  backgroundImage: NetworkImage(controller.userInfo["avatar"] ?? 'assets/profile.png'),
                 ),
                 Container(
                   padding: const EdgeInsets.all(4),

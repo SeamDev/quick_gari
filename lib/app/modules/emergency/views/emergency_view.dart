@@ -10,12 +10,12 @@ class EmergencyView extends GetView<EmergencyController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EmergencyView'),
+        title: const Text('Working'),
         centerTitle: true,
       ),
       body: const Center(
         child: Text(
-          'EmergencyView is working',
+          'This Page is in working Stage',
           style: TextStyle(fontSize: 20),
         ),
       ),

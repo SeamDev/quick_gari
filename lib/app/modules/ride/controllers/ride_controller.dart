@@ -26,4 +26,14 @@ class RideController extends GetxController {
     isLoading = false;
     update();
   }
+
+  void dataRefresh() async {
+    isLoading = true;
+    update();
+    dataList = await ApiService.getUserRideList();
+    isLoading = false;
+    update();
+  }
+
+  
 }

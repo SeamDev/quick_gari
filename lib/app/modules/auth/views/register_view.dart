@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
 import 'package:file_picker/file_picker.dart';
@@ -24,7 +26,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String selectedGender = "male";
   Uint8List? selectedImageBytes;
-  String? selectedImageName;
 
   @override
   void dispose() {
@@ -45,10 +46,22 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (result != null && result.files.isNotEmpty) {
-        setState(() {
-          selectedImageBytes = result.files.first.bytes;
-          selectedImageName = result.files.first.name;
-        });
+        Uint8List? imageBytes = result.files.first.bytes;
+
+        if (imageBytes != null) {
+          if (!kIsWeb) {
+            imageBytes = await FlutterImageCompress.compressWithList(
+              imageBytes,
+              quality: 60,
+              minWidth: 512,
+              minHeight: 512,
+            );
+          }
+
+          setState(() {
+            selectedImageBytes = imageBytes;
+          });
+        }
       }
     } catch (e) {
       debugPrint("Image pick error: $e");
@@ -66,6 +79,15 @@ class _SignupScreenState extends State<SignupScreen> {
       Get.snackbar(
         "Error",
         "All fields are required",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    if(password.length <8 ){
+      
+      Get.snackbar(
+        "Error",
+        "Password length must b greater than 7",
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -89,9 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    // Navigate to OTP verify screen (example)
-    //Get.to(() => VerifyOtpScreen(phoneNumber: phone));
-    bool success = await ApiService.register(
+    Map response = await ApiService.register(
       name,
       email,
       "0$phone",
@@ -100,15 +120,13 @@ class _SignupScreenState extends State<SignupScreen> {
       password,
     );
 
-    if (success) {
+    if (response['success']) {
       //Get.offAllNamed(Routes.NAVBAR);
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("User Already Exist or Password length must be 8"),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(response['message'].toString())));
       }
     }
   }

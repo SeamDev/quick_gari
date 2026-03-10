@@ -45,7 +45,7 @@ class RideProposalView extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        "${controller.dataList["proposals"].length} cars found",
+                        "${controller.dataList["proposals"].length} proposal found",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
 
@@ -57,7 +57,7 @@ class RideProposalView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final data =
                                 controller.dataList["proposals"][index];
-                            return vehicleCard(data, controller.mainList);
+                            return vehicleCard(data, controller.mainList , id);
                           },
                         ),
                       ),
@@ -70,7 +70,7 @@ class RideProposalView extends StatelessWidget {
   }
 }
 
-Widget vehicleCard(Map<String, dynamic> data, List<String> mainList) {
+Widget vehicleCard(Map<String, dynamic> data, List<String> mainList,String id) {
   return Container(
     padding: const EdgeInsets.all(16),
     margin: EdgeInsets.only(top: 16),
@@ -180,7 +180,7 @@ Widget vehicleCard(Map<String, dynamic> data, List<String> mainList) {
             minimumSize: Size(300, 50),
           ),
           onPressed: () {
-            Get.to(() => CarDetailPage(data, mainList));
+            Get.to(() => CarDetailPage(data, mainList,id));
           },
           child: const Text(
             "Vehicle Details & Booking",

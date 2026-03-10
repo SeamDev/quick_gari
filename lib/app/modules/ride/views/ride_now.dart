@@ -6,7 +6,8 @@ import 'package:quick_gari/app/modules/ride/views/rent.dart';
 class CarDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
   final List<String> mainList;
-  CarDetailPage(this.data, this.mainList, {super.key});
+  final String id;
+  CarDetailPage(this.data, this.mainList, this.id, {super.key});
   final controller = Get.put(RideNowController());
 
   @override
@@ -145,7 +146,7 @@ class CarDetailPage extends StatelessWidget {
                       child: Column(
                         children: [
                           Image.network(
-                            data["driver"]?["avatar"] ?? "assets/driver.png",
+                            data["driver"]?["avatar"] ?? "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg",
                             width: 100,
                             height: 100,
                           ),
@@ -208,7 +209,7 @@ class CarDetailPage extends StatelessWidget {
                             ),
                           ),
                           onPressed: () =>
-                              Get.to(() => RequestForRentPage(data, mainList)),
+                              Get.to(() => RequestForRentPage(data, mainList,id)),
                           child: const Text(
                             'Ride Now',
                             style: TextStyle(fontSize: 22, color: Colors.white),

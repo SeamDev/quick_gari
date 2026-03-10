@@ -78,7 +78,7 @@ class CarDetailsView extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundImage: NetworkImage( data["driver"]["avatar"] ??'assets/driver.png'),
+                    backgroundImage: NetworkImage( data["driver"]["avatar"] ?? "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg"),
                   ),
                   const SizedBox(width: 12),
                   Column(

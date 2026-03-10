@@ -1,4 +1,4 @@
-package com.example.quick_gari
+package com.seam.quickgari
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -106,7 +106,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.REGISTER_VEHICLE,
-      page: () => const RegisterVehicleView(),
+      page: () =>  RegisterVehicleView(),
       binding: RegisterVehicleBinding(),
     ),
     GetPage(
