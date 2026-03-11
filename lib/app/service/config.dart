@@ -7,6 +7,7 @@ class Config {
   static const String registerAPI = "/user/register";
   static const String verifyOTPAPI = "/auth/verify-otp";
   static const String reSendOTPAPI = "/auth/resend-otp";
+  static const String refreashAPI = "/auth/refresh";
   static const String getUserAPI = "/auth/user-info";
   //Car
   static const String carAPI = "/car";

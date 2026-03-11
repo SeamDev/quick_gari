@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:quick_gari/app/modules/auth/views/verify.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/config.dart';
 import 'package:quick_gari/app/service/dio_logger.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
@@ -27,9 +28,19 @@ final dio =
 
             // Only attach token if requiresAuth is true AND it doesn't already have one
             if (requiresAuth && !options.headers.containsKey('Authorization')) {
-              final token = await HiveService.getToken();
+              String? token = await HiveService.getToken();
               if (token != null && token.toString().isNotEmpty) {
                 options.headers['Authorization'] = 'Bearer $token';
+              } else {
+                if (await ApiService.refreshToken() &&
+                    await ApiService.getUser()) {
+                  token = await HiveService.getToken();
+                  if (token != null && token.toString().isNotEmpty) {
+                    options.headers['Authorization'] = 'Bearer $token';
+                  } else {
+                    Get.offAllNamed(Routes.AUTH);
+                  }
+                }
               }
             }
             return handler.next(options);
@@ -163,6 +174,25 @@ class ApiService {
       );
 
       debugPrint("${response.data}");
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  // Refresh Token (USES SPECIFIC TOKEN)
+  static Future<bool> refreshToken() async {
+    try {
+      var url = Config.baseUrl + Config.apiVersion + Config.refreashAPI;
+      String? refreashToken = await HiveService.getRToken();
+      var response = await dio.post(
+        url,
+        options: Options(extra: {'requiresAuth': false}),
+        data: {"refreshToken": refreashToken},
+      );
+      HiveService.setToken(response.data["data"]["accessToken"]);
+      HiveService.setRToken(response.data["data"]["refreshToken"]);
       return response.statusCode == 200;
     } catch (e) {
       debugPrint("ERROR: $e");

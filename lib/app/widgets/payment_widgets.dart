@@ -10,12 +10,15 @@ class PaymentView extends StatefulWidget {
   final String number;
   final String fare;
   final String id;
+  final String serviceFor;
 
   const PaymentView({
     super.key,
     required this.name,
     required this.number,
-    required this.fare, required this.id,
+    required this.fare,
+    required this.id,
+    required this.serviceFor,
   });
 
   @override
@@ -41,9 +44,9 @@ class _PaymentViewState extends State<PaymentView> {
     }
 
     // submit logic
-    Map<String, String> body = {   
-      "rideId": widget.id,
-      "transactionId": "TXN123456789",
+    Map<String, String> body = {
+      widget.serviceFor: widget.id,
+      "transactionId": trxController.text.trim(),
     };
     Map response = await ApiService.postPayment(
       trxController.text.toString(),

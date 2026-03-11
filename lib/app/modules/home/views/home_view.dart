@@ -98,7 +98,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: ()=> Get.toNamed(Routes.EMERGENCY),
+              onPressed: () => Get.toNamed(Routes.EMERGENCY),
               child: const Text(
                 'Load',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -112,7 +112,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: ()=> Get.toNamed(Routes.EMERGENCY),
+              onPressed: () => Get.toNamed(Routes.EMERGENCY),
               child: const Text(
                 'Emergency',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -140,7 +140,7 @@ class HomeView extends GetView<HomeController> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: ()=> Get.toNamed(Routes.SHARE_VEHICLE),
+              onPressed: () => Get.toNamed(Routes.EMERGENCY),
               child: const Text(
                 'Share Vehicle',
                 style: TextStyle(fontSize: 22, color: Colors.white),
@@ -152,4 +152,3 @@ class HomeView extends GetView<HomeController> {
     );
   }
 }
-

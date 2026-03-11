@@ -33,12 +33,19 @@ class AuthController extends GetxController {
   void checkAuth() async {
     final token = await HiveService.getToken();
     if (token == null) {
+      if (await ApiService.refreshToken() && await ApiService.getUser()) {
+        Get.offAllNamed(Routes.NAVBAR);
+      }
       isSplash = false;
     } else {
       if (await ApiService.getUser()) {
         Get.offAllNamed(Routes.NAVBAR);
       } else {
-        isSplash = false;
+        if (await ApiService.refreshToken() && await ApiService.getUser()) {
+          Get.offAllNamed(Routes.NAVBAR);
+        } else {
+          isSplash = false;
+        }
       }
     }
     await Future.delayed(Duration(seconds: 2));

@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
-import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
-void showPaymentSuccessDialog(BuildContext context, int data) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => PaymentSuccessDialog(data),
-  );
-}
 
 class ConfirmBookingView extends StatelessWidget {
   final Map<dynamic, dynamic> data;
@@ -170,8 +162,21 @@ class ConfirmBookingView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () =>
-                    showPaymentSuccessDialog(context, data["fare"]),
+                onPressed: () {
+                  String name = data['driver']?['name'];
+                  String number = data['driver']?['phoneNumber'];
+                  String fare = data['fare'].toString();
+                  String id = data['_id'].toString();
+                  Get.to(
+                    () => PaymentView(
+                      name: name,
+                      number: number,
+                      fare: fare,
+                      id: id,
+                      serviceFor: 'returnId',
+                    ),
+                  );
+                },
                 child: const Text(
                   'Confirm Booking',
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -264,125 +269,6 @@ class ConfirmBookingView extends StatelessWidget {
           Text(
             '$symbol $value',
             style: TextStyle(fontWeight: bold ? FontWeight.w600 : null),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PaymentSuccessDialog extends StatelessWidget {
-  final int data;
-  const PaymentSuccessDialog(this.data, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Success Icon
-                Container(
-                  height: 100,
-                  width: 100,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFC6EEDB),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    size: 48,
-                    color: Color(0xFF00B37E),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text(
-                  'Payment Success',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-                ),
-
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Your money has been successfully sent',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text('Amount', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 6),
-
-                Text(
-                  '\$${data.toString()}',
-                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.w600),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Dashed Divider
-                Row(
-                  children: List.generate(
-                    30,
-                    (index) => Expanded(
-                      child: Container(
-                        height: 1,
-                        color: index.isEven
-                            ? Colors.transparent
-                            : Colors.grey.shade400,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text(
-                  'How is your trip?',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                ),
-
-                const SizedBox(height: 6),
-
-                const Text(
-                  'Your feedback will help us to improve your driving experience better',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Feedback Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0A8F55),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () {
-                      Get.offAllNamed(Routes.NAVBAR);
-                    },
-                    child: const Text(
-                      'Please Feedback',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

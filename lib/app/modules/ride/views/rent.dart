@@ -246,7 +246,7 @@ class RequestForRentPage extends StatelessWidget {
                     name: name,
                     number: number,
                     fare: fare,
-                    id: id,
+                    id: id, serviceFor: 'rideId',
                   ),
                 );
               },
