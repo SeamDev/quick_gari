@@ -109,10 +109,10 @@ Widget vehicleCard(Map<String, dynamic> data, List<String> mainList,String id) {
         const SizedBox(height: 6),
 
         /// Distance
-        const Text(
-          "5 KM | Distance from your starting location",
-          style: TextStyle(color: Colors.black87, fontSize: 12),
-        ),
+        // const Text(
+        //   "5 KM | Distance from your starting location",
+        //   style: TextStyle(color: Colors.black87, fontSize: 12),
+        // ),
 
         const SizedBox(height: 14),
 

@@ -3,7 +3,6 @@ import 'package:get/route_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
-
 class ConfirmBookingView extends StatelessWidget {
   final Map<dynamic, dynamic> data;
   const ConfirmBookingView(this.data, {super.key});
@@ -124,8 +123,7 @@ class ConfirmBookingView extends StatelessWidget {
             Row(
               children: [
                 _paymentCard('assets/bkash.png'),
-                const SizedBox(width: 12),
-                _paymentCard('assets/cash.png'),
+                // _paymentCard('assets/cash.png'),
               ],
             ),
 
@@ -142,9 +140,9 @@ class ConfirmBookingView extends StatelessWidget {
               child: Column(
                 children: [
                   _fareRow('Driver Fare', '৳', '${data["fare"]}'),
-                  _fareRow('Service Fee', '৳', '${data["fare"]}'),
+                  _fareRow('Service Fee', '৳', '${data["fare"] * 0.1}'),
                   const Divider(),
-                  _fareRow('Total', '৳', '${data["fare"]}', bold: true),
+                  _fareRow('Total', '৳', '${data["fare"] * 1.1}', bold: true),
                 ],
               ),
             ),

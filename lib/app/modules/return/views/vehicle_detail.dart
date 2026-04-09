@@ -86,10 +86,10 @@ class CarDetailsView extends StatelessWidget {
                     children: [
                       Text('Driver Name : ${data["driver"]?["name"]}'),
                       SizedBox(height: 4),
-                      Text(
-                        'Phone : ${data["driver"]?["phoneNumber"]}',
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      // Text(
+                      //   'Phone : ${data["driver"]?["phoneNumber"]}',
+                      //   style: TextStyle(color: Colors.grey),
+                      // ),
                     ],
                   ),
                 ],

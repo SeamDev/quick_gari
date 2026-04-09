@@ -153,7 +153,7 @@ class RideViewList extends GetView<RideController> {
                     ),
                   ),
                   onPressed: () {
-                    Get.to("");
+                    Get.back();
                   },
                   child: const Text(
                     "Book later",

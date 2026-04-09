@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
 
 class PaymentView extends StatefulWidget {
   final String name;
@@ -29,7 +28,7 @@ class _PaymentViewState extends State<PaymentView> {
   final TextEditingController trxController = TextEditingController();
 
   void copyNumber() {
-    Clipboard.setData(ClipboardData(text: widget.number));
+    Clipboard.setData(ClipboardData(text: "01570269334"));
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("Driver number copied")));
@@ -54,8 +53,7 @@ class _PaymentViewState extends State<PaymentView> {
     );
     if (!mounted) return;
     if (response['success'] ?? false) {
-      final user = HiveService.get("user");
-      showBookingSuccessDialog(context, user["name"] ?? "User");
+      showBookingSuccessDialog(context);
     } else {
       ScaffoldMessenger.of(
         context,
@@ -109,21 +107,14 @@ class _PaymentViewState extends State<PaymentView> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
 
-                  const SizedBox(height: 15),
-
-                  Text(
-                    "Name: ${widget.name}",
-                    style: const TextStyle(fontSize: 16),
-                  ),
-
                   const SizedBox(height: 10),
 
                   Row(
                     children: [
                       Expanded(
                         child: Text(
-                          "Number: ${widget.number}",
-                          style: const TextStyle(fontSize: 16),
+                          "Number: 01570269334",
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                       IconButton(
@@ -136,9 +127,27 @@ class _PaymentViewState extends State<PaymentView> {
                   const Divider(height: 30),
 
                   Text(
-                    "Fare: ৳ ${widget.fare}",
+                    "Fare: ৳ ${int.parse(widget.fare)*1.1}",
                     style: const TextStyle(
                       fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                  const Divider(height: 30),
+
+                  Text(
+                    "**Please send the payment to this number and paste the transaction ID. Your request will remain pending until we receive confirmation.**",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                  Text(
+                    "**Payment method : Send Money**",
+                    style: const TextStyle(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
                     ),
@@ -189,7 +198,7 @@ class _PaymentViewState extends State<PaymentView> {
     );
   }
 
-  void showBookingSuccessDialog(BuildContext context, String name) {
+  void showBookingSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -223,7 +232,7 @@ class _PaymentViewState extends State<PaymentView> {
 
                 // ---------- Subtitle ----------
                 Text(
-                  "Your booking has been placed sent to\n$name",
+                  "Your request is in pending",
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),

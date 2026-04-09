@@ -15,7 +15,7 @@ class ProfileView extends GetView<ProfileController> {
 
     final ProfileController controller = Get.put(ProfileController());
 
-    String selectedGender = controller.userInfo["gender"] ?? "male";
+    String selectedGender = controller.user.gender ?? "male";
 
     return Scaffold(
       appBar: AppBar(
@@ -59,7 +59,7 @@ class ProfileView extends GetView<ProfileController> {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey[200],
-                  backgroundImage: NetworkImage(controller.userInfo["avatar"] ?? 'assets/profile.png'),
+                  backgroundImage: NetworkImage(controller.user.avatar),
                 ),
                 Container(
                   padding: const EdgeInsets.all(4),
@@ -74,7 +74,7 @@ class ProfileView extends GetView<ProfileController> {
 
             const SizedBox(height: 12),
             Text(
-              controller.userInfo["name"] ?? "Unknown",
+              controller.user.name,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -87,7 +87,7 @@ class ProfileView extends GetView<ProfileController> {
             TextField(
               controller: emailController,
               decoration: InputDecoration(
-                hintText: controller.userInfo["email"] ?? "Unknown",
+                hintText: controller.user.email,
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
@@ -125,7 +125,7 @@ class ProfileView extends GetView<ProfileController> {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       hintText:
-                          '+88${controller.userInfo["phoneNumber"] ?? "Unknown"}',
+                          '+88${controller.user.phoneNumber}',
                       filled: true,
                       fillColor: Colors.grey[100],
                       border: OutlineInputBorder(

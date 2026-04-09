@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
@@ -9,7 +10,7 @@ class MenuView extends GetView<NavbarController> {
 
   @override
   Widget build(BuildContext context) {
-    controller;
+    final user = AppConfig().user.obs;
     return Container(
       width: MediaQuery.of(context).size.width * .75,
       decoration: const BoxDecoration(
@@ -27,22 +28,27 @@ class MenuView extends GetView<NavbarController> {
             Stack(
               children: [
                 Center(
-                  child: Column(
-                    children: [
-                      CircleAvatar(radius: 40, backgroundImage: NetworkImage(controller.profile)),
-                      SizedBox(height: 10),
-                      Text(
-                        controller.name,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  child: Obx(
+                    () => Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: NetworkImage(user.value.avatar),
                         ),
-                      ),
-                      Text(
-                        controller.email,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
+                        SizedBox(height: 10),
+                        Text(
+                          user.value.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          user.value.email,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Positioned(
@@ -76,7 +82,7 @@ class MenuView extends GetView<NavbarController> {
               title: Text("Log Out", style: const TextStyle(fontSize: 16)),
               onTap: () {
                 HiveService.clear();
-                Get.offAllNamed(Routes.AUTH , arguments: {"isInit": false});
+                Get.offAllNamed(Routes.AUTH, arguments: {"isInit": false});
               },
             ),
             const SizedBox(height: 20),

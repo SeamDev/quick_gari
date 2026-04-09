@@ -203,7 +203,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  data["fare"].toString(),
+                  (data["fare"]*0.1).toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -226,7 +226,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  data["fare"].toString(),
+                  (data["fare"]*1.1).toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],

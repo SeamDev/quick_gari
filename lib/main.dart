@@ -5,7 +5,6 @@ import 'package:quick_gari/app/service/hive_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //Get.put(NavbarController());
   await HiveService.init();
   runApp(const MyApp());
 }

@@ -158,14 +158,14 @@ class CarDetailPage extends StatelessWidget {
                               color: Colors.black54,
                             ),
                           ),
-                          Text(
-                            "Phone Number :   ${data["driver"]?["phoneNumber"]}",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black54,
-                            ),
-                          ),
+                          // Text(
+                          //   "Phone Number :   ${data["driver"]?["phoneNumber"]}",
+                          //   style: TextStyle(
+                          //     fontSize: 18,
+                          //     fontWeight: FontWeight.w600,
+                          //     color: Colors.black54,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

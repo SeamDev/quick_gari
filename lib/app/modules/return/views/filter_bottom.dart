@@ -43,7 +43,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 20),
 
-          _editableField(
+          EditableField(
             icon: Icons.location_on,
             iconColor: Colors.green,
             label: "Starting Point",
@@ -53,7 +53,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 12),
 
-          _editableField(
+          EditableField(
             icon: Icons.location_on_outlined,
             iconColor: Colors.red,
             label: "Arrival Point",
@@ -62,7 +62,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 12),
 
-          _editableField(
+          EditableField(
             icon: Icons.money,
             iconColor: Colors.green,
             label: "Fare",
@@ -71,7 +71,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 12),
 
-          _editableField(
+          EditableField(
             icon: Icons.calendar_month,
             iconColor: Colors.redAccent,
             label: "Date",
@@ -96,7 +96,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 12),
 
-          _editableField(
+          EditableField(
             icon: Icons.access_time,
             iconColor: Colors.green,
             label: "Time",
@@ -183,44 +183,91 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
   );
 }
 
-Widget _editableField({
-  required IconData icon,
-  required Color iconColor,
-  required String label,
-  required TextEditingController controller,
-  bool readOnly = false,
-  VoidCallback? onTap,
-  Color borderColor = const Color(0xFFE0E0E0),
-}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      border: Border.all(color: borderColor),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      children: [
-        Icon(icon, color: iconColor),
-        const SizedBox(width: 12),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            readOnly: readOnly,
-            onTap: onTap,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              labelText: label,
-              labelStyle: const TextStyle(fontSize: 13, color: Colors.black54),
+class EditableField extends StatefulWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final TextEditingController controller;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final Color borderColor;
+
+  const EditableField({
+    super.key,
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.controller,
+    this.readOnly = false,
+    this.onTap,
+    this.borderColor = const Color(0xFFE0E0E0),
+  });
+
+  @override
+  State<EditableField> createState() => _EditableFieldState();
+}
+
+class _EditableFieldState extends State<EditableField> {
+  bool showClear = false;
+
+  @override
+  void initState() {
+    super.initState();
+    showClear = widget.controller.text.isNotEmpty;
+    widget.controller.addListener(_textListener);
+  }
+
+  void _textListener() {
+    if (mounted) {
+      setState(() {
+        showClear = widget.controller.text.isNotEmpty;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_textListener);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: widget.borderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(widget.icon, color: widget.iconColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: widget.controller,
+              readOnly: widget.readOnly,
+              onTap: widget.onTap,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                labelText: widget.label,
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                ),
+              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
-        ),
-        if (controller.text.isNotEmpty)
-          GestureDetector(
-            onTap: () => controller.clear(),
-            child: const Icon(Icons.close, color: Colors.red, size: 18),
-          ),
-      ],
-    ),
-  );
+          if (showClear && !widget.readOnly)
+            GestureDetector(
+              onTap: () {
+                widget.controller.clear();
+              },
+              child: const Icon(Icons.close, color: Colors.red, size: 18),
+            ),
+        ],
+      ),
+    );
+  }
 }

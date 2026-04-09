@@ -31,7 +31,7 @@ class _SignInScreenState extends State<SignInScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text("Password is Empty")));
       return;
-    } else if (password.length <= 8) {
+    } else if (password.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Password length must be greater than 7")),
       );

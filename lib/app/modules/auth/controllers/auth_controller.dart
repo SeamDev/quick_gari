@@ -20,34 +20,26 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void checkAuth() async {
     final token = await HiveService.getToken();
     if (token == null) {
-      if (await ApiService.refreshToken() && await ApiService.getUser()) {
+      if (await HiveService.getToken() != null &&
+          await ApiService.refreshToken() &&
+          await ApiService.getUser()) {
         Get.offAllNamed(Routes.NAVBAR);
       }
-      isSplash = false;
     } else {
       if (await ApiService.getUser()) {
         Get.offAllNamed(Routes.NAVBAR);
       } else {
-        if (await ApiService.refreshToken() && await ApiService.getUser()) {
+        if (await HiveService.getToken() != null &&
+            await ApiService.refreshToken() &&
+            await ApiService.getUser()) {
           Get.offAllNamed(Routes.NAVBAR);
-        } else {
-          isSplash = false;
         }
       }
     }
+    isSplash = false;
     await Future.delayed(Duration(seconds: 2));
     update();
   }

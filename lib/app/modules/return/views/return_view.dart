@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/return/views/filter_bottom.dart';
 import 'package:quick_gari/app/modules/return/views/vehicle_detail.dart';
 
@@ -37,7 +38,7 @@ class ReturnView extends GetView<ReturnController> {
         ),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        actions: [
+        actions: !AppConfig().user.isCarOwner ? null : [
           GestureDetector(
             onTap: () => showEditableAddressSheet(context,refresh),
             child: Container(
@@ -198,7 +199,7 @@ class ReturnView extends GetView<ReturnController> {
           const SizedBox(height: 16),
 
           /// Button
-          ElevatedButton(
+          if(!AppConfig().user.isCarOwner) ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4CAF50),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

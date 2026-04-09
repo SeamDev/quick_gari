@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 import '../controllers/ride_controller.dart';
@@ -30,13 +31,15 @@ class RideView extends GetView<RideController> {
         ),
         title: const Text("Back", style: TextStyle(color: Colors.black)),
         centerTitle: false,
-        actions: [
-          IconButton(
-            onPressed: () => showEditableAddressSheet(context, refresh),
-            icon: Icon(Icons.add_circle, size: 30),
-          ),
-          SizedBox(width: 5),
-        ],
+        actions: !AppConfig().user.isCarOwner
+            ? [
+                IconButton(
+                  onPressed: () => showEditableAddressSheet(refresh),
+                  icon: Icon(Icons.add_circle, size: 30),
+                ),
+                const SizedBox(width: 5),
+              ]
+            : null,
       ),
 
       body: GetBuilder<RideController>(
@@ -64,7 +67,7 @@ class RideView extends GetView<RideController> {
                           itemCount: controller.dataList.length,
                           itemBuilder: (context, index) {
                             final data = controller.dataList[index];
-                            return vehicleCard(data);
+                            return vehicleCard(data, refresh);
                           },
                         ),
                       ),
@@ -77,7 +80,13 @@ class RideView extends GetView<RideController> {
   }
 }
 
-Widget vehicleCard(Map<String, String> data) {
+Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
+  String startPT = data["startLocation"] ?? "--Error--";
+  String endPT = data["endLocation"] ?? "--Error--";
+  String date = DateFormat("dd-MM-yyyy   hh:mm a").format(
+    DateTime.parse(data["startTime"] ?? "2026-03-04T13:23:00.000Z").toLocal(),
+  );
+
   return Container(
     padding: const EdgeInsets.all(16),
     margin: EdgeInsets.only(top: 16),
@@ -94,7 +103,7 @@ Widget vehicleCard(Map<String, String> data) {
           icon: Icons.circle,
           iconColor: Colors.green,
           title: "Starting Area",
-          value: data["startLocation"] ?? "--Error--",
+          value: startPT,
         ),
 
         const SizedBox(height: 8),
@@ -104,7 +113,7 @@ Widget vehicleCard(Map<String, String> data) {
           icon: Icons.location_on,
           iconColor: Colors.green,
           title: "Ending Area",
-          value: data["endLocation"] ?? "--Error--",
+          value: endPT,
         ),
 
         const SizedBox(height: 8),
@@ -114,11 +123,7 @@ Widget vehicleCard(Map<String, String> data) {
           icon: Icons.calendar_month,
           iconColor: Colors.redAccent,
           title: "Date & Time",
-          value: DateFormat("dd-MM-yyyy   hh:mm a").format(
-            DateTime.parse(
-              data["startTime"] ?? "2026-03-04T13:23:00.000Z",
-            ).toLocal(),
-          ),
+          value: date,
         ),
 
         const SizedBox(height: 16),
@@ -134,10 +139,19 @@ Widget vehicleCard(Map<String, String> data) {
             minimumSize: Size(300, 50),
           ),
           onPressed: () {
-            Get.to(() => RideProposalView(id: data["_id"] ?? "00"));
+            AppConfig().user.isCarOwner
+                ? showEditableAddressSheet(
+                    refresh,
+                    readonly: true,
+                    start: startPT,
+                    end: endPT,
+                    date: date,
+                    id: data["_id"] ?? "",
+                  )
+                : Get.to(() => RideProposalView(id: data["_id"] ?? "00"));
           },
-          child: const Text(
-            "See Proposal",
+          child: Text(
+            AppConfig().user.isCarOwner ? "Bid a Fare" : "See Proposal",
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -174,18 +188,30 @@ Widget _infoRow({
   );
 }
 
-showEditableAddressSheet(BuildContext context, void Function() refresh) {
+showEditableAddressSheet(
+  void Function() refresh, {
+  bool readonly = false,
+  String start = '',
+  String end = '',
+  String date = '',
+  String id = '',
+}) {
   final startCtrl = TextEditingController();
   final endCtrl = TextEditingController();
+  final fareCtrl = TextEditingController();
   final dateCtrl = TextEditingController();
   final timeCtrl = TextEditingController();
-
+  if (readonly) {
+    startCtrl.text = start;
+    endCtrl.text = end;
+    dateCtrl.text = date;
+  }
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
   Get.bottomSheet(
     DraggableScrollableSheet(
-      initialChildSize: 0.7,
+      initialChildSize: 0.67,
       minChildSize: 0.35,
       maxChildSize: 0.85,
 
@@ -221,76 +247,90 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
               const SizedBox(height: 20),
 
               /// Starting Point
-              _editableField(
+              EditableField(
                 icon: Icons.location_on,
                 iconColor: Colors.green,
                 label: "Starting Point",
                 controller: startCtrl,
-                borderColor: Colors.green,
+                readOnly: readonly,
               ),
 
               const SizedBox(height: 12),
 
               /// Arrival Point
-              _editableField(
+              EditableField(
                 icon: Icons.location_on_outlined,
                 iconColor: Colors.red,
                 label: "Arrival Point",
                 controller: endCtrl,
+                readOnly: readonly,
               ),
 
               const SizedBox(height: 12),
 
               /// Date Picker
-              _editableField(
+              EditableField(
                 icon: Icons.calendar_month,
                 iconColor: Colors.redAccent,
                 label: "Date",
                 controller: dateCtrl,
                 readOnly: true,
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                    initialDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    dateCtrl.text =
-                        "${picked.day.toString().padLeft(2, '0')}-"
-                        "${picked.month.toString().padLeft(2, '0')}-"
-                        "${picked.year}";
-                    selectedDate = picked;
-                  }
-                },
+                onTap: readonly
+                    ? null
+                    : () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                          initialDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          dateCtrl.text =
+                              "${picked.day.toString().padLeft(2, '0')}-"
+                              "${picked.month.toString().padLeft(2, '0')}-"
+                              "${picked.year}";
+                          selectedDate = picked;
+                        }
+                      },
               ),
 
               const SizedBox(height: 12),
 
               /// Time Picker
-              _editableField(
-                icon: Icons.access_time,
-                iconColor: Colors.green,
-                label: "Time",
-                controller: timeCtrl,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    final hour = picked.hourOfPeriod == 0
-                        ? 12
-                        : picked.hourOfPeriod;
-                    final minute = picked.minute.toString().padLeft(2, '0');
-                    final period = picked.period == DayPeriod.am ? "AM" : "PM";
+              if (!readonly)
+                EditableField(
+                  icon: Icons.access_time,
+                  iconColor: Colors.green,
+                  label: "Time",
+                  controller: timeCtrl,
+                  readOnly: true,
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      final hour = picked.hourOfPeriod == 0
+                          ? 12
+                          : picked.hourOfPeriod;
+                      final minute = picked.minute.toString().padLeft(2, '0');
+                      final period = picked.period == DayPeriod.am
+                          ? "AM"
+                          : "PM";
 
-                    timeCtrl.text = "$hour:$minute $period";
-                    selectedTime = picked;
-                  }
-                },
-              ),
+                      timeCtrl.text = "$hour:$minute $period";
+                      selectedTime = picked;
+                    }
+                  },
+                ),
+
+              if (readonly)
+                EditableField(
+                  icon: Icons.money,
+                  iconColor: Colors.green,
+                  label: "Fare",
+                  controller: fareCtrl,
+                ),
 
               const SizedBox(height: 24),
 
@@ -304,27 +344,54 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
                   ),
                 ),
                 onPressed: () async {
-                  //Get.back();
+                  if (!readonly) {
+                    //validators
+                    if (startCtrl.text.isEmpty ||
+                        endCtrl.text.isEmpty ||
+                        dateCtrl.text.isEmpty ||
+                        timeCtrl.text.isEmpty) {
+                      Get.snackbar("Empty", "Fill all field");
+                      return;
+                    }
+                    //
+                    final combinedDateTime = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    );
 
-                  final combinedDateTime = DateTime(
-                    selectedDate.year,
-                    selectedDate.month,
-                    selectedDate.day,
-                    selectedTime.hour,
-                    selectedTime.minute,
-                  );
+                    final requestBody = {
+                      "startLocation": startCtrl.text,
+                      "endLocation": endCtrl.text,
+                      "date":
+                          "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                      "startTime": combinedDateTime.toUtc().toIso8601String(),
+                    };
 
-                  final requestBody = {
-                    "startLocation": startCtrl.text,
-                    "endLocation": endCtrl.text,
-                    "date":
-                        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
-                    "startTime": combinedDateTime.toUtc().toIso8601String(),
-                  };
-
-                  await ApiService.rideSheet(requestBody);
+                    Map res = await ApiService.rideSheet(requestBody);
+                    Get.back();
+                    Get.snackbar("Bid For Fare", res['message']);
+                  } else {
+                    if (int.tryParse(fareCtrl.text) == null ||
+                        int.parse(fareCtrl.text) <= 0) {
+                      Get.snackbar("Fare", "Bid Fare atleast 1 and number");
+                      return;
+                    } else {
+                      final requestBody = {
+                        "rideId": id,
+                        "fare": int.parse(fareCtrl.text),
+                        "message": "Hello There i am available for this period",
+                      };
+                      Map res = await ApiService.sendProposalForRide(
+                        requestBody,
+                      );
+                      Get.back();
+                      Get.snackbar("Bid For Fare", res['message']);
+                    }
+                  }
                   refresh();
-                  Get.back();
                 },
                 child: const Text(
                   "Continue",
@@ -342,44 +409,91 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
   );
 }
 
-Widget _editableField({
-  required IconData icon,
-  required Color iconColor,
-  required String label,
-  required TextEditingController controller,
-  bool readOnly = false,
-  VoidCallback? onTap,
-  Color borderColor = const Color(0xFFE0E0E0),
-}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      border: Border.all(color: borderColor),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      children: [
-        Icon(icon, color: iconColor),
-        const SizedBox(width: 12),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            readOnly: readOnly,
-            onTap: onTap,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              labelText: label,
-              labelStyle: const TextStyle(fontSize: 13, color: Colors.black54),
+class EditableField extends StatefulWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final TextEditingController controller;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  final Color borderColor;
+
+  const EditableField({
+    super.key,
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.controller,
+    this.readOnly = false,
+    this.onTap,
+    this.borderColor = const Color(0xFFE0E0E0),
+  });
+
+  @override
+  State<EditableField> createState() => _EditableFieldState();
+}
+
+class _EditableFieldState extends State<EditableField> {
+  bool showClear = false;
+
+  @override
+  void initState() {
+    super.initState();
+    showClear = widget.controller.text.isNotEmpty;
+    widget.controller.addListener(_textListener);
+  }
+
+  void _textListener() {
+    if (mounted) {
+      setState(() {
+        showClear = widget.controller.text.isNotEmpty;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_textListener);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: widget.borderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(widget.icon, color: widget.iconColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: widget.controller,
+              readOnly: widget.readOnly,
+              onTap: widget.onTap,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                labelText: widget.label,
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.black54,
+                ),
+              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
-        ),
-        if (controller.text.isNotEmpty)
-          GestureDetector(
-            onTap: () => controller.clear(),
-            child: const Icon(Icons.close, color: Colors.red, size: 18),
-          ),
-      ],
-    ),
-  );
+          if (showClear && !widget.readOnly)
+            GestureDetector(
+              onTap: () {
+                widget.controller.clear();
+              },
+              child: const Icon(Icons.close, color: Colors.red, size: 18),
+            ),
+        ],
+      ),
+    );
+  }
 }

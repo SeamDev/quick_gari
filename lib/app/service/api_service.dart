@@ -3,9 +3,10 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/auth/views/verify.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/config.dart';
+import 'package:quick_gari/app/service/api_config.dart';
 import 'package:quick_gari/app/service/dio_logger.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
 
@@ -29,17 +30,29 @@ final dio =
             // Only attach token if requiresAuth is true AND it doesn't already have one
             if (requiresAuth && !options.headers.containsKey('Authorization')) {
               String? token = await HiveService.getToken();
-              if (token != null && token.toString().isNotEmpty) {
+              if (token != null && token.isNotEmpty) {
                 options.headers['Authorization'] = 'Bearer $token';
               } else {
-                if (await ApiService.refreshToken() &&
-                    await ApiService.getUser()) {
+                // Step 3: Try to refresh token
+                bool refreshed = await ApiService.refreshToken();
+                bool userFetched = false;
+
+                if (refreshed) {
+                  userFetched = await ApiService.getUser();
+                }
+
+                if (refreshed && userFetched) {
+                  // Step 4: Attach new token if available
                   token = await HiveService.getToken();
-                  if (token != null && token.toString().isNotEmpty) {
+                  if (token != null && token.isNotEmpty) {
                     options.headers['Authorization'] = 'Bearer $token';
                   } else {
+                    // If token still missing → navigate to login
                     Get.offAllNamed(Routes.AUTH);
                   }
+                } else {
+                  // Refresh failed → navigate to login
+                  Get.offAllNamed(Routes.AUTH);
                 }
               }
             }
@@ -86,7 +99,7 @@ class ApiService {
         final data = response.data;
         HiveService.setToken(data["token"]["accessToken"]);
         HiveService.setRToken(data["token"]["refreshToken"]);
-        HiveService.put("user", data["data"]);
+        getUser();
         return response.data;
       } else {
         debugPrint("Login failed");
@@ -225,7 +238,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        HiveService.put("user", data["data"]);
+        AppConfig().load(Map<String, dynamic>.from(data["data"]));
         return true;
       }
       return false;
@@ -404,20 +417,23 @@ class ApiService {
   // ==========================================
 
   // Request For a Ride (TOKEN AUTOMATICALLY INJECTED)
-  static Future<dynamic> rideSheet(dynamic body) async {
+  static Future<Map> rideSheet(dynamic body) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.rideAPI;
       var response = await dio.post(url, data: body);
 
-      return response.statusCode == 200;
+      return {
+        'success': response.statusCode == 200,
+        'message': response.data["message"],
+      };
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return {'success': false, 'message': 'Error'};
     }
   }
 
   // Ride - Get User All Created PRoposal List
-  static Future<List<Map<String, String>>> getUserRideList() async {
+  static Future<List<Map<String, dynamic>>> getUserRideList() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.getUserRideListAPI;
 
@@ -428,7 +444,27 @@ class ApiService {
       List data = response.data["data"];
 
       return data
-          .map<Map<String, String>>((e) => Map<String, String>.from(e))
+          .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
+          .toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  // Owner Ride - Get User All Created PRoposal List
+  static Future<List<Map<String, dynamic>>> getAllRideList() async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/ride/requested";
+
+      var response = await dio.get(url);
+
+      //debugPrint("${response.data["data"]}");
+
+      List data = response.data["data"];
+
+      return data
+          .map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e))
           .toList();
     } catch (e) {
       debugPrint("ERROR: $e");
@@ -452,23 +488,25 @@ class ApiService {
   }
 
   // Send Proposal For a Ride (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> sendProposalForRide() async {
+  static Future<Map> sendProposalForRide(body) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.rideProposalAPI;
 
-      var response = await dio.post(
-        url,
-        data: {
-          "rideId": "69a2cf2d0e9808e22b83289c",
-          "fare": "200",
-          "message": "Hello There i am available for this period",
-        },
-      );
+      var response = await dio.post(url, data: body);
 
-      return response.statusCode == 200;
+      return {
+        'success': response.statusCode == 200,
+        "message": response.data["message"],
+      };
+    } on DioException catch (e) {
+      debugPrint("ERROR: $e");
+      return {
+        'success': false,
+        "message": e.response?.data["message"].toString(),
+      };
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return {'success': false, "message": "Error"};
     }
   }
 

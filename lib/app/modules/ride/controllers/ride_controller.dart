@@ -1,13 +1,15 @@
 import 'package:get/get.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 
 class RideController extends GetxController {
   bool isLoading = true;
-  List<Map<String, String>> dataList = [];
+  List<Map<String, dynamic>> dataList = [];
 
   @override
   void onInit() {
-    getUserRideList();
+    //AppConfig().user.isCarOwner ? getAlluserList() : getUserRideList();
+    dataRefresh();
     super.onInit();
   }
 
@@ -30,10 +32,16 @@ class RideController extends GetxController {
   void dataRefresh() async {
     isLoading = true;
     update();
-    dataList = await ApiService.getUserRideList();
+    dataList = AppConfig().user.isCarOwner
+        ? await ApiService.getAllRideList()
+        : await ApiService.getUserRideList();
     isLoading = false;
     update();
   }
 
-  
+  void getAlluserList() async {
+    dataList = await ApiService.getAllRideList();
+    isLoading = false;
+    update();
+  }
 }

@@ -1,14 +1,11 @@
 import 'package:get/get.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 
 class ProfileController extends GetxController {
-  //TODO: Implement ProfileController
 
-  dynamic userInfo;
+  final user = AppConfig().user;
   @override
   void onInit() {
-    userInfo = HiveService.get("user");
-    print(userInfo);
     super.onInit();
   }
 
@@ -19,7 +16,6 @@ class ProfileController extends GetxController {
 
   @override
   void onClose() {
-    print(0);
     super.onClose();
   }
 }
