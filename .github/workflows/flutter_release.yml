@@ -1,0 +1,68 @@
+name: Flutter Build (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Version name (e.g. 1.2.0)"
+        required: true
+      build_number:
+        description: "Build number (e.g. 12)"
+        required: true
+      release:
+        description: "Save as release"
+        required: true
+        default: "false"
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install deps
+        run: flutter pub get
+
+      # 🔹 Set version
+      - name: Set version
+        run: |
+          sed -i '' "s/^version:.*/version: ${{ github.event.inputs.version_name }}+${{ github.event.inputs.build_number }}/" pubspec.yaml
+
+      - name: Clean
+        run: flutter clean
+
+      # 🔹 Build APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 🔹 Build iOS
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
+
+      # 🔹 Rename outputs
+      - name: Rename files
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk app-${{ github.event.inputs.version_name }}.apk
+          mv build/ios/iphoneos app-ios-${{ github.event.inputs.version_name }}
+
+      # 📦 Upload only if release = true
+      - name: Upload APK
+        if: ${{ github.event.inputs.release == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuickGari-apk-${{ github.event.inputs.version_name }}
+          path: app-${{ github.event.inputs.version_name }}.apk
+
+      - name: Upload iOS
+        if: ${{ github.event.inputs.release == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuickGari-ios-${{ github.event.inputs.version_name }}
+          path: app-ios-${{ github.event.inputs.version_name }}
