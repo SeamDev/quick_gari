@@ -66,10 +66,10 @@ class HiveService {
   ////
   ///
   ///
-  static Future<void> setToken(String value) async {
+  static Future<void> setToken(String? value) async {
     await Hive.box(_tokenBox).put("token", value);
   }
-  static Future<void> setRToken(String value) async {
+  static Future<void> setRToken(String? value) async {
     await Hive.box(_tokenBox).put("Rtoken", value);
   }
   static Future<String?> getToken() async {

@@ -27,7 +27,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
           child: Column(
             children: [
               // ================= OWNER INFO =================
-              buildSectionCard(
+              /* buildSectionCard(
                 title: "Owner Information",
                 children: [
                   appInput(
@@ -54,12 +54,21 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                   appInput(id: "address", label: "Address", maxLines: 3),
                   uploadButton("NID Card Photo (Optional)", "nid"),
                 ],
-              ),
+              ), */
 
               // ================= VEHICLE BASIC =================
               buildSectionCard(
                 title: "Vehicle Basic Information",
                 children: [
+                  appInput(
+                    id: "fullName",
+                    label: "Car Name",
+                    onChanged: (v) => controller.fullName = v,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return "Car Name required";
+                      return null;
+                    },
+                  ),
                   dropdownField(
                     title: "Vehicle Type",
                     items: [
@@ -117,21 +126,21 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                       if (v == null || v.isEmpty) return "Required";
                       return null;
                     },
-                  ),
+                  ), 
                   // AC Switch
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("AC Available?"),
-                      GetBuilder<RegisterVehicleController>(
-                        builder: (c) => Switch(
-                          activeThumbColor: const Color(0xFF00804B),
-                          value: controller.isAC,
-                          onChanged: (v) => controller.isAC = v,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     const Text("AC Available?"),
+                  //     GetBuilder<RegisterVehicleController>(
+                  //       builder: (c) => Switch(
+                  //         activeThumbColor: const Color(0xFF00804B),
+                  //         value: controller.isAC,
+                  //         onChanged: (v) => controller.isAC = v,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   dropdownField(
                     title: "Fuel Type",
                     items: ['Petrol', 'Diesel', 'Hybrid', 'Electric'],
@@ -190,30 +199,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                   ),
                   uploadButton("Tax Token Photo", "tax"),
                   uploadButton("Registration Card Photo", "reg"),
-                ],
-              ),
-
-              // ================= DRIVER INFO =================
-              buildSectionCard(
-                title: "Driver Information",
-                children: [
-                  appInput(
-                    id: "dName",
-                    label: "Driver Name",
-                    onChanged: (v) => controller.driverName = v,
-                  ),
-                  appInput(
-                    id: "dPhone",
-                    label: "Driver Phone",
-                    onChanged: (p0) => controller.driverPhone = p0,
-                  ),
-                  appInput(
-                    id: "lNumber",
-                    label: "Licence Number",
-                    onChanged: (p0) => controller.licenseNumber = p0,
-                  ),
-                  uploadButton("License Photo (Optional)", "lic"),
-                  uploadButton("Driver Photo (Optional)", "dri"),
+                  uploadButton("Driving Licence Photo", "lic"),
                 ],
               ),
 

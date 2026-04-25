@@ -55,7 +55,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         Get.snackbar("Verify OTP", "Failed");
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -68,7 +68,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         Get.snackbar("Resend OTP", "OTP Send Failed");
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

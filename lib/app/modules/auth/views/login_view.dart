@@ -48,7 +48,7 @@ class _SignInScreenState extends State<SignInScreen> {
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(response["message"])));
+      ).showSnackBar(SnackBar(content: Text(response["message"] ?? "Null Error on Login")));
 
       setState(() {
         isLoading = false;

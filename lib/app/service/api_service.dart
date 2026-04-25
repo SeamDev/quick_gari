@@ -10,66 +10,106 @@ import 'package:quick_gari/app/service/api_config.dart';
 import 'package:quick_gari/app/service/dio_logger.dart';
 import 'package:quick_gari/app/service/hive_service.dart';
 
-// ==========================================
-// 1. DIO INITIALIZATION & INTERCEPTOR SETUP
-// ==========================================
-final dio =
-    Dio(
-        BaseOptions(
-          connectTimeout: const Duration(seconds: 15),
-          receiveTimeout: const Duration(seconds: 15),
-          contentType: Headers.jsonContentType,
-        ),
-      )
-      ..interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (options, handler) async {
-            // Check if this request opted out of needing auth (defaults to true)
-            bool requiresAuth = options.extra['requiresAuth'] ?? true;
+bool firstTry = false, secondTry = false;
 
-            // Only attach token if requiresAuth is true AND it doesn't already have one
-            if (requiresAuth && !options.headers.containsKey('Authorization')) {
-              String? token = await HiveService.getToken();
-              if (token != null && token.isNotEmpty) {
-                options.headers['Authorization'] = 'Bearer $token';
-              } else {
-                // Step 3: Try to refresh token
-                bool refreshed = await ApiService.refreshToken();
-                bool userFetched = false;
+class ApiService {
+  // ==========================================
+  // 1. DIO INITIALIZATION & INTERCEPTOR SETUP
+  // ==========================================
+  static Dio dio =
+      Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            contentType: Headers.jsonContentType,
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              // Check if this request opted out of needing auth (defaults to true)
+              bool requiresAuth = options.extra['requiresAuth'] ?? true;
 
-                if (refreshed) {
-                  userFetched = await ApiService.getUser();
+              // Only attach token if requiresAuth is true AND it doesn't already have one
+              if (requiresAuth &&
+                  !options.headers.containsKey('Authorization')) {
+                String? token = await HiveService.getToken();
+                if (token != null && token.isNotEmpty) {
+                  options.headers['Authorization'] = 'Bearer $token';
                 }
+                /* else {
+                  // Step 3: Try to refresh token
+                  bool refreshed = await ApiService.refreshToken();
+                  bool userFetched = false;
 
-                if (refreshed && userFetched) {
-                  // Step 4: Attach new token if available
-                  token = await HiveService.getToken();
-                  if (token != null && token.isNotEmpty) {
-                    options.headers['Authorization'] = 'Bearer $token';
+                  if (refreshed) {
+                    userFetched = await ApiService.getUser();
+                  }
+
+                  if (refreshed && userFetched) {
+                    // Step 4: Attach new token if available
+                    token = await HiveService.getToken();
+                    if (token != null && token.isNotEmpty) {
+                      options.headers['Authorization'] = 'Bearer $token';
+                    } else {
+                      // If token still missing → navigate to login
+                      Get.offAllNamed(Routes.AUTH);
+                    }
                   } else {
-                    // If token still missing → navigate to login
+                    // Refresh failed → navigate to login
                     Get.offAllNamed(Routes.AUTH);
                   }
+                } */
+              }
+              return handler.next(options);
+            },
+            onError: (DioException error, handler) async {
+              final is401 = error.response?.statusCode == 401;
+
+              if (is401 && !secondTry) {
+                if (firstTry) {
+                  secondTry = true;
                 } else {
-                  // Refresh failed → navigate to login
+                  firstTry = true;
+                }
+                final refreshed = await ApiService.refreshToken();
+                if (refreshed) {
+                  final token = await HiveService.getToken();
+
+                  if (token != null && token.isNotEmpty) {
+                    try {
+                      final retryDio = Dio();
+
+                      final RequestOptions options = error.requestOptions
+                          .copyWith(
+                            headers: Map<String, dynamic>.from(
+                              error.requestOptions.headers,
+                            )..['Authorization'] = 'Bearer $token',
+                          );
+
+                      final response = await retryDio.fetch(options);
+
+                      return handler.resolve(response);
+                    } catch (e) {
+                      HiveService.clear();
+                      Get.offAllNamed(Routes.AUTH);
+                      debugPrint("Retry Error");
+                      return handler.next(error);
+                    }
+                  }
+                  HiveService.clear();
                   Get.offAllNamed(Routes.AUTH);
                 }
               }
-            }
-            return handler.next(options);
-          },
-          onError: (DioException error, handler) async {
-            // You can handle global 401 token refreshes here in the future
-            return handler.next(error);
-          },
-        ),
-      )
-      ..interceptors.add(DioLogger());
 
-// ==========================================
-// 2. API SERVICE CLASS
-// ==========================================
-class ApiService {
+              return handler.next(error);
+            },
+          ),
+        )
+        ..interceptors.add(DioLogger());
+  // ==========================================
+  // 2. API SERVICE CLASS
+  // ==========================================
   static Future<bool> g() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
@@ -99,7 +139,7 @@ class ApiService {
         final data = response.data;
         HiveService.setToken(data["token"]["accessToken"]);
         HiveService.setRToken(data["token"]["refreshToken"]);
-        getUser();
+        await ApiService.getUser();
         return response.data;
       } else {
         debugPrint("Login failed");
@@ -198,15 +238,26 @@ class ApiService {
   static Future<bool> refreshToken() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.refreashAPI;
-      String? refreashToken = await HiveService.getRToken();
+
+      String? refreshToken = await HiveService.getRToken();
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        return false;
+      }
+
       var response = await dio.post(
         url,
         options: Options(extra: {'requiresAuth': false}),
-        data: {"refreshToken": refreashToken},
+        data: {"refreshToken": refreshToken},
       );
-      HiveService.setToken(response.data["data"]["accessToken"]);
-      HiveService.setRToken(response.data["data"]["refreshToken"]);
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        HiveService.setToken(response.data?["data"]?["accessToken"]);
+        HiveService.setRToken(response.data?["data"]?["refreshToken"]);
+        return true;
+      } else {
+        HiveService.clear();
+        return false;
+      }
     } catch (e) {
       debugPrint("ERROR: $e");
       return false;
@@ -511,16 +562,13 @@ class ApiService {
   }
 
   // Accept Proposal (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> acceptProposal() async {
+  static Future<bool> acceptProposal(String rideID, String proposalID) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.acceptProposalAPI;
 
       var response = await dio.post(
         url,
-        data: {
-          "rideId": "69a31106061621a0432d5c99",
-          "proposalId": "69a31131061621a0432d5ca2",
-        },
+        data: {"rideId": rideID, "proposalId": proposalID},
       );
 
       return response.statusCode == 200;

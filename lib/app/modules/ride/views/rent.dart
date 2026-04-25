@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
 class RequestForRentPage extends StatelessWidget {
   final Map<String, dynamic> data;
   final List<String> mainList;
   final String id;
-  RequestForRentPage(this.data, this.mainList, this.id, {super.key});
+  final String status;
+  RequestForRentPage(
+    this.data,
+    this.mainList,
+    this.id,
+    this.status, {
+    super.key,
+  });
   final RentController controller = Get.put(RentController());
   @override
   Widget build(BuildContext context) {
@@ -203,7 +211,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  (data["fare"]*0.1).toString(),
+                  (data["fare"] * 0.1).toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -226,7 +234,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  (data["fare"]*1.1).toString(),
+                  (data["fare"] * 1.1).toString(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -237,18 +245,34 @@ class RequestForRentPage extends StatelessWidget {
 
             // -------- Confirm Booking Button --------
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String name = data['driver']?['name'];
                 String number = data['driver']?['phoneNumber'];
                 String fare = data['fare'].toString();
-                Get.to(
-                  () => PaymentView(
-                    name: name,
-                    number: number,
-                    fare: fare,
-                    id: id, serviceFor: 'rideId',
-                  ),
-                );
+                if (status == "PENDING") {
+                  Get.to(
+                    () => PaymentView(
+                      name: name,
+                      number: number,
+                      fare: fare,
+                      id: id,
+                      serviceFor: 'rideId',
+                    ),
+                  );
+                } else if (await ApiService.acceptProposal(id, data["_id"])) {
+                  Get.snackbar("Confirm Ride", "Ride Confirmed Successfully");
+                  Get.to(
+                    () => PaymentView(
+                      name: name,
+                      number: number,
+                      fare: fare,
+                      id: id,
+                      serviceFor: 'rideId',
+                    ),
+                  );
+                } else {
+                  Get.snackbar("Confirm Ride", "Ride Confirmed Already");
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF007F4F),
@@ -257,8 +281,8 @@ class RequestForRentPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                "Confirm Booking",
+              child: Text(
+                status == "PENDING" ? "Confirm Booking" : "Accept & Confirm Booking",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 17,

@@ -232,7 +232,7 @@ class _PaymentViewState extends State<PaymentView> {
 
                 // ---------- Subtitle ----------
                 Text(
-                  "Your request is in pending",
+                  "Payment Submitted Successtully",
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),

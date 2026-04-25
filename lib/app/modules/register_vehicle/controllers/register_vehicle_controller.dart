@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -12,9 +10,6 @@ class RegisterVehicleController extends GetxController {
   // =============================
 
   String? fullName;
-  String? phone;
-  String? email;
-  String? address;
 
   String? model;
   String? registrationNumber;
@@ -34,17 +29,13 @@ class RegisterVehicleController extends GetxController {
   String? manufactureYear;
   String? registrationYear;
 
-  bool isAC = false;
-
   // =============================
   // FILE VARIABLES
   // =============================
 
-  Map? nidPhoto;
   Map? taxTokenPhoto;
   Map? registrationCardPhoto;
   Map? licensePhoto;
-  Map? driverPhoto;
 
   Map? frontView;
   Map? sideView;
@@ -88,9 +79,6 @@ class RegisterVehicleController extends GetxController {
 
   void filePICK(String key) async {
     switch (key) {
-      case "nid":
-        nidPhoto = await pickFile();
-        break;
       case "tax":
         taxTokenPhoto = await pickFile();
         break;
@@ -99,9 +87,6 @@ class RegisterVehicleController extends GetxController {
         break;
       case "lic":
         licensePhoto = await pickFile();
-        break;
-      case "dri":
-        driverPhoto = await pickFile();
         break;
       case "front":
         frontView = await pickFile();
@@ -174,6 +159,7 @@ class RegisterVehicleController extends GetxController {
 
     bool res = await ApiService.registerCar(body);
     if (res) {
+      ApiService.getUser();
       Get.back();
     } else {}
   }

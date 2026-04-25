@@ -87,6 +87,18 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
     DateTime.parse(data["startTime"] ?? "2026-03-04T13:23:00.000Z").toLocal(),
   );
 
+  bool isBided = false;
+  int amount = 0;
+  if (AppConfig().user.isCarOwner) {
+    for (dynamic i in data["proposals"]) {
+      if (i["driver"] == AppConfig().user.id) {
+        isBided = true;
+        amount = i["fare"];
+        break;
+      }
+    }
+  }
+
   return Container(
     padding: const EdgeInsets.all(16),
     margin: EdgeInsets.only(top: 16),
@@ -146,12 +158,17 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                     start: startPT,
                     end: endPT,
                     date: date,
+                    amount: amount,
                     id: data["_id"] ?? "",
                   )
-                : Get.to(() => RideProposalView(id: data["_id"] ?? "00"));
+                : Get.to(() => RideProposalView(id: data["_id"] ?? "00",status: data["status"] ?? "null",));
           },
           child: Text(
-            AppConfig().user.isCarOwner ? "Bid a Fare" : "See Proposal",
+            AppConfig().user.isCarOwner
+                ? isBided
+                      ? "See My Fare"
+                      : "Bid a Fare"
+                : "See Proposal",
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -191,6 +208,7 @@ Widget _infoRow({
 showEditableAddressSheet(
   void Function() refresh, {
   bool readonly = false,
+  int amount = 0,
   String start = '',
   String end = '',
   String date = '',
@@ -206,6 +224,7 @@ showEditableAddressSheet(
     endCtrl.text = end;
     dateCtrl.text = date;
   }
+  if (amount > 0) fareCtrl.text = amount.toString();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
@@ -238,8 +257,8 @@ showEditableAddressSheet(
                 ),
               ),
 
-              const Text(
-                "Select address",
+              Text(
+                amount > 0 ? "My Fare" : "Bid a Fare",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -247,52 +266,55 @@ showEditableAddressSheet(
               const SizedBox(height: 20),
 
               /// Starting Point
-              EditableField(
-                icon: Icons.location_on,
-                iconColor: Colors.green,
-                label: "Starting Point",
-                controller: startCtrl,
-                readOnly: readonly,
-              ),
+              if (!readonly)
+                EditableField(
+                  icon: Icons.location_on,
+                  iconColor: Colors.green,
+                  label: "Starting Point",
+                  controller: startCtrl,
+                  readOnly: readonly,
+                ),
 
-              const SizedBox(height: 12),
+              if (!readonly) const SizedBox(height: 12),
 
               /// Arrival Point
-              EditableField(
-                icon: Icons.location_on_outlined,
-                iconColor: Colors.red,
-                label: "Arrival Point",
-                controller: endCtrl,
-                readOnly: readonly,
-              ),
+              if (!readonly)
+                EditableField(
+                  icon: Icons.location_on_outlined,
+                  iconColor: Colors.red,
+                  label: "Arrival Point",
+                  controller: endCtrl,
+                  readOnly: readonly,
+                ),
 
-              const SizedBox(height: 12),
+              if (!readonly) const SizedBox(height: 12),
 
               /// Date Picker
-              EditableField(
-                icon: Icons.calendar_month,
-                iconColor: Colors.redAccent,
-                label: "Date",
-                controller: dateCtrl,
-                readOnly: true,
-                onTap: readonly
-                    ? null
-                    : () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                          initialDate: DateTime.now(),
-                        );
-                        if (picked != null) {
-                          dateCtrl.text =
-                              "${picked.day.toString().padLeft(2, '0')}-"
-                              "${picked.month.toString().padLeft(2, '0')}-"
-                              "${picked.year}";
-                          selectedDate = picked;
-                        }
-                      },
-              ),
+              if (!readonly)
+                EditableField(
+                  icon: Icons.calendar_month,
+                  iconColor: Colors.redAccent,
+                  label: "Date",
+                  controller: dateCtrl,
+                  readOnly: true,
+                  onTap: readonly
+                      ? null
+                      : () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                            initialDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            dateCtrl.text =
+                                "${picked.day.toString().padLeft(2, '0')}-"
+                                "${picked.month.toString().padLeft(2, '0')}-"
+                                "${picked.year}";
+                            selectedDate = picked;
+                          }
+                        },
+                ),
 
               const SizedBox(height: 12),
 
@@ -329,6 +351,7 @@ showEditableAddressSheet(
                   icon: Icons.money,
                   iconColor: Colors.green,
                   label: "Fare",
+                  readOnly: amount > 0,
                   controller: fareCtrl,
                 ),
 
@@ -373,6 +396,9 @@ showEditableAddressSheet(
                     Map res = await ApiService.rideSheet(requestBody);
                     Get.back();
                     Get.snackbar("Bid For Fare", res['message']);
+                  } else if (amount > 0) {
+                    Get.back();
+                    return;
                   } else {
                     if (int.tryParse(fareCtrl.text) == null ||
                         int.parse(fareCtrl.text) <= 0) {
@@ -393,8 +419,12 @@ showEditableAddressSheet(
                   }
                   refresh();
                 },
-                child: const Text(
-                  "Continue",
+                child: Text(
+                  readonly
+                      ? amount > 0
+                            ? "Close"
+                            : "Submit Fare"
+                      : "Continue",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),

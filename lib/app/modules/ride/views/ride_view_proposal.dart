@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/ride_proposal_controller.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
+
 class RideProposalView extends StatelessWidget {
   final String id;
-  RideProposalView({super.key, required this.id});
+  final String status;
+  RideProposalView({super.key, required this.id, required this.status});
 
   late final RideProposalController controller = Get.put(
     RideProposalController(id),
@@ -57,7 +59,12 @@ class RideProposalView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final data =
                                 controller.dataList["proposals"][index];
-                            return vehicleCard(data, controller.mainList , id);
+                            return vehicleCard(
+                              data,
+                              controller.mainList,
+                              id,
+                              status,
+                            );
                           },
                         ),
                       ),
@@ -70,7 +77,12 @@ class RideProposalView extends StatelessWidget {
   }
 }
 
-Widget vehicleCard(Map<String, dynamic> data, List<String> mainList,String id) {
+Widget vehicleCard(
+  Map<String, dynamic> data,
+  List<String> mainList,
+  String id,
+  String status,
+) {
   return Container(
     padding: const EdgeInsets.all(16),
     margin: EdgeInsets.only(top: 16),
@@ -113,7 +125,6 @@ Widget vehicleCard(Map<String, dynamic> data, List<String> mainList,String id) {
         //   "5 KM | Distance from your starting location",
         //   style: TextStyle(color: Colors.black87, fontSize: 12),
         // ),
-
         const SizedBox(height: 14),
 
         /// Starting Area
@@ -180,7 +191,7 @@ Widget vehicleCard(Map<String, dynamic> data, List<String> mainList,String id) {
             minimumSize: Size(300, 50),
           ),
           onPressed: () {
-            Get.to(() => CarDetailPage(data, mainList,id));
+            Get.to(() => CarDetailPage(data, mainList, id, status));
           },
           child: const Text(
             "Vehicle Details & Booking",

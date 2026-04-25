@@ -4,7 +4,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:typed_data';
+
 
 import 'package:quick_gari/app/service/api_service.dart';
 

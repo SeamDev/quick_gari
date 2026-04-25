@@ -7,7 +7,8 @@ class CarDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
   final List<String> mainList;
   final String id;
-  CarDetailPage(this.data, this.mainList, this.id, {super.key});
+  final String status;
+  CarDetailPage(this.data, this.mainList, this.id, this.status, {super.key});
   final controller = Get.put(RideNowController());
 
   @override
@@ -209,7 +210,7 @@ class CarDetailPage extends StatelessWidget {
                             ),
                           ),
                           onPressed: () =>
-                              Get.to(() => RequestForRentPage(data, mainList,id)),
+                              Get.to(() => RequestForRentPage(data, mainList,id,status)),
                           child: const Text(
                             'Ride Now',
                             style: TextStyle(fontSize: 22, color: Colors.white),
