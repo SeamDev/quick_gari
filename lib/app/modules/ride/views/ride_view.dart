@@ -161,13 +161,21 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                     amount: amount,
                     id: data["_id"] ?? "",
                   )
-                : Get.to(() => RideProposalView(id: data["_id"] ?? "00",status: data["status"] ?? "null",));
+                : Get.to(
+                    () => RideProposalView(
+                      id: data["_id"] ?? "00",
+                      status: data["status"] ?? "null",
+                      driverID: data["driver"],
+                    ),
+                  );
           },
           child: Text(
             AppConfig().user.isCarOwner
                 ? isBided
                       ? "See My Fare"
                       : "Bid a Fare"
+                : data["status"] == "ACCEPTED"
+                ? "Accepted | See Car Detail"
                 : "See Proposal",
             style: TextStyle(color: Colors.white),
           ),

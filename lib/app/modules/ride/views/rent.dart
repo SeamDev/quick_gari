@@ -234,13 +234,11 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  (data["fare"] * 1.1).toString(),
+                  ((data["fare"] ?? 0.0) * 1.1).toStringAsFixed(2),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            const SizedBox(height: 24),
             const SizedBox(height: 10),
 
             // -------- Confirm Booking Button --------

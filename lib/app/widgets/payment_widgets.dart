@@ -127,7 +127,7 @@ class _PaymentViewState extends State<PaymentView> {
                   const Divider(height: 30),
 
                   Text(
-                    "Fare: ৳ ${int.parse(widget.fare)*1.1}",
+                    "Fare: ৳ ${(int.parse(widget.fare)*1.1).toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/ride_proposal_controller.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
+import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 class RideProposalView extends StatelessWidget {
   final String id;
   final String status;
-  RideProposalView({super.key, required this.id, required this.status});
+  final String? driverID;
+  RideProposalView({
+    super.key,
+    required this.id,
+    required this.status,
+    this.driverID,
+  });
 
   late final RideProposalController controller = Get.put(
     RideProposalController(id),
@@ -46,10 +53,11 @@ class RideProposalView extends StatelessWidget {
                     children: [
                       const SizedBox(height: 10),
 
-                      Text(
-                        "${controller.dataList["proposals"].length} proposal found",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
+                      if (driverID == null)
+                        Text(
+                          "${controller.dataList["proposals"].length} proposal found",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
 
                       const SizedBox(height: 12),
 
@@ -59,6 +67,20 @@ class RideProposalView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final data =
                                 controller.dataList["proposals"][index];
+                            if (driverID != null) {
+                              if (data["car"]["user"] != driverID) {
+                                return null;
+                              }
+                            }
+                            if (status == "ACCEPTED") {
+                              return DriverInfoContainer(
+                                data: {
+                                  "name": data["driver"]["name"],
+                                  "phone": data["driver"]["phoneNumber"],
+                                  "image": data["driver"]["avatar"],
+                                },
+                              );
+                            }
                             return vehicleCard(
                               data,
                               controller.mainList,
