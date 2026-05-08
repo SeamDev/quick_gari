@@ -34,11 +34,11 @@ final dio =
                 options.headers['Authorization'] = 'Bearer $token';
               } else {
                 // Step 3: Try to refresh token
-                bool refreshed = await ApiService.refreshToken();
+                bool refreshed = await ApiService1.refreshToken();
                 bool userFetched = false;
 
                 if (refreshed) {
-                  userFetched = await ApiService.getUser();
+                  userFetched = await ApiService1.getUser();
                 }
 
                 if (refreshed && userFetched) {
@@ -60,7 +60,7 @@ final dio =
           },
           onError: (DioException error, handler) async {
             if (error.response?.statusCode == 401) {
-              if (!await ApiService.refreshToken()) {}
+              if (!await ApiService1.refreshToken()) {}
             }
             return handler.next(error);
           },
@@ -71,7 +71,7 @@ final dio =
 // ==========================================
 // 2. API SERVICE CLASS
 // ==========================================
-class ApiService {
+class ApiService1 {
   static Future<bool> g() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
@@ -101,7 +101,7 @@ class ApiService {
         final data = response.data;
         HiveService.setToken(data["token"]["accessToken"]);
         HiveService.setRToken(data["token"]["refreshToken"]);
-        await ApiService.getUser();
+        await ApiService1.getUser();
         return response.data;
       } else {
         debugPrint("Login failed");

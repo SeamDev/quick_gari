@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/ride_proposal_controller.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
-import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 class RideProposalView extends StatelessWidget {
   final String id;
@@ -71,15 +70,6 @@ class RideProposalView extends StatelessWidget {
                               if (data["car"]["user"] != driverID) {
                                 return null;
                               }
-                            }
-                            if (status == "ACCEPTED") {
-                              return DriverInfoContainer(
-                                data: {
-                                  "name": data["driver"]["name"],
-                                  "phone": data["driver"]["phoneNumber"],
-                                  "image": data["driver"]["avatar"],
-                                },
-                              );
                             }
                             return vehicleCard(
                               data,

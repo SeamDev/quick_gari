@@ -56,7 +56,7 @@ class RideView extends GetView<RideController> {
                       const SizedBox(height: 10),
 
                       Text(
-                        "${controller.dataList.length} cars found",
+                        "${controller.filteredList.length} cars found",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
 
@@ -64,9 +64,10 @@ class RideView extends GetView<RideController> {
 
                       Expanded(
                         child: ListView.builder(
-                          itemCount: controller.dataList.length,
+                          itemCount: controller.filteredList.length,
                           itemBuilder: (context, index) {
-                            final data = controller.dataList[index];
+                            final data = controller.filteredList[index];
+
                             return vehicleCard(data, refresh);
                           },
                         ),
@@ -174,8 +175,6 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                 ? isBided
                       ? "See My Fare"
                       : "Bid a Fare"
-                : data["status"] == "ACCEPTED"
-                ? "Accepted | See Car Detail"
                 : "See Proposal",
             style: TextStyle(color: Colors.white),
           ),

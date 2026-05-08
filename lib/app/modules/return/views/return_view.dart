@@ -38,33 +38,38 @@ class ReturnView extends GetView<ReturnController> {
         ),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        actions: !AppConfig().user.isCarOwner ? null : [
-          GestureDetector(
-            onTap: () => showEditableAddressSheet(context,refresh),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: const [
-                  Text('Create', style: TextStyle(color: Colors.black87)),
-                  SizedBox(width: 6),
-                  Icon(Icons.add, color: Colors.black54),
-                  SizedBox(width: 6),
-                ],
-              ),
-            ),
-          ),
-        ],
+        actions: !AppConfig().user.isCarOwner
+            ? null
+            : [
+                GestureDetector(
+                  onTap: () => showEditableAddressSheet(context, refresh),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: const [
+                        Text('Create', style: TextStyle(color: Colors.black87)),
+                        SizedBox(width: 6),
+                        Icon(Icons.add, color: Colors.black54),
+                        SizedBox(width: 6),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
       ),
       body: GetBuilder<ReturnController>(
         builder: (_) {
           return controller.isLoading
               ? Center(child: CircularProgressIndicator())
               : controller.data.isEmpty
-              ? Center(child: Text("NO Return Car Found"),)
+              ? Center(child: Text("NO Return Car Found"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -199,23 +204,27 @@ class ReturnView extends GetView<ReturnController> {
           const SizedBox(height: 16),
 
           /// Button
-          if(!AppConfig().user.isCarOwner) ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4CAF50),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          if (!AppConfig().user.isCarOwner)
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4CAF50),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                minimumSize: Size(300, 50),
               ),
-              minimumSize: Size(300, 50),
+              onPressed: () {
+                Get.to(() => CarDetailsView(data));
+              },
+              child: Text(
+                data["payment"] == "ACCEPTED" ? "" : "Vehicle Details & Booking",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-            onPressed: () {
-              Get.to(() => CarDetailsView(data));
-            },
-            child: const Text(
-              "Vehicle Details & Booking",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
         ],
       ),
     );

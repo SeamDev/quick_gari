@@ -28,8 +28,8 @@ import '../modules/ride/bindings/ride_binding.dart';
 import '../modules/ride/views/ride_view.dart';
 import '../modules/share_vehicle/bindings/share_vehicle_binding.dart';
 import '../modules/share_vehicle/views/share_vehicle_view.dart';
-import '../modules/wallet/bindings/wallet_binding.dart';
-import '../modules/wallet/views/wallet_view.dart';
+import '../modules/history/bindings/history_binding.dart';
+import '../modules/history/views/history_view.dart';
 
 part 'app_routes.dart';
 

@@ -142,7 +142,7 @@ class ConfirmBookingView extends StatelessWidget {
                   _fareRow('Driver Fare', '৳', '${data["fare"]}'),
                   _fareRow('Service Fee', '৳', '${data["fare"] * 0.1}'),
                   const Divider(),
-                  _fareRow('Total', '৳', '${data["fare"] * 1.1}', bold: true),
+                  _fareRow('Total', '৳', '${((data["fare"] ?? 0.0) * 1.1).toStringAsFixed(2)}', bold: true),
                 ],
               ),
             ),

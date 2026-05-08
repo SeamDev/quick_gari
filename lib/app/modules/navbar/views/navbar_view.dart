@@ -7,7 +7,7 @@ import 'package:quick_gari/app/modules/home/views/home_view.dart';
 import 'package:quick_gari/app/modules/navbar/views/menu_view.dart';
 import 'package:quick_gari/app/modules/offer/views/offer_view.dart';
 import 'package:quick_gari/app/modules/profile/views/profile_view.dart';
-import 'package:quick_gari/app/modules/wallet/views/wallet_view.dart';
+import 'package:quick_gari/app/modules/history/views/history_view.dart';
 
 import '../controllers/navbar_controller.dart';
 
@@ -52,6 +52,7 @@ class NavbarView extends GetView<NavbarController> {
 
       /// ---- SIDE MENU SCREEN ----
       drawer: const MenuView(),
+      //disabledGestures: true,
 
       /// ---- MAIN SCREEN ----
         child: Padding(
@@ -119,9 +120,9 @@ class NavbarView extends GetView<NavbarController> {
                     child: GestureDetector(
                       onTap: () => controller.currentIndex = 2,
                       child: const Icon(
-                        Icons.account_balance_wallet_outlined,
+                        Icons.history ,
                         color: Colors.white,
-                        size: 28,
+                        size: 35,
                       ),
                     ),
                   ),

@@ -6,21 +6,14 @@ class RideController extends GetxController {
   bool isLoading = true;
   List<Map<String, dynamic>> dataList = [];
 
+// Inside RideController
+List get filteredList => dataList.where((data) => data["status"] != "ACCEPTED").toList();
+
   @override
   void onInit() {
     //AppConfig().user.isCarOwner ? getAlluserList() : getUserRideList();
     dataRefresh();
     super.onInit();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 
   void getUserRideList() async {
