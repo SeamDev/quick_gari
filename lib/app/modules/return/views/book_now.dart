@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
 class ConfirmBookingView extends StatelessWidget {
@@ -9,6 +10,9 @@ class ConfirmBookingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    String status = data['status'];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -142,7 +146,12 @@ class ConfirmBookingView extends StatelessWidget {
                   _fareRow('Driver Fare', '৳', '${data["fare"]}'),
                   _fareRow('Service Fee', '৳', '${data["fare"] * 0.1}'),
                   const Divider(),
-                  _fareRow('Total', '৳', '${((data["fare"] ?? 0.0) * 1.1).toStringAsFixed(2)}', bold: true),
+                  _fareRow(
+                    'Total',
+                    '৳',
+                    '${((data["fare"] ?? 0.0) * 1.1).toStringAsFixed(2)}',
+                    bold: true,
+                  ),
                 ],
               ),
             ),
@@ -160,11 +169,25 @@ class ConfirmBookingView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   String name = data['driver']?['name'];
                   String number = data['driver']?['phoneNumber'];
                   String fare = data['fare'].toString();
                   String id = data['_id'].toString();
+                  if (status == "AVAILABLE") {
+                    if (await ApiService.acceptReturnTrip(id)) {
+                      Get.snackbar(
+                        "Confirm Ride",
+                        "Ride Confirmed Successfully",
+                      );
+                    } else {
+                      Get.snackbar(
+                        "Confirm Ride",
+                        "Ride Confirmed Unsuccessful",
+                      );
+                      return;
+                    }
+                  }
                   Get.to(
                     () => PaymentView(
                       name: name,
@@ -175,8 +198,8 @@ class ConfirmBookingView extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text(
-                  'Confirm Booking',
+                child: Text(
+                  status == "AVAILABLE" ? 'Accept and Confirm Booking' : 'Confirm Booking',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),

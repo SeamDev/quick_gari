@@ -137,8 +137,8 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        HiveService.setToken(data["token"]["accessToken"]);
-        HiveService.setRToken(data["token"]["refreshToken"]);
+        HiveService.setToken(data["data"]["accessToken"]);
+        HiveService.setRToken(data["data"]["refreshToken"]);
         await ApiService.getUser();
         return response.data;
       } else {
@@ -464,7 +464,7 @@ class ApiService {
   }
 
   // ==========================================
-  // Ride
+  /// Ride
   // ==========================================
 
   // Request For a Ride (TOKEN AUTOMATICALLY INJECTED)
@@ -591,6 +591,58 @@ class ApiService {
     }
   }
 
+  static Future<Map> rideVerifyOtp({
+    required String rideId,
+    required String otp,
+  }) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/ride/$rideId/verify-otp";
+
+      var response = await dio.post(url, data: {"otp": otp});
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        return {"success": false, "message": "OTP verification failed"};
+      }
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? e.message,
+      };
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
+    }
+  }
+
+  static Future<List<Map>> getPassengerCompleteRide() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/passenger/completed";
+      var response = await dio.get(url);
+      List data = response.data["data"];
+
+      return data.map<Map>((e) => Map.from(e)).toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map>> getDriverCompleteRide() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/driver/completed";
+      var response = await dio.get(url);
+      List data = response.data["data"];
+
+      return data.map<Map>((e) => Map.from(e)).toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
   // ==========================================
   // Return
   // ==========================================
@@ -631,10 +683,94 @@ class ApiService {
     }
   }
 
-  // GetAllAvailable Trip (TOKEN AUTOMATICALLY INJECTED)
+  // GetAllAvailable Trip  -- delet
   static Future<List<Map>> getAllReturnTrip() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
+      var response = await dio.get(url);
+      List data = response.data["data"];
+
+      return data.map<Map>((e) => Map.from(e)).toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<bool> acceptReturnTrip(String id) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/$id/book";
+
+      var response = await dio.post(url);
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  static Future<bool> verifyReturnOTP(String id, String otp) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.acceptProposalAPI}/$id/verify-otp";
+
+      var response = await dio.post(url, data: {"otp": otp});
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  static Future<Map<String,dynamic>> getPassengerActiveReturn() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/passenger/active";
+      var response = await dio.get(url);
+      Map<String,dynamic> data = response.data["data"];
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
+  static Future<Map<String,dynamic>> getDriverActiveReturn() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/driver/active";
+      var response = await dio.get(url);
+      Map<String,dynamic> data = response.data["data"];
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
+  static Future<List<Map>> getPassengerCompleteReturn() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/passenger/completed";
+      var response = await dio.get(url);
+      List data = response.data["data"];
+
+      return data.map<Map>((e) => Map.from(e)).toList();
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map>> getDriverCompleteReturn() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/driver/completed";
       var response = await dio.get(url);
       List data = response.data["data"];
 
