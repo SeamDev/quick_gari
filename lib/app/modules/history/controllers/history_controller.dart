@@ -5,8 +5,8 @@ import 'package:quick_gari/app/service/api_service.dart';
 import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 class WalletController extends GetxController {
-  RxMap<String, dynamic> dataRide = <String, dynamic>{}.obs;
-  RxMap<String, dynamic> dataReturn = <String, dynamic>{}.obs;
+  RxList<Map<String, dynamic>> dataRide = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> dataReturn = <Map<String, dynamic>>[].obs;
 
   RxBool isLoading = false.obs;
 
@@ -22,8 +22,10 @@ class WalletController extends GetxController {
       isLoading.value = true;
       if (AppConfig().user.isCarOwner) {
         dataReturn.value = await ApiService.getDriverActiveReturn();
+        dataRide.value = await ApiService.getDriverActiveRide();
       } else {
         dataReturn.value = await ApiService.getPassengerActiveReturn();
+        dataRide.value = await ApiService.getPassengerActiveRide();
       }
     } catch (e) {
       debugPrint("Fetch Error: $e");
@@ -32,23 +34,4 @@ class WalletController extends GetxController {
     }
   }
 
-  /// GO TO DRIVER PAGE
-  Future<void> gotoDriver({
-    required String rideId,
-    required String driverId,
-    bool isVerified = false,
-  }) async {
-    try {
-      isLoading.value = true;
-
-      /// NAVIGATE
-      Get.to(() => DriverInfoContainer(isVerified: isVerified));
-    } catch (e) {
-      debugPrint("Goto Driver Error: $e");
-
-      Get.snackbar("Error", "Something went wrong");
-    } finally {
-      isLoading.value = false;
-    }
-  }
 }

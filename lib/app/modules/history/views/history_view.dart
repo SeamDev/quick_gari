@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 import '../controllers/history_controller.dart';
@@ -19,7 +20,7 @@ class WalletView extends GetView<WalletController> {
             await controller.fetchData();
           },
           child: Obx(
-            () => controller.dataReturn.isEmpty
+            () => controller.dataRide.isEmpty && controller.dataReturn.isEmpty
                 ? CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: const [
@@ -29,27 +30,58 @@ class WalletView extends GetView<WalletController> {
                       ),
                     ],
                   )
-                : ListView(
-                    children: [
-                      if (controller.dataReturn.isNotEmpty)
-                        DriverInfoContainer(
-                          name: controller.dataReturn["driver"] ?? "N/A",
-                          phone: controller.dataReturn["phone"] ?? "N/A",
-                          vehicleName:
-                              controller.dataReturn["vehicle_name"] ?? "N/A",
-                          fare:
-                              controller.dataReturn["fare"]?.toString() ?? "0",
-                          startPoint:
-                              controller.dataReturn["start_point"] ?? "N/A",
-                          endPoint: controller.dataReturn["end_point"] ?? "N/A",
-                          image: controller.dataReturn["image"] ?? "",
-                          id:
-                              controller.dataReturn["_id"]?.toString() ??
-                              "",
-                          status: controller.dataReturn["status"] ?? "",
-                        ),
-                      if (controller.dataRide.isNotEmpty) DriverInfoContainer(),
-                    ],
+                : ListView.builder(
+                    itemCount:
+                        controller.dataReturn.length +
+                        controller.dataRide.length,
+                    itemBuilder: (context, index) {
+                      bool isReturn = index < controller.dataReturn.length;
+                      bool isOwner = AppConfig().user.isCarOwner;
+                      final item = isReturn
+                          ? controller.dataReturn[index]
+                          : controller.dataRide[index -
+                                controller.dataReturn.length];
+
+                      return DriverInfoContainer(
+                        refresh: controller.fetchData,
+                        tripType: isReturn ? "Return" : "Ride",
+                        name:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["name"] ??
+                            "N/A",
+                        phone:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["phoneNumber"] ??
+                            "N/A",
+                        image:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["avatar"] ??
+                            "N/A",
+                        vehicleName: item["car"]?["carName"] ?? "N/A",
+                        fare: item["fare"]?.toString() ?? "0",
+                        startPoint: item["startLocation"] ?? "N/A",
+                        endPoint: item["endLocation"] ?? "N/A" ?? "N/A",
+                        carImage:
+                            item["car"]?["features"]?["images"]?[0] ?? "N/A",
+                        id: item["_id"] ?? "N/A",
+                        status: item["status"] ?? "N/A",
+                        date: item["startTime"] ?? "N/A",
+                        isVerified:
+                            item[isReturn
+                                ? "retfurnOtpVerified"
+                                : "rideOtpVerified"] ??
+                            false,
+                      );
+                    },
                   ),
           ),
         ),

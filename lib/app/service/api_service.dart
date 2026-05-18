@@ -591,12 +591,13 @@ class ApiService {
     }
   }
 
-  static Future<Map> rideVerifyOtp({
+  static Future<Map> tripVerifyOtp({
+    required String tripType,
     required String rideId,
     required String otp,
   }) async {
     try {
-      var url = "${Config.baseUrl}${Config.apiVersion}/ride/$rideId/verify-otp";
+      var url = "${Config.baseUrl}${Config.apiVersion}/$tripType/$rideId/verify-otp";
 
       var response = await dio.post(url, data: {"otp": otp});
 
@@ -612,6 +613,37 @@ class ApiService {
       };
     } catch (e) {
       return {"success": false, "message": e.toString()};
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getPassengerActiveRide() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/passenger/active";
+      var response = await dio.get(url);
+
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getDriverActiveRide() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/driver/active";
+      var response = await dio.get(url);
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
     }
   }
 
@@ -725,31 +757,32 @@ class ApiService {
     }
   }
 
-  static Future<Map<String,dynamic>> getPassengerActiveReturn() async {
+  static Future<List<Map<String, dynamic>>> getPassengerActiveReturn() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/passenger/active";
       var response = await dio.get(url);
-      Map<String,dynamic> data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
       return data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return {};
+      return [];
     }
   }
 
-  static Future<Map<String,dynamic>> getDriverActiveReturn() async {
+  static Future<List<Map<String, dynamic>>> getDriverActiveReturn() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/driver/active";
       var response = await dio.get(url);
-      Map<String,dynamic> data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"].cast<Map<String, dynamic>>();
 
       return data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return {};
+      return [];
     }
   }
 

@@ -81,7 +81,7 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
               final picked = await showDatePicker(
                 context: context,
                 firstDate: DateTime.now(),
-                lastDate: DateTime(2100),
+                lastDate: DateTime.now(),
                 initialDate: DateTime.now(),
               );
               if (picked != null) {
