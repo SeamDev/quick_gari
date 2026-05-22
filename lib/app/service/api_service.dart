@@ -650,7 +650,7 @@ class ApiService {
   static Future<List<Map>> getPassengerCompleteRide() async {
     try {
       var url =
-          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/passenger/completed";
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/list/user/completed";
       var response = await dio.get(url);
       List data = response.data["data"];
 
@@ -664,7 +664,7 @@ class ApiService {
   static Future<List<Map>> getDriverCompleteRide() async {
     try {
       var url =
-          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/driver/completed";
+          "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/list/driver/completed";
       var response = await dio.get(url);
       List data = response.data["data"];
 
