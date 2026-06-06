@@ -98,11 +98,12 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
         focusNode: focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        maxLength: 1,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(index == 0 ? widget.length : 1),
+        ],
         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         decoration: InputDecoration(
-          counterText: "",
           filled: true,
           fillColor: Colors.grey.shade100,
           enabledBorder: OutlineInputBorder(
@@ -119,8 +120,24 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
         ),
         onChanged: (value) {
           if (value.isNotEmpty) {
+            // Handle paste
+            if (value.length > 1) {
+              final chars = value.split('');
+
+              for (int i = 0; i < widget.length; i++) {
+                controllers[i].text = i < chars.length ? chars[i] : '';
+              }
+
+              FocusScope.of(context).unfocus();
+
+              handleChange();
+              return;
+            }
+            // Normal typing
             if (index < widget.length - 1) {
               FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+            } else {
+              FocusScope.of(context).unfocus();
             }
           } else {
             if (index > 0) {

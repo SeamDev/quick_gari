@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 import '../controllers/history_controller.dart';
@@ -18,7 +19,7 @@ class HistoryView extends GetView<HistoryController> {
             await controller.fetchData();
           },
           child: Obx(
-            () => controller.data.isNotEmpty
+            () => controller.dataRide.isEmpty && controller.dataReturn.isEmpty
                 ? CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: const [
@@ -29,9 +30,52 @@ class HistoryView extends GetView<HistoryController> {
                     ],
                   )
                 : ListView.builder(
-                    itemCount: 3,
+                    itemCount:
+                        controller.dataReturn.length +
+                        controller.dataRide.length,
                     itemBuilder: (context, index) {
-                      return DriverInfoContainer(refresh: (){});
+                      bool isReturn = index < controller.dataReturn.length;
+                      bool isOwner = AppConfig().user.isCarOwner;
+                      final item = isReturn
+                          ? controller.dataReturn[index]
+                          : controller.dataRide[index -
+                                controller.dataReturn.length];
+
+                      return DriverInfoContainer(
+                        refresh: controller.fetchData,
+                        tripType: isReturn ? "Return" : "Ride",
+                        name:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["name"] ??
+                            "N/A",
+                        phone:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["phoneNumber"] ??
+                            "N/A",
+                        image:
+                            item[!isOwner
+                                ? "driver"
+                                : isReturn
+                                ? "passenger"
+                                : "user"]?["avatar"] ??
+                            "N/A",
+                        vehicleName: item["car"]?["carName"] ?? "N/A",
+                        fare: item["fare"]?.toString() ?? "0",
+                        startPoint: item["startLocation"] ?? "N/A",
+                        endPoint: item["endLocation"] ?? "N/A" ?? "N/A",
+                        carImage:
+                            item["car"]?["features"]?["images"]?[0] ?? "N/A",
+                        id: item["_id"] ?? "N/A",
+                        status: item["status"] ?? "N/A",
+                        date: item["startTime"] ?? "N/A",
+                        isVerified: true,
+                      );
                     },
                   ),
           ),

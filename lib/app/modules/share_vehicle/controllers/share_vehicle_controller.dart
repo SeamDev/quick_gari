@@ -1,21 +1,35 @@
-import 'dart:typed_data';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
+import 'package:quick_gari/app/service/api_service.dart';
 
 class ShareVehicleController extends GetxController {
-  /// Image
-  var selectedImage = Rx<Uint8List?>(null);
+  @override
+  void onInit() {
+    fetchData();
+    super.onInit();
+  }
+
+  @override
+  void onClose() {
+    dateController.text = "";
+    stops.value = List.generate(3, (_) => {"place": "", "time": "--:--"});
+    super.onClose();
+  }
+
+  final dateController = TextEditingController();
 
   final user = AppConfig().user;
 
   /// Stops (JSON-like)
-  var stops = List.generate(3, (_) => {"place": "", "time": ""}).obs;
+  var stops = List.generate(3, (_) => {"place": "", "time": "--:--"}).obs;
 
   /// Loading state
   var isLoading = false.obs;
+
+  //  Data
+  RxList<Map<String, dynamic>> data = <Map<String, dynamic>>[].obs;
+
 
   // ================== STOPS ==================
 
@@ -31,14 +45,17 @@ class ShareVehicleController extends GetxController {
     );
 
     if (picked != null) {
-      stops[index]["time"] = picked.format(context);
+      stops[index]["time"] =
+          '${picked.hour.toString().padLeft(2, '0')}:'
+          '${picked.minute.toString().padLeft(2, '0')}';
+
       stops.refresh();
     }
   }
 
   void addStop() {
     if (stops.length < 8) {
-      stops.add({"place": "", "time": ""});
+      stops.add({"place": "", "time": "--:--"});
     } else {
       Get.snackbar(
         "Limit Reached",
@@ -60,43 +77,19 @@ class ShareVehicleController extends GetxController {
     }
   }
 
-  // ================== IMAGE ==================
-
-  void pickFile() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image, // only images
-        allowMultiple: false,
-      );
-
-      if (result != null) {
-        selectedImage.value = result.files.single.bytes;
-      }
-    } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to pick file",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
-
-  void removeImage() {
-    selectedImage.value = null;
-  }
-
   // ================== ACTIONS ==================
 
-  void onCancel() {
-    /// Reset everything
-    stops.value = List.generate(3, (_) => {"place": "", "time": ""});
-
-    selectedImage.value = null;
-
-    Get.back();
-  }
-
   void onSubmit() async {
+    /// Validate Date
+    if (dateController.text.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please fill date",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     /// Validate stops
     for (var stop in stops) {
       if (stop["place"]!.isEmpty || stop["time"]!.isEmpty) {
@@ -109,42 +102,41 @@ class ShareVehicleController extends GetxController {
       }
     }
 
-    /// Validate image
-    if (selectedImage.value == null) {
-      Get.snackbar(
-        "Error",
-        "Please upload vehicle image",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
     try {
       isLoading.value = true;
 
       /// Prepare clean JSON
       final data = {
-        "stops": stops
-            .map((e) => {"place": e["place"], "time": e["time"]})
-            .toList(),
-        "image": selectedImage.value,
+        "journeyDate": dateController.text,
+        "stops": stops.asMap().entries.map((entry) {
+          final index = entry.key;
+          final stop = entry.value;
+
+          return {
+            "location": stop["place"],
+            "arrivalTime": stop["time"],
+            "order": index,
+          };
+        }).toList(),
       };
 
-      /// DEBUG
-      debugPrint("SUBMIT DATA: $data");
+      /// API CALL HERE
 
-      /// TODO: API CALL HERE
-
-      await Future.delayed(const Duration(seconds: 1)); // fake API
-
-      Get.snackbar(
-        "Success",
-        "Vehicle added successfully",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      /// Reset after success
-      onCancel();
+      final res = await ApiService.createShareVehicle(data);
+      if (res == 201) {
+        Get.back();
+        Get.snackbar(
+          "Success",
+          "Vehicle added successfully",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar(
+          "Failed",
+          res["message"],
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     } catch (e) {
       Get.snackbar(
         "Error",
@@ -153,6 +145,22 @@ class ShareVehicleController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+      dateController.text = "";
+      stops.value = List.generate(3, (_) => {"place": "", "time": "--:--"});
     }
+  }
+
+  // Avai;able
+
+  void fetchData() async {
+    isLoading.value = true;
+
+    if (AppConfig().user.isCarOwner) {
+      data.value = await ApiService.getDrShVehicle();
+    } else {
+      data.value = await ApiService.getAvShVehicle();
+    }
+
+    isLoading.value = false;
   }
 }

@@ -28,7 +28,7 @@ class NavbarView extends GetView<NavbarController> {
           content = const FavouriteView();
           break;
         case 2:
-          content = const WalletView();
+          content = const TripView();
           break;
         case 3:
           content = const OfferView();
@@ -42,21 +42,23 @@ class NavbarView extends GetView<NavbarController> {
       // Menu
       return AdvancedDrawer(
         controller: controller.advancedDrawerController,
-      //backdropColor: Colors.black.withValues(alpha: 0.2),
-      animationDuration: const Duration(milliseconds: 270),
-      openRatio: 0.6,
-      animateChildDecoration: true,
-      childDecoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(30)),
-      ),
+        //backdropColor: Colors.black.withValues(alpha: 0.2),
+        animationDuration: const Duration(milliseconds: 270),
+        openRatio: 0.6,
+        animateChildDecoration: true,
+        childDecoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+        ),
 
-      /// ---- SIDE MENU SCREEN ----
-      drawer: const MenuView(),
-      //disabledGestures: true,
+        /// ---- SIDE MENU SCREEN ----
+        drawer: const MenuView(),
+        //disabledGestures: true,
 
-      /// ---- MAIN SCREEN ----
+        /// ---- MAIN SCREEN ----
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).padding.bottom,
+          ),
           child: Scaffold(
             body: content,
             bottomNavigationBar: SizedBox(
@@ -92,7 +94,7 @@ class NavbarView extends GetView<NavbarController> {
                       ),
                     ),
                   ),
-          
+
                   // Center hexagon floating button
                   Positioned(
                     bottom: 16,
@@ -101,28 +103,36 @@ class NavbarView extends GetView<NavbarController> {
                     child: GestureDetector(
                       onTap: () => controller.currentIndex = 2,
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CustomPaint(
-                            size: const Size(70, 70),
-                            painter: HexagonPainter(color: Color(0xFF00A86B)),
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CustomPaint(
+                                size: const Size(60, 60),
+                                painter: HexagonPainter(
+                                  color: Color(0xFF00A86B),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.history,
+                                color: Colors.white,
+                                size: 35,
+                              ),
+                            ],
                           ),
+
                           const SizedBox(height: 4),
+
+                          Text(
+                            "History",
+                            style: TextStyle(
+                              color: controller.currentIndex == 2 ? Color(0xFF00A86B) : Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ],
-                      ),
-                    ),
-                  ),
-          
-                  // Wallet icon inside hexagon
-                  Positioned(
-                    bottom: 38,
-                    left: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () => controller.currentIndex = 2,
-                      child: const Icon(
-                        Icons.history ,
-                        color: Colors.white,
-                        size: 35,
                       ),
                     ),
                   ),

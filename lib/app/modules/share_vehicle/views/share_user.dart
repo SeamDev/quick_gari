@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:quick_gari/app/modules/share_vehicle/views/select_car.dart';
 
 import '../controllers/share_vehicle_controller.dart';
@@ -9,75 +10,45 @@ class ShareUser extends GetView<ShareVehicleController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Available Shared Cars'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search, size: 28),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          _dateFilters(),
-          const SizedBox(height: 12),
-          _carCard(
-            startTime: 'Tue, Apr 30 - Start: 09:10',
-            imageUrl:
-                'https://loremflickr.com/0/150/car', // replace with your image
-            seats: '3 / 8',
-          ),
-          const SizedBox(height: 16),
-          _carCard(
-            startTime: 'Tue, Apr 30 - Start: 10:30',
-            imageUrl:
-                'https://loremflickr.com/0/150/car', // replace with your image
-            seats: '5 / 8',
-          ),
-        ],
-      ),
-    );
-  }
+    String formatJourneyDate(String date) {
+      final DateTime dt = DateTime.parse(date).toLocal();
 
-  /// 🔹 Date filter chips
-  Widget _dateFilters() {
-    return Row(
-      children: [
-        _chip('All Dates', isActive: true),
-        const SizedBox(width: 8),
-        _chip('Tue, Apr 30'),
-        const SizedBox(width: 8),
-        _chip('Wed, May 1'),
-      ],
-    );
-  }
+      return DateFormat('EEE, MMM dd - hh:mm a').format(dt);
+    }
 
-  Widget _chip(String text, {bool isActive = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: isActive
-            ? const Color.fromARGB(255, 0, 131, 29)
-            : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          if (isActive)
-            const Icon(Icons.calendar_month, size: 16, color: Colors.white),
-          if (isActive) const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        controller.fetchData();
+      },
+      child: Obx(
+        () => controller.data.isEmpty
+            ? CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: controller.isLoading.value
+                          ? CircularProgressIndicator()
+                          : Text("No Ride"),
+                    ),
+                  ),
+                ],
+              )
+            : ListView.builder(
+                itemCount: controller.data.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> data = controller.data[index];
+                  return _carCard(
+                    startTime: formatJourneyDate(data["journeyDate"]),
+                    imageUrl: data["vehicle"]["images"][0],
+                    stops: data["stops"],
+                    seats: data["availableSeats"].toString(),
+                    goto: () =>
+                        Get.to(() => SelectCar(data: controller.data[index])),
+                  );
+                },
+              ),
       ),
     );
   }
@@ -86,16 +57,19 @@ class ShareUser extends GetView<ShareVehicleController> {
   Widget _carCard({
     required String startTime,
     required String imageUrl,
+    required List stops,
     required String seats,
+    required VoidCallback goto,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.08),
+            color: Colors.black.withValues(alpha: .08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -126,12 +100,25 @@ class ShareUser extends GetView<ShareVehicleController> {
           const SizedBox(height: 12),
 
           /// Route
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _LocationTime(name: 'Rajshahi', time: '09:10'),
-              _LocationTime(name: 'Godagari', time: '09:40'),
-              _LocationTime(name: 'Copalpur', time: '09:00'),
+          Column(
+            children: [
+              for (int i = 0; i < stops.length; i += 4)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: stops
+                        .skip(i)
+                        .take(4)
+                        .map<Widget>(
+                          (stop) => _LocationTime(
+                            name: stop['location'] ?? '',
+                            time: stop['arrivalTime'] ?? '',
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
             ],
           ),
 
@@ -160,7 +147,7 @@ class ShareUser extends GetView<ShareVehicleController> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () => Get.to(() => SelectCar()),
+              onPressed: goto,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 0, 131, 29),
                 shape: RoundedRectangleBorder(
@@ -171,7 +158,7 @@ class ShareUser extends GetView<ShareVehicleController> {
                 'SELECT CAR',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),

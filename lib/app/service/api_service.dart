@@ -464,7 +464,7 @@ class ApiService {
   }
 
   // ==========================================
-  /// Ride
+  // Ride
   // ==========================================
 
   // Request For a Ride (TOKEN AUTOMATICALLY INJECTED)
@@ -597,7 +597,8 @@ class ApiService {
     required String otp,
   }) async {
     try {
-      var url = "${Config.baseUrl}${Config.apiVersion}/$tripType/$rideId/verify-otp";
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/$tripType/$rideId/verify-otp";
 
       var response = await dio.post(url, data: {"otp": otp});
 
@@ -647,28 +648,30 @@ class ApiService {
     }
   }
 
-  static Future<List<Map>> getPassengerCompleteRide() async {
+  static Future<List<Map<String, dynamic>>> getPassengerCompleteRide() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/list/user/completed";
       var response = await dio.get(url);
-      List data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
-      return data.map<Map>((e) => Map.from(e)).toList();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
     }
   }
 
-  static Future<List<Map>> getDriverCompleteRide() async {
+  static Future<List<Map<String, dynamic>>> getDriverCompleteRide() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.rideAPI}/list/driver/completed";
       var response = await dio.get(url);
-      List data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
-      return data.map<Map>((e) => Map.from(e)).toList();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
@@ -715,7 +718,6 @@ class ApiService {
     }
   }
 
-  // GetAllAvailable Trip  -- delet
   static Future<List<Map>> getAllReturnTrip() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.returnTripAPI;
@@ -777,7 +779,8 @@ class ApiService {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/driver/active";
       var response = await dio.get(url);
-      List<Map<String, dynamic>> data = response.data["data"].cast<Map<String, dynamic>>();
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
       return data;
     } catch (e) {
@@ -786,28 +789,30 @@ class ApiService {
     }
   }
 
-  static Future<List<Map>> getPassengerCompleteReturn() async {
+  static Future<List<Map<String, dynamic>>> getPassengerCompleteReturn() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/passenger/completed";
       var response = await dio.get(url);
-      List data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
-      return data.map<Map>((e) => Map.from(e)).toList();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
     }
   }
 
-  static Future<List<Map>> getDriverCompleteReturn() async {
+  static Future<List<Map<String, dynamic>>> getDriverCompleteReturn() async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}${Config.returnTripAPI}/driver/completed";
       var response = await dio.get(url);
-      List data = response.data["data"];
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
 
-      return data.map<Map>((e) => Map.from(e)).toList();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
@@ -818,73 +823,52 @@ class ApiService {
   // Share Vehicle
   // ==========================================
 
-  // Create Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> createShareVehicle() async {
+  // Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
+
+  static Future<dynamic> createShareVehicle(Map<String, dynamic> data) async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.shareVehicleAPI;
 
-      var response = await dio.post(
-        url,
-        data: {
-          "journeyDate": "2026-02-25",
-          "stops": [
-            {"location": "Rajshahi", "arrivalTime": "08:00 AM", "order": 0},
-            {"location": "Natore", "arrivalTime": "09:30 AM", "order": 1},
-            {"location": "Bogura", "arrivalTime": "11:00 AM", "order": 2},
-          ],
-          "perSeatFare": 250,
-        },
-      );
+      var response = await dio.post(url, data: data);
 
-      return response.statusCode == 200;
+      return response.statusCode;
+    } on DioException catch (e) {
+      return e.response?.data["errors"][0];
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return {'message': 'No Dio Error'};
     }
   }
 
-  // Get Available Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> getAvShVehicle() async {
+  static Future<List<Map<String, dynamic>>> getAvShVehicle() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.shareVAvailableAPI;
       var response = await dio.get(url);
-      return response.statusCode == 200;
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return [];
     }
   }
 
-  // Get Driver Share Vehicle (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> getDrShVehicle() async {
+  static Future<List<Map<String, dynamic>>> getDrShVehicle() async {
     try {
       var url = Config.baseUrl + Config.apiVersion + Config.shareVDriverAPI;
       var response = await dio.get(url);
-      return response.statusCode == 200;
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+      return data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return false;
+      return [];
     }
   }
 
-  // Get Share Vehicle BY ID (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> getShVehicleByID() async {
-    try {
-      var url =
-          "${Config.baseUrl}${Config.apiVersion}${Config.shareVehicleAPI}/699bf590be2911b89c1b23da";
-      var response = await dio.get(url);
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint("ERROR: $e");
-      return false;
-    }
-  }
-
-  ///Paymnt -----------------------------------------
-  /// Post - Payment
   static Future<Map> postPayment(String trx, Map<String, String> body) async {
     try {
-      var url = Config.baseUrl + Config.apiVersion + Config.paymentAPI;
+      var url = "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking";
       var response = await dio.post(url, data: body);
       return response.data;
     } on DioException catch (e) {
@@ -892,6 +876,37 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return {'success': false};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getSVCostPer(
+    String from,
+    String to,
+  ) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-fare/$from/$to";
+      var response = await dio.get(url);
+      Map<String, dynamic> data = response.data["data"];
+      return data;
+    } on DioException catch (e) {
+      return e.response?.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
+  static Future<List<String>> getSVStopLocation() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-fare/locations-list";
+      var response = await dio.get(url);
+      List<String> data = response.data["data"].cast<String>();
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
     }
   }
 }

@@ -5,8 +5,8 @@ import 'package:quick_gari/app/widgets/driver_info_page.dart';
 
 import '../controllers/mytrip_controller.dart';
 
-class WalletView extends GetView<WalletController> {
-  const WalletView({super.key});
+class TripView extends GetView<WalletController> {
+  const TripView({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -10,6 +10,7 @@ class PaymentView extends StatefulWidget {
   final String fare;
   final String id;
   final String serviceFor;
+  final String proposalId;
 
   const PaymentView({
     super.key,
@@ -17,6 +18,7 @@ class PaymentView extends StatefulWidget {
     required this.number,
     required this.fare,
     required this.id,
+    required this.proposalId,
     required this.serviceFor,
   });
 
@@ -46,6 +48,7 @@ class _PaymentViewState extends State<PaymentView> {
     Map<String, String> body = {
       widget.serviceFor: widget.id,
       "transactionId": trxController.text.trim(),
+      "proposalId": widget.proposalId,
     };
     Map response = await ApiService.postPayment(
       trxController.text.toString(),
@@ -127,7 +130,7 @@ class _PaymentViewState extends State<PaymentView> {
                   const Divider(height: 30),
 
                   Text(
-                    "Fare: ৳ ${(int.parse(widget.fare)*1.1).toStringAsFixed(2)}",
+                    "Fare: ৳ ${(int.parse(widget.fare) * 1.1).toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

@@ -1,4 +1,3 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,7 +5,7 @@ import '../controllers/share_vehicle_controller.dart';
 
 class ShareAdmin extends GetView<ShareVehicleController> {
   const ShareAdmin({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,25 +13,13 @@ class ShareAdmin extends GetView<ShareVehicleController> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildHeader(),
-          const SizedBox(height: 20),
-
-          /// Form Fields
-          _buildLocationFields(),
           _buildDateTimeRow(),
-          _buildSeatsField(),
-
-          /// Image Upload
-          _buildImageUpload(),
-
-          /// Price
-          _buildPriceField(),
 
           /// Route Section
           _buildRouteHeader(),
           _buildStopsList(),
           _buildAddStopButton(),
-          const SizedBox(height: 10,),
+          const SizedBox(height: 16),
 
           //
           Row(
@@ -40,7 +27,7 @@ class ShareAdmin extends GetView<ShareVehicleController> {
               /// Cancel Button
               Expanded(
                 child: OutlinedButton(
-                  onPressed: controller.onCancel,
+                  onPressed: () => Get.back(),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -91,165 +78,16 @@ class ShareAdmin extends GetView<ShareVehicleController> {
     );
   }
 
-  // ================= HEADER =================
-  Widget _buildHeader() {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Add Vehicle",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 4),
-        Text(
-          "Fill in the details to list your ride",
-          style: TextStyle(color: Colors.grey),
-        ),
-      ],
-    );
-  }
-
-  // ================= LOCATION =================
-  Widget _buildLocationFields() {
-    return Column(
-      children: [
-        _label("Starting Area"),
-        _input("e.g., Mirpur", Icons.location_on_outlined),
-
-        _label("Ending Area *"),
-        _input("e.g., Motijheel", Icons.location_on_outlined),
-      ],
-    );
-  }
-
   // ================= DATE & TIME =================
   Widget _buildDateTimeRow() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _label("Departure Date *"),
-              _input("mm/dd/yyyy", Icons.calendar_today),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _label("Departure Time *"),
-              _input("--:--", Icons.access_time),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ================= SEATS =================
-  Widget _buildSeatsField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [_label("Total Seats *"), _input("4 Seats", Icons.people)],
-    );
-  }
-
-  // ================= IMAGE =================
-  Widget _buildImageUpload() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _label("Image Upload *"),
-        const SizedBox(height: 6),
-
-        Obx(() {
-          final image = controller.selectedImage.value;
-
-          return InkWell(
-            onTap: controller.pickFile,
-            borderRadius: BorderRadius.circular(12),
-            child: DottedBorder(
-              borderType: BorderType.RRect,
-              radius: const Radius.circular(12),
-              dashPattern: const [6, 4],
-              color: Colors.grey.shade400,
-              child: SizedBox(
-                height: 140,
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: image != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(image, fit: BoxFit.fitHeight),
-                            )
-                          : const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.cloud_upload_outlined,
-                                    size: 32,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    "Tap to upload vehicle image",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            ),
-                    ),
-
-                    /// Remove button
-                    if (image != null)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: GestureDetector(
-                          onTap: controller.removeImage,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            child: const Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  // ================= PRICE =================
-  Widget _buildPriceField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _label("Price per Seat (৳) *"),
-        const SizedBox(height: 8),
-        TextField(
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            prefixText: "৳ ",
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          ),
+        _label("Departure Date *"),
+        dateInput(
+          hint: "Select Date",
+          icon: Icons.calendar_today,
+          controller: controller.dateController,
         ),
       ],
     );
@@ -293,8 +131,7 @@ class ShareAdmin extends GetView<ShareVehicleController> {
   }
 
   Widget _stopCard(int index) {
-    //final stop = controller.stops[index];
-
+    final stop = controller.stops[index];
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
@@ -340,7 +177,8 @@ class ShareAdmin extends GetView<ShareVehicleController> {
           const SizedBox(height: 12),
 
           /// Place
-          TextField(
+          TextFormField(
+            initialValue: stop["place"] ?? "",
             decoration: _inputDecoration("Place name"),
             onChanged: (val) => controller.updatePlace(index, val),
           ),
@@ -350,7 +188,10 @@ class ShareAdmin extends GetView<ShareVehicleController> {
           /// Time
           TextField(
             readOnly: true,
-            decoration: _inputDecoration("--:--", icon: Icons.access_time),
+            decoration: _inputDecoration(
+              stop["time"] ?? "--:--",
+              icon: Icons.access_time,
+            ),
             onTap: () => controller.pickTime(index, Get.context!),
           ),
         ],
@@ -362,8 +203,6 @@ class ShareAdmin extends GetView<ShareVehicleController> {
     return Obx(
       () => Column(
         children: [
-          const SizedBox(height: 10),
-
           /// Add Stop Button
           SizedBox(
             width: double.infinity,
@@ -407,8 +246,29 @@ class ShareAdmin extends GetView<ShareVehicleController> {
     );
   }
 
-  Widget _input(String hint, IconData icon) {
-    return TextField(decoration: _inputDecoration(hint, icon: icon));
+  Widget dateInput({
+    required String hint,
+    required IconData icon,
+    required TextEditingController controller,
+  }) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      decoration: _inputDecoration(hint, icon: icon),
+      onTap: () async {
+        final DateTime? pickedDate = await showDatePicker(
+          context: Get.context!, // or context if inside StatefulWidget
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2100),
+        );
+
+        if (pickedDate != null) {
+          controller.text =
+              "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+        }
+      },
+    );
   }
 
   InputDecoration _inputDecoration(String hint, {IconData? icon}) {

@@ -21,10 +21,6 @@ class Config {
   static const String getUserRideListAPI = "/ride/list/user";
   //Share Vehicle
   static const String shareVehicleAPI = "/share-vehicle";
-  static const String shareVAvailableAPI = "/share-vehicle";
+  static const String shareVAvailableAPI = "/share-vehicle/available";
   static const String shareVDriverAPI = "/share-vehicle/driver";
-
-  // Payment
-  static const String paymentAPI = "/payment/submit";
-
 }

@@ -664,16 +664,4 @@ class ApiService1 {
 
   ///Paymnt -----------------------------------------
   /// Post - Payment
-  static Future<Map> postPayment(String trx, Map<String, String> body) async {
-    try {
-      var url = Config.baseUrl + Config.apiVersion + Config.paymentAPI;
-      var response = await dio.post(url, data: body);
-      return response.data;
-    } on DioException catch (e) {
-      return e.response?.data;
-    } catch (e) {
-      debugPrint("ERROR: $e");
-      return {'success': false};
-    }
-  }
 }

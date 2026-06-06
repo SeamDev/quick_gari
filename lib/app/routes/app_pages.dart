@@ -103,7 +103,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.WALLET,
-      page: () => const WalletView(),
+      page: () => const TripView(),
       binding: WalletBinding(),
     ),
     GetPage(

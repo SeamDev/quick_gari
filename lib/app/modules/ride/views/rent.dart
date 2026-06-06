@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
-import 'package:quick_gari/app/service/api_service.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
 class RequestForRentPage extends StatelessWidget {
@@ -188,7 +187,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  data["fare"].toString(),
+                  data["fare"].toStringAsFixed(2),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -211,7 +210,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
 
                 Text(
-                  (data["fare"] * 0.1).toString(),
+                  (data["fare"] * 0.1).toStringAsFixed(2),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -247,30 +246,18 @@ class RequestForRentPage extends StatelessWidget {
                 String name = data['driver']?['name'];
                 String number = data['driver']?['phoneNumber'];
                 String fare = data['fare'].toString();
-                if (status == "PENDING") {
-                  Get.to(
-                    () => PaymentView(
-                      name: name,
-                      number: number,
-                      fare: fare,
-                      id: id,
-                      serviceFor: 'rideId',
-                    ),
-                  );
-                } else if (await ApiService.acceptProposal(id, data["_id"])) {
-                  Get.snackbar("Confirm Ride", "Ride Confirmed Successfully");
-                  Get.to(
-                    () => PaymentView(
-                      name: name,
-                      number: number,
-                      fare: fare,
-                      id: id,
-                      serviceFor: 'rideId',
-                    ),
-                  );
-                } else {
-                  Get.snackbar("Confirm Ride", "Ride Confirmed Already");
-                }
+                String proposalId = data["_id"];
+
+                Get.to(
+                  () => PaymentView(
+                    name: name,
+                    number: number,
+                    fare: fare,
+                    id: id,
+                    serviceFor: 'rideId',
+                    proposalId: proposalId,
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF007F4F),
@@ -280,7 +267,7 @@ class RequestForRentPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                status == "PENDING" ? "Confirm Booking" : "Accept & Confirm Booking",
+                "Confirm Booking",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 17,

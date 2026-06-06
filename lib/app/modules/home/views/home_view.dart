@@ -86,7 +86,7 @@ class HomeView extends GetView<HomeController> {
               ),
               onPressed: () => Get.toNamed(Routes.RIDE),
               child: const Text(
-                'Ride',
+                'Rent For Ride',
                 style: TextStyle(fontSize: 22, color: Colors.white),
               ),
             ),
@@ -128,8 +128,8 @@ class HomeView extends GetView<HomeController> {
               ),
               onPressed: () => Get.toNamed(Routes.RETURN),
               child: const Text(
-                'Return',
-                style: TextStyle(fontSize: 22, color: Colors.white),
+                'Empty Return Vehicle',
+                style: TextStyle(fontSize: 20, color: Colors.white),
               ),
             ),
             ElevatedButton(
