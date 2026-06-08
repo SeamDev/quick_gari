@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/modules/share_vehicle/views/confirm_return.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/widgets/otp_input.dart';
+import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
 class SelectCar extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -81,6 +82,27 @@ class _SelectCarState extends State<SelectCar> {
         .toList();
   }
 
+  // Confirm
+  void acceptSV() async {
+    if (pickup.isEmpty || drop.isEmpty) {
+      Get.snackbar("Info", "First set all location");
+      return;
+    }
+
+    Map<String, dynamic> body = {
+      "shareVehicleId": widget.data["_id"],
+      "pickupStop": pickup,
+      "dropStop": drop,
+      "seatsBooked": selectSeat,
+    };
+    //var res = await ApiService.acceptSV(body);
+
+    Get.to(
+      () =>
+          PaymentView(fare: (costPerSeat * selectSeat).toString(), body: body),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,11 +135,11 @@ class _SelectCarState extends State<SelectCar> {
           const SizedBox(height: 16),
           _routeInfo(widget.data["stops"]),
           const SizedBox(height: 16),
-          _seatInfo(widget.data["availableSeats"].toString()),
+          _seatInfo(),
           if (!AppConfig().user.isCarOwner) const SizedBox(height: 24),
           if (!AppConfig().user.isCarOwner)
             _locationField(
-              title: "Pickup Location",
+              title: "Pick Up Location",
               icon: Icons.location_on,
               iconColor: Colors.green,
               items: locations,
@@ -133,7 +155,7 @@ class _SelectCarState extends State<SelectCar> {
           if (!AppConfig().user.isCarOwner) const SizedBox(height: 16),
           if (!AppConfig().user.isCarOwner)
             _locationField(
-              title: "Pickup Location",
+              title: "Drop Out Location",
               icon: Icons.location_on,
               iconColor: Colors.green,
               items: getDropList(widget.data["stops"], pickup),
@@ -163,7 +185,8 @@ class _SelectCarState extends State<SelectCar> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
-                  value: selectSeat,
+                  value: widget.data["availableSeats"] > 0 ? 1 : null,
+                  disabledHint: Text("NO Seat Available"),
                   isExpanded: true,
                   items: List.generate(
                     widget.data["availableSeats"],
@@ -174,7 +197,7 @@ class _SelectCarState extends State<SelectCar> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      selectSeat = value ?? 1;
+                      selectSeat = value ?? 0;
                     });
                   },
                 ),
@@ -196,12 +219,23 @@ class _SelectCarState extends State<SelectCar> {
                   Center(child: Text("No Passenger")),
 
                 ...widget.data["passengers"].map<Widget>(
-                  (stop) => Padding(
+                  (passenger) => Padding(
                     padding: const EdgeInsets.only(bottom: 14),
-                    child: _infoField(
-                      label: stop['location'].toString(),
-                      value: stop['arrivalTime'].toString(),
-                      icon: Icons.location_on_outlined,
+                    child: passengerCard(
+                      passenger,
+                      onOtpSubmit: (otp) async {
+                        Map res = await ApiService.verifyOtpSV(
+                          widget.data["_id"],
+                          passenger["passenger"]["userId"],
+                          otp,
+                        );
+                        if (res["success"]) {
+                          Get.snackbar("Success", res["message"]);
+                          Get.offAllNamed(Routes.NAVBAR);
+                        } else {
+                          Get.snackbar("Failed", res["message"]);
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -239,12 +273,12 @@ class _SelectCarState extends State<SelectCar> {
               height: 52,
               child: ElevatedButton(
                 onPressed: () {
-                  
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (_) => const BookingConfirmedDialog(),
-                  );
+                  // showDialog(
+                  //   context: context,
+                  //   barrierDismissible: false,
+                  //   builder: (_) => const BookingConfirmedDialog(),
+                  // );
+                  acceptSV();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(0, 153, 102, 1),
@@ -313,19 +347,24 @@ class _SelectCarState extends State<SelectCar> {
       children: stops.map<Widget>((stop) {
         return _RouteRow(
           place: stop['location'].toString(),
-          time: stop['arrivalTime'].toString(),
+          time: DateFormat(
+            "hh:mm a",
+          ).format(DateFormat("HH:mm").parse(stop['arrivalTime'])),
         );
       }).toList(),
     );
   }
 
   /// 👥 Seats
-  Widget _seatInfo(String seat) {
+  Widget _seatInfo() {
     return Row(
       children: [
         Icon(Icons.person, color: Colors.green),
         SizedBox(width: 10),
-        Text('Available: $seat', style: TextStyle(fontWeight: FontWeight.w600)),
+        Text(
+          'Available: ${widget.data["availableSeats"].toString()} / ${widget.data["vehicle"]["seatCapacity"]}',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
       ],
     );
   }
@@ -405,32 +444,107 @@ class _RouteRow extends StatelessWidget {
   }
 }
 
-Widget _infoField({
-  required String label,
-  required String value,
-  required IconData icon,
+Widget passengerCard(
+  Map<String, dynamic> passenger, {
+  Function(String otp)? onOtpSubmit,
 }) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-      const SizedBox(height: 8),
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.grey),
-            const SizedBox(width: 12),
-            Expanded(child: Text(value)),
-          ],
-        ),
+  return Card(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    elevation: 3,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(child: Icon(Icons.person)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  passenger["passenger"]?["name"] ?? "",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const Divider(height: 24),
+
+          _infoRow(
+            Icons.email,
+            "Email",
+            passenger["passenger"]?["email"] ?? "",
+          ),
+          _infoRow(
+            Icons.phone,
+            "Phone",
+            passenger["passenger"]?["phoneNumber"].toString() ?? "",
+          ),
+          _infoRow(Icons.location_on, "Pickup", passenger["pickupStop"] ?? ""),
+          _infoRow(Icons.flag, "Drop", passenger["dropStop"] ?? ""),
+          _infoRow(
+            Icons.event_seat,
+            "Seats",
+            passenger["seatsBooked"].toString(),
+          ),
+          _infoRow(Icons.money, "Fare", "৳${passenger["totalFare"]}"),
+          _infoRow(
+            Icons.payments,
+            "Total Price",
+            "৳${passenger["totalPrice"]}",
+          ),
+          const SizedBox(height: 12),
+
+          if (!(passenger["bookingOtpVerified"] ?? false))
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(),
+                const SizedBox(height: 8),
+
+                const Text(
+                  "Verify Passenger OTP",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 12),
+
+                OtpInputWidget(
+                  length: 6,
+                  validator: (value) {
+                    if (value.length != 6) {
+                      return "Please enter 6 digit OTP";
+                    }
+                    return null;
+                  },
+                  onSubmit: (otp) {
+                    onOtpSubmit?.call(otp);
+                  },
+                ),
+              ],
+            ),
+        ],
       ),
-    ],
+    ),
+  );
+}
+
+Widget _infoRow(IconData icon, String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 8),
+        Text("$title: ", style: const TextStyle(fontWeight: FontWeight.w600)),
+        Expanded(child: Text(value)),
+      ],
+    ),
   );
 }
 

@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 
 class ShareVehicleController extends GetxController {
   @override
   void onInit() {
+    getAllStopLocation();
     fetchData();
     super.onInit();
-  }
-
-  @override
-  void onClose() {
-    dateController.text = "";
-    stops.value = List.generate(3, (_) => {"place": "", "time": "--:--"});
-    super.onClose();
   }
 
   final dateController = TextEditingController();
@@ -22,7 +17,11 @@ class ShareVehicleController extends GetxController {
   final user = AppConfig().user;
 
   /// Stops (JSON-like)
-  var stops = List.generate(3, (_) => {"place": "", "time": "--:--"}).obs;
+  RxList<Map<String, String>> stops = List.generate(
+    3,
+    (_) => {"place": "", "time": "--:--"},
+  ).obs;
+  RxList<String> allStopLocation = <String>[].obs;
 
   /// Loading state
   var isLoading = false.obs;
@@ -30,8 +29,11 @@ class ShareVehicleController extends GetxController {
   //  Data
   RxList<Map<String, dynamic>> data = <Map<String, dynamic>>[].obs;
 
-
   // ================== STOPS ==================
+
+  void getAllStopLocation() async {
+    allStopLocation.value = await ApiService.getSVStopLocation();
+  }
 
   void updatePlace(int index, String value) {
     stops[index]["place"] = value;
@@ -77,6 +79,10 @@ class ShareVehicleController extends GetxController {
     }
   }
 
+  void resetData() {
+    dateController.clear();
+    stops.value = List.generate(3, (_) => {"place": "", "time": "--:--"});
+  }
   // ================== ACTIONS ==================
 
   void onSubmit() async {
@@ -122,14 +128,14 @@ class ShareVehicleController extends GetxController {
 
       /// API CALL HERE
 
-      final res = await ApiService.createShareVehicle(data);
-      if (res == 201) {
-        Get.back();
+      Map<String,dynamic> res = await ApiService.createShareVehicle(data);
+      if (res["success"]) {
         Get.snackbar(
           "Success",
           "Vehicle added successfully",
           snackPosition: SnackPosition.BOTTOM,
         );
+        Get.offAllNamed(Routes.NAVBAR);
       } else {
         Get.snackbar(
           "Failed",
@@ -145,8 +151,7 @@ class ShareVehicleController extends GetxController {
       );
     } finally {
       isLoading.value = false;
-      dateController.text = "";
-      stops.value = List.generate(3, (_) => {"place": "", "time": "--:--"});
+      //resetData();
     }
   }
 

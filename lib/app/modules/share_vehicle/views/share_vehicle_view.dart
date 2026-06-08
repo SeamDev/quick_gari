@@ -11,7 +11,6 @@ class ShareVehicleView extends GetView<ShareVehicleController> {
   @override
   Widget build(BuildContext context) {
     //return controller.user.isCarOwner ? ShareAdmin() : ShareUser();
-    controller;
     return Scaffold(
       appBar: AppBar(
         title: Text("Share Vehicle"),

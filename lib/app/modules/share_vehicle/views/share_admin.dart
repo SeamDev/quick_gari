@@ -1,68 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/share_vehicle_controller.dart';
 
 class ShareAdmin extends GetView<ShareVehicleController> {
   const ShareAdmin({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildDateTimeRow(),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        controller.resetData();
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _buildDateTimeRow(),
 
-          /// Route Section
-          _buildRouteHeader(),
-          _buildStopsList(),
-          _buildAddStopButton(),
-          const SizedBox(height: 16),
+            /// Route Section
+            _buildRouteHeader(),
+            _buildStopsList(),
+            _buildAddStopButton(),
+            const SizedBox(height: 16),
 
-          //
-          Row(
-            children: [
-              /// Cancel Button
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Get.back(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            //
+            Row(
+              children: [
+                /// Cancel Button
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(color: Colors.black),
-                  ),
                 ),
-              ),
 
-              const SizedBox(width: 12),
+                const SizedBox(width: 12),
 
-              /// Add Vehicle Button
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: controller.onSubmit,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Color.fromRGBO(21, 93, 252, 1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                /// Add Vehicle Button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: controller.onSubmit,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: Color.fromRGBO(21, 93, 252, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Add Vehicle",
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  child: const Text(
-                    "Add Vehicle",
-                    style: TextStyle(color: Colors.white),
-                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -177,12 +183,36 @@ class ShareAdmin extends GetView<ShareVehicleController> {
           const SizedBox(height: 12),
 
           /// Place
-          TextFormField(
-            initialValue: stop["place"] ?? "",
+          // TextFormField(
+          //   initialValue: stop["place"] ?? "",
+          //   decoration: _inputDecoration("Place name"),
+          //   onChanged: (val) => controller.updatePlace(index, val),
+          // ),
+          DropdownButtonFormField<String>(
             decoration: _inputDecoration("Place name"),
-            onChanged: (val) => controller.updatePlace(index, val),
-          ),
+            items: controller.allStopLocation
+                .where((location) {
+                  // Allow current value
+                  if (location == stop["place"]) return true;
 
+                  // Hide values selected in other dropdowns
+                  return !controller.stops.any(
+                    (s) => s != stop && s["place"] == location,
+                  );
+                })
+                .map(
+                  (location) => DropdownMenuItem<String>(
+                    value: location,
+                    child: Text(location),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                controller.updatePlace(index, value);
+              }
+            },
+          ),
           const SizedBox(height: 10),
 
           /// Time
@@ -264,8 +294,7 @@ class ShareAdmin extends GetView<ShareVehicleController> {
         );
 
         if (pickedDate != null) {
-          controller.text =
-              "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+          controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
         }
       },
     );

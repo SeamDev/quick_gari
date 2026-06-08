@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 
 class BookingConfirmedDialog extends StatelessWidget {
   const BookingConfirmedDialog({super.key});
@@ -51,7 +51,7 @@ class BookingConfirmedDialog extends StatelessWidget {
       height: 72,
       width: 72,
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.15),
+        color: Colors.green.withValues(alpha: .15),
         shape: BoxShape.circle,
       ),
       child: const Icon(Icons.check, size: 36, color: Colors.green),
@@ -124,7 +124,7 @@ class BookingConfirmedDialog extends StatelessWidget {
       height: 48,
       child: ElevatedButton(
         onPressed: () {
-          Get.offAllNamed("/home");
+          Get.offAllNamed(Routes.NAVBAR);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color.fromRGBO(0, 153, 102, 1),

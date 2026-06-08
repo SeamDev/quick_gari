@@ -183,7 +183,10 @@ class _LocationTime extends StatelessWidget {
       children: [
         Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 4),
-        Text(time, style: const TextStyle(color: Colors.black54)),
+        Text(
+          DateFormat("hh:mm a").format(DateFormat("HH:mm").parse(time)),
+          style: const TextStyle(color: Colors.black54),
+        ),
       ],
     );
   }

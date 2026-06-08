@@ -299,6 +299,19 @@ class ApiService {
     }
   }
 
+  static Future<Map> postPayment(Map<String, dynamic> body) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/payment/submit";
+      var response = await dio.post(url, data: body);
+      return response.data;
+    } on DioException catch (e) {
+      return e.response?.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {'success': false};
+    }
+  }
+
   // ==========================================
   // Car
   // ==========================================
@@ -831,12 +844,12 @@ class ApiService {
 
       var response = await dio.post(url, data: data);
 
-      return response.statusCode;
+      return response.data;
     } on DioException catch (e) {
-      return e.response?.data["errors"][0];
+      return e.response?.data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return {'message': 'No Dio Error'};
+      return {"success": false,'message': 'No Dio Error'};
     }
   }
 
@@ -863,19 +876,6 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
-    }
-  }
-
-  static Future<Map> postPayment(String trx, Map<String, String> body) async {
-    try {
-      var url = "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking";
-      var response = await dio.post(url, data: body);
-      return response.data;
-    } on DioException catch (e) {
-      return e.response?.data;
-    } catch (e) {
-      debugPrint("ERROR: $e");
-      return {'success': false};
     }
   }
 
@@ -907,6 +907,40 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return [];
+    }
+  }
+
+  static Future<Map> acceptSV(Map<String, dynamic> body) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking";
+      var response = await dio.post(url, data: body);
+      return response.data;
+    } on DioException catch (e) {
+      return e.response?.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {'success': false};
+    }
+  }
+
+  static Future<Map> verifyOtpSV(
+    String shareVehicleID,
+    String passengerID,
+    String otp,
+  ) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle/$shareVehicleID/verify-otp";
+      var response = await dio.post(
+        url,
+        data: {"passengerId": passengerID, "otp": otp},
+      );
+      return response.data;
+    } on DioException catch (e) {
+      return e.response?.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {'success': false};
     }
   }
 }

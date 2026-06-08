@@ -5,21 +5,23 @@ import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 
 class PaymentView extends StatefulWidget {
-  final String name;
-  final String number;
+  final String? name;
+  final String? number;
   final String fare;
-  final String id;
-  final String serviceFor;
-  final String proposalId;
+  final String? id;
+  final String? serviceFor;
+  final String? proposalId;
+  final Map<String, dynamic>? body;
 
   const PaymentView({
     super.key,
-    required this.name,
-    required this.number,
+    this.name,
+    this.number,
     required this.fare,
-    required this.id,
-    required this.proposalId,
-    required this.serviceFor,
+    this.proposalId,
+    this.serviceFor,
+    this.id,
+    this.body,
   });
 
   @override
@@ -45,15 +47,20 @@ class _PaymentViewState extends State<PaymentView> {
     }
 
     // submit logic
-    Map<String, String> body = {
-      widget.serviceFor: widget.id,
-      "transactionId": trxController.text.trim(),
-      "proposalId": widget.proposalId,
-    };
-    Map response = await ApiService.postPayment(
-      trxController.text.toString(),
-      body,
-    );
+    Map<String, dynamic> body;
+    if (widget.body != null) {
+      body = {
+        "shareVehicleBookingPayload": widget.body,
+        "transactionId": trxController.text.trim(),
+      };
+    } else {
+      body = {
+        widget.serviceFor ?? "rideId": widget.id,
+        "transactionId": trxController.text.trim(),
+        "proposalId": widget.proposalId,
+      };
+    }
+    Map response = await ApiService.postPayment(body);
     if (!mounted) return;
     if (response['success'] ?? false) {
       showBookingSuccessDialog(context);

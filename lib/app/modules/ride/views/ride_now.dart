@@ -240,7 +240,7 @@ class SpecCard extends StatelessWidget {
       width: 80,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.05),
+        color: Colors.green.withValues(alpha: .05),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Color(0xFF007F4F)),
       ),

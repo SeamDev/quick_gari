@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class EmergencyController extends GetxController {
-  //TODO: Implement EmergencyController
+  //Implement EmergencyController
 
   final count = 0.obs;
   @override
