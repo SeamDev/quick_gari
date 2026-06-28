@@ -72,9 +72,9 @@ class MenuView extends GetView<NavbarController> {
             _menuItem(Icons.car_rental, "My Vehicle", route: Routes.MY_VEHICLE),
             _menuItem(Icons.report_problem_outlined, "Complain"),
             _menuItem(Icons.history , "History", route: Routes.HISTORY),
-            _menuItem(Icons.info_outline, "About Us"),
-            _menuItem(Icons.settings_outlined, "Settings"),
-            _menuItem(Icons.help_outline, "Help & Support"),
+            _menuItem(Icons.info_outline, "About Us",route: Routes.ABOUT_US),
+            //_menuItem(Icons.settings_outlined, "Settings"),
+            _menuItem(Icons.help_outline, "Help & Support",route: Routes.HELP_SUPPORT),
 
             const Spacer(),
             ListTile(

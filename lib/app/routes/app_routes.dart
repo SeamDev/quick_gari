@@ -22,6 +22,8 @@ abstract class Routes {
   static const REGISTER_VEHICLE = _Paths.REGISTER_VEHICLE;
   static const MY_VEHICLE = _Paths.MY_VEHICLE;
   static const HISTORY = _Paths.HISTORY;
+  static const ABOUT_US = _Paths.ABOUT_US;
+  static const HELP_SUPPORT = _Paths.HELP_SUPPORT;
 }
 
 abstract class _Paths {
@@ -42,4 +44,6 @@ abstract class _Paths {
   static const REGISTER_VEHICLE = '/register-vehicle';
   static const MY_VEHICLE = '/my-vehicle';
   static const HISTORY = '/history';
+  static const ABOUT_US = '/about-us';
+  static const HELP_SUPPORT = '/help-support';
 }

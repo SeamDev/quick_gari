@@ -8,13 +8,11 @@ class OfferView extends GetView<OfferController> {
 
   @override
   Widget build(BuildContext context) {
+    List data = [];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Offer'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Offer'), centerTitle: true),
 
-      body: ListView.builder(
+      body: data.isEmpty ? Center(child: Text("No offer available right now"),) : ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 5,
         itemBuilder: (context, index) {
@@ -24,10 +22,7 @@ class OfferView extends GetView<OfferController> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: Colors.green.shade300,
-                width: 1.2,
-              ),
+              border: Border.all(color: Colors.green.shade300, width: 1.2),
             ),
 
             child: Row(
@@ -48,18 +43,17 @@ class OfferView extends GetView<OfferController> {
                     SizedBox(height: 4),
                     Text(
                       "Black Friday",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),
 
                 // RIGHT BUTTON
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xff00894C), // Green
                     borderRadius: BorderRadius.circular(12),
@@ -72,7 +66,7 @@ class OfferView extends GetView<OfferController> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           );

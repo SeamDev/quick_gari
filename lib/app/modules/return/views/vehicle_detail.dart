@@ -27,15 +27,15 @@ class CarDetailsView extends StatelessWidget {
               '${data["car"]["carName"]}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 4),
+            // const SizedBox(height: 4),
 
-            Row(
-              children: const [
-                Icon(Icons.star, color: Colors.orange, size: 16),
-                SizedBox(width: 4),
-                Text('4.9 (531 reviews)', style: TextStyle(color: Colors.grey)),
-              ],
-            ),
+            // Row(
+            //   children: const [
+            //     Icon(Icons.star, color: Colors.orange, size: 16),
+            //     SizedBox(width: 4),
+            //     Text('4.9 (531 reviews)', style: TextStyle(color: Colors.grey)),
+            //   ],
+            // ),
 
             const SizedBox(height: 16),
 

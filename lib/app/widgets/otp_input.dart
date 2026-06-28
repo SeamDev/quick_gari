@@ -91,20 +91,22 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
 
   Widget buildField(int index) {
     return SizedBox(
-      width: 55,
+      width: 40,
       height: 65,
       child: TextField(
         controller: controllers[index],
         focusNode: focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
+        
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(index == 0 ? widget.length : 1),
         ],
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         decoration: InputDecoration(
           filled: true,
+          contentPadding: EdgeInsets.all(0),
           fillColor: Colors.grey.shade100,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),

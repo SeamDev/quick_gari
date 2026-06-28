@@ -358,14 +358,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
+              /*
               const SizedBox(height: 22),
               Center(
                 child: Text(
                   "or",
                   style: TextStyle(color: Colors.grey.shade600),
                 ),
-              ),
-              const SizedBox(height: 22),
+              ),const SizedBox(height: 22),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -373,7 +373,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   _socialCircle("assets/facebook.png"),
                   _socialCircle("assets/gmail.png"),
                 ],
-              ),
+              ),*/
               const SizedBox(height: 25),
               Center(
                 child: Row(

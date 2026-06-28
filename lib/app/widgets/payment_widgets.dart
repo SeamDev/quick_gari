@@ -90,119 +90,121 @@ class _PaymentViewState extends State<PaymentView> {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            /// Payment Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Driver Information",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Number: 01570269334",
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: copyNumber,
-                        icon: const Icon(Icons.copy, size: 20),
-                      ),
-                    ],
-                  ),
-
-                  const Divider(height: 30),
-
-                  Text(
-                    "Fare: ৳ ${(int.parse(widget.fare) * 1.1).toStringAsFixed(2)}",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              /// Payment Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade300,
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                  const Divider(height: 30),
-
-                  Text(
-                    "**Please send the payment to this number and paste the transaction ID. Your request will remain pending until we receive confirmation.**",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                  Text(
-                    "**Payment method : Send Money**",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            /// Transaction ID Field
-            TextField(
-              controller: trxController,
-              decoration: InputDecoration(
-                labelText: "Transaction ID",
-                hintText: "Enter your payment transaction ID",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  ],
                 ),
-                prefixIcon: const Icon(Icons.payment),
+        
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Payment Number",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+        
+                    const SizedBox(height: 10),
+        
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Number: 01570269334",
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: copyNumber,
+                          icon: const Icon(Icons.copy, size: 20),
+                        ),
+                      ],
+                    ),
+        
+                    const Divider(height: 30),
+        
+                    Text(
+                      "Fare: ৳ ${(int.parse(widget.fare) * 1.1).toStringAsFixed(2)}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const Divider(height: 30),
+        
+                    Text(
+                      "**Please send the payment to this number and paste the transaction ID. Your request will remain pending until we receive confirmation.**",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    Text(
+                      "**Payment method : Send Money**",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            const SizedBox(height: 30),
-
-            /// Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: submitPayment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
+        
+              const SizedBox(height: 25),
+        
+              /// Transaction ID Field
+              TextField(
+                controller: trxController,
+                decoration: InputDecoration(
+                  labelText: "Transaction ID",
+                  hintText: "Enter your payment transaction ID",
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                child: const Text(
-                  "Submit Payment",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  prefixIcon: const Icon(Icons.payment),
                 ),
               ),
-            ),
-          ],
+        
+              const SizedBox(height: 30),
+        
+              /// Submit Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: submitPayment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Submit Payment",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

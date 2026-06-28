@@ -7,8 +7,6 @@ class RideProposalController extends GetxController {
   Map<String, dynamic> dataList = <String, dynamic>{};
   List<String> mainList = [];
 
-
-
   final String id;
   RideProposalController(this.id);
 
@@ -18,15 +16,7 @@ class RideProposalController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   void getUserRideProposalList() async {
     dataList = await ApiService.getUserRideProposalList(id);

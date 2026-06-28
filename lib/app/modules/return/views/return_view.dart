@@ -136,13 +136,6 @@ class ReturnView extends GetView<ReturnController> {
             style: TextStyle(color: Colors.black87, fontSize: 13),
           ),
 
-          const SizedBox(height: 6),
-
-          /// Distance
-          const Text(
-            "5 KM | Distance from your starting location",
-            style: TextStyle(color: Colors.black87, fontSize: 12),
-          ),
 
           const SizedBox(height: 14),
 

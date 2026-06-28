@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/service/api_service.dart';
 import 'package:quick_gari/app/service/call_service.dart';
@@ -169,7 +170,7 @@ class DriverInfoContainer extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Driver : $name",
+                                  "Passenger : $name",
                                   style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w600,
@@ -214,14 +215,16 @@ class DriverInfoContainer extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       /// TIME
-                      /*buildInfoRow(
-                          icon: Icons.access_time,
-                          iconColor: Colors.orange,
-                          title: "Travel Time",
-                          value: travelTime,
-                        ),
-        
-                        const SizedBox(height: 16),*/
+                      buildInfoRow(
+                        icon: Icons.access_time,
+                        iconColor: Colors.orange,
+                        title: "Date & Time",
+                        value: DateFormat(
+                          'yyyy-MM-dd hh:mm a',
+                        ).format(DateTime.parse(date)),
+                      ),
+
+                      const SizedBox(height: 16),
 
                       /// FARE
                       buildInfoRow(
@@ -243,7 +246,7 @@ class DriverInfoContainer extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          PhoneCallService.call(phone);
+                          SupportService.call(phone);
                         },
                         icon: const Icon(Icons.call),
                         label: const Text("Call Driver"),
@@ -369,12 +372,11 @@ class DriverInfoContainer extends StatelessWidget {
         const SizedBox(width: 10),
 
         Text(
-          "$title :",
+          "$title :  ",
           style: TextStyle(fontSize: 15, color: Colors.grey.shade700),
         ),
 
-        const Spacer(),
-
+        //const Spacer(),
         Flexible(
           child: Text(
             value,

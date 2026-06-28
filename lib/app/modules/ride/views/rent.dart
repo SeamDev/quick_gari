@@ -117,11 +117,11 @@ class RequestForRentPage extends StatelessWidget {
                     Text(mainList[1], style: TextStyle(fontSize: 16)),
                   ],
                 ),
-                Spacer(),
-                Text(
-                  "11km",
-                  style: TextStyle(fontSize: 18, color: Colors.black54),
-                ),
+                // Spacer(),
+                // Text(
+                //   "11km",
+                //   style: TextStyle(fontSize: 18, color: Colors.black54),
+                // ),
               ],
             ),
             const SizedBox(height: 24),

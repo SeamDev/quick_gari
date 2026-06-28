@@ -47,19 +47,19 @@ class ConfirmBookingView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: Colors.orange, size: 14),
-                            SizedBox(width: 4),
-                            Text(
-                              '4.9 (531 reviews)',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     Icon(Icons.star, color: Colors.orange, size: 14),
+                        //     SizedBox(width: 4),
+                        //     Text(
+                        //       '4.9 (531 reviews)',
+                        //       style: TextStyle(
+                        //         color: Colors.grey,
+                        //         fontSize: 12,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -91,10 +91,10 @@ class ConfirmBookingView extends StatelessWidget {
               iconColor: Colors.green,
               title: 'Ending point',
               value: '${data["endLocation"]}',
-              trailing: const Text(
-                '1.1km',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
+              // trailing: const Text(
+              //   '1.1km',
+              //   style: TextStyle(color: Colors.grey, fontSize: 12),
+              // ),
             ),
 
             const SizedBox(height: 16),

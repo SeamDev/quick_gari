@@ -43,8 +43,8 @@ class RideProposalView extends StatelessWidget {
         builder: (_) {
           return controller.isLoading
               ? Center(child: CircularProgressIndicator(color: Colors.green))
-              : controller.dataList.isEmpty
-              ? Center(child: Text("No Proposal Created"))
+              : controller.dataList["proposals"].isEmpty
+              ? Center(child: Text("Please wait , Driver will respond shortly"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(

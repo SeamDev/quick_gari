@@ -1,11 +1,15 @@
 import 'package:get/get.dart';
 
+import '../modules/about_us/bindings/about_us_binding.dart';
+import '../modules/about_us/views/about_us_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/emergency/bindings/emergency_binding.dart';
 import '../modules/emergency/views/emergency_view.dart';
 import '../modules/favourite/bindings/favourite_binding.dart';
 import '../modules/favourite/views/favourite_view.dart';
+import '../modules/help_support/bindings/help_support_binding.dart';
+import '../modules/help_support/views/help_support_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -121,6 +125,16 @@ class AppPages {
       name: _Paths.HISTORY,
       page: () => const HistoryView(),
       binding: HistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.ABOUT_US,
+      page: () => const AboutUsView(),
+      binding: AboutUsBinding(),
+    ),
+    GetPage(
+      name: _Paths.HELP_SUPPORT,
+      page: () => const HelpSupportView(),
+      binding: HelpSupportBinding(),
     ),
   ];
 }

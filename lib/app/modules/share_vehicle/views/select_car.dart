@@ -185,7 +185,7 @@ class _SelectCarState extends State<SelectCar> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<int>(
-                  value: widget.data["availableSeats"] > 0 ? 1 : null,
+                  value: widget.data["availableSeats"] > 0 ? selectSeat : null,
                   disabledHint: Text("NO Seat Available"),
                   isExpanded: true,
                   items: List.generate(

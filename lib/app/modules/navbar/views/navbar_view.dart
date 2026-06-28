@@ -125,7 +125,7 @@ class NavbarView extends GetView<NavbarController> {
                           const SizedBox(height: 4),
 
                           Text(
-                            "History",
+                            "Your Trip",
                             style: TextStyle(
                               color: controller.currentIndex == 2 ? Color(0xFF00A86B) : Colors.grey,
                               fontSize: 12,

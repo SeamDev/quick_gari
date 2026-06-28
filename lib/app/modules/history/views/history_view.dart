@@ -40,7 +40,6 @@ class HistoryView extends GetView<HistoryController> {
                           ? controller.dataReturn[index]
                           : controller.dataRide[index -
                                 controller.dataReturn.length];
-
                       return DriverInfoContainer(
                         refresh: controller.fetchData,
                         tripType: isReturn ? "Return" : "Ride",

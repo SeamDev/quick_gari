@@ -33,6 +33,7 @@ class RideView extends GetView<RideController> {
         centerTitle: false,
         actions: !AppConfig().user.isCarOwner
             ? [
+                Text("Create Trip"),
                 IconButton(
                   onPressed: () => showEditableAddressSheet(refresh),
                   icon: Icon(Icons.add_circle, size: 30),

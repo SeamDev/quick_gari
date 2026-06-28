@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/register_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
@@ -46,9 +47,9 @@ class _SignInScreenState extends State<SignInScreen> {
     if (response["success"]) {
       Get.offAllNamed(Routes.NAVBAR);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(response["message"] ?? "Null Error on Login")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response["message"] ?? "Null Error on Login")),
+      );
 
       setState(() {
         isLoading = false;
@@ -125,10 +126,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: GestureDetector(
                   onTap: () {
                     // Navigate to forgot password screen if needed
-                    Get.snackbar("Forgot?", "Forgot password clicked!");
+                     Clipboard.setData(ClipboardData(text: "01570269334"));
+                    Get.snackbar("Forgot", "Call Admin . Number Copied !");
                   },
                   child: const Text(
-                    "Forget password?",
+                    "Forget password",
                     style: TextStyle(
                       color: Colors.red,
                       fontSize: 13,
@@ -176,6 +178,7 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: 25),
 
               // Line Separator
+              /*
               Row(
                 children: [
                   Expanded(
@@ -217,7 +220,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 text: "Sign up with Apple",
                 onTap: () {},
               ),
-
+*/
               const SizedBox(height: 30),
 
               // Sign Up Row
