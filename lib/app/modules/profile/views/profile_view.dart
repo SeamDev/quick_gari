@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
@@ -9,194 +10,364 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-    final TextEditingController addressController = TextEditingController();
-
-    final ProfileController controller = Get.put(ProfileController());
-
-    String selectedGender = controller.user.gender ?? "male";
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile', style: TextStyle(color: Colors.black87)),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          GestureDetector(
-            onTap: () {
-              HiveService.clear();
-              Get.offAllNamed(Routes.AUTH,arguments: {"isInit": false});
-            },
-            child: Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: Center(
-                child: Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-
-            // 🔹 Profile Picture
-            Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: NetworkImage(controller.user.avatar),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.green,
-                  ),
-                  child: const Icon(Icons.check, size: 16, color: Colors.white),
-                ),
-              ],
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Profile',
+              style: TextStyle(color: Colors.black87),
             ),
 
-            const SizedBox(height: 12),
-            Text(
-              controller.user.name,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 24),
+            backgroundColor: Colors.white,
+            centerTitle: true,
+            elevation: 0,
 
-            // 🔹 Email Field
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                hintText: controller.user.email,
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  HiveService.clear();
 
-            // 🔹 Phone Number Field
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: const [
-                      Image(
-                        image: AssetImage('assets/bd_flag.png'),
-                        height: 20,
-                        width: 28,
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText:
-                          '+88${controller.user.phoneNumber}',
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                  Get.offAllNamed(Routes.AUTH, arguments: {"isInit": false});
+                },
+
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: Text(
+                      'Logout',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // 🔹 Gender Dropdown
-            DropdownButtonFormField<String>(
-              initialValue: selectedGender,
-              items: const [
-                DropdownMenuItem(value: 'male', child: Text('Male')),
-                DropdownMenuItem(value: 'female', child: Text('Female')),
-                DropdownMenuItem(value: 'other', child: Text('Other')),
-              ],
-              onChanged: (value) {
-                selectedGender = value!;
-              },
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
               ),
-            ),
-            const SizedBox(height: 12),
+            ],
+          ),
 
-            // 🔹 Address Field
-            TextField(
-              controller: addressController,
-              decoration: InputDecoration(
-                hintText: 'Address',
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+          backgroundColor: Colors.white,
 
-            // 🔹 Add File Button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: Colors.green),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(controller.user.avatar),
                 ),
-                child: const Text(
-                  'Add Others file',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16,
+
+                const SizedBox(height: 12),
+
+                Text(
+                  controller.user.name,
+                  style: const TextStyle(
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+
+                const SizedBox(height: 25),
+
+                inputField(
+                  controller: controller.emailController,
+                  hint: controller.user.email,
+                ),
+
+                const SizedBox(height: 12),
+
+                inputField(
+                  controller: controller.phoneController,
+                  hint: "+88${controller.user.phoneNumber}",
+                  keyboard: TextInputType.phone,
+                ),
+
+                const SizedBox(height: 12),
+
+                Obx(
+                  () => DropdownButtonFormField<String>(
+                    initialValue: controller.selectedGender.value,
+
+                    items: const [
+                      DropdownMenuItem(value: "male", child: Text("Male")),
+
+                      DropdownMenuItem(value: "female", child: Text("Female")),
+
+                      DropdownMenuItem(value: "other", child: Text("Other")),
+                    ],
+
+                    onChanged: (v) {
+                      controller.changeGender(v!);
+                    },
+
+                    decoration: fieldDecoration("Gender"),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                OutlinedButton(
+                  onPressed: controller.toggleAddress,
+
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 55),
+
+                    backgroundColor: Colors.grey[100],
+
+                    side: BorderSide(color: Colors.grey.shade300, width: 1),
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      Text(
+                        "Address",
+                        style: TextStyle(color: Colors.black87, fontSize: 16),
+                      ),
+
+                      Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Obx(
+                  () => controller.showAddress.value
+                      ? Column(
+                          children: [
+                            title("Present Address"),
+
+                            addressInput(controller.presentVillage, "Village"),
+
+                            addressInput(controller.presentUnion, "Union"),
+
+                            addressInput(controller.presentUpazila, "Upazila"),
+
+                            addressInput(
+                              controller.presentDistrict,
+                              "District",
+                            ),
+
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: controller.sameAddress.value,
+
+                                  onChanged: (v) {
+                                    controller.changeSameAddress(v ?? false);
+                                  },
+                                ),
+
+                                const Text("Same as Present Address"),
+                              ],
+                            ),
+
+                            title("Permanent Address"),
+
+                            addressInput(
+                              controller.permanentVillage,
+                              "Village",
+                            ),
+
+                            addressInput(controller.permanentUnion, "Union"),
+
+                            addressInput(
+                              controller.permanentUpazila,
+                              "Upazila",
+                            ),
+
+                            addressInput(
+                              controller.permanentDistrict,
+                              "District",
+                            ),
+                          ],
+                        )
+                      : const SizedBox(),
+                ),
+
+                const SizedBox(height: 16),
+
+                OutlinedButton(
+                  onPressed: controller.toggleNid,
+
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 55),
+
+                    backgroundColor: Colors.grey[100],
+
+                    side: BorderSide(color: Colors.grey.shade300, width: 1),
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    children: [
+                      Text(
+                        "Add Other file",
+                        style: TextStyle(color: Colors.black87, fontSize: 16),
+                      ),
+
+                      Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Obx(
+                  () => controller.showNid.value
+                      ? Column(
+                          children: [
+                            inputField(
+                              controller: controller.nidController,
+                              hint: "NID Number",
+                              keyboard: TextInputType.number,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            nidUploadBox(
+                              "NID Front Photo",
+                              controller.nidFront.value,
+                              () {
+                                controller.pickNidImage(true);
+                              },
+                            ),
+
+                            nidUploadBox(
+                              "NID Back Photo",
+                              controller.nidBack.value,
+                              () {
+                                controller.pickNidImage(false);
+                              },
+                            ),
+                          ],
+                        )
+                      : const SizedBox(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget title(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget inputField({
+    required TextEditingController controller,
+    required String hint,
+    TextInputType? keyboard,
+  }) {
+    return TextField(
+      controller: controller,
+
+      keyboardType: keyboard,
+
+      decoration: fieldDecoration(hint),
+    );
+  }
+
+  Widget addressInput(TextEditingController controller, String hint) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+
+      child: inputField(controller: controller, hint: hint),
+    );
+  }
+
+  InputDecoration fieldDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+
+      filled: true,
+
+      fillColor: Colors.grey[100],
+
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
+  Widget nidUploadBox(String title, Uint8List? image, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+
+      child: Container(
+        margin: const EdgeInsets.only(top: 10),
+
+        padding: const EdgeInsets.all(12),
+
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          
+
+          borderRadius: BorderRadius.circular(12),
+
+          border: Border.all(color: Colors.green),
+        ),
+
+        child: Column(
+          children: [
+            if (image != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+
+                child: Image.memory(
+                  image,
+
+                  height: 150,
+
+                  width: double.infinity,
+
+                  fit: BoxFit.scaleDown,
+                ),
               ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+              children: [
+                Text(image == null ? title : "Change $title"),
+
+                const Icon(Icons.cloud_upload, color: Colors.green),
+              ],
             ),
           ],
         ),

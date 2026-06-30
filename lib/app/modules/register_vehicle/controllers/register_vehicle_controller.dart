@@ -33,14 +33,14 @@ class RegisterVehicleController extends GetxController {
   // FILE VARIABLES
   // =============================
 
-  Map? taxTokenPhoto;
-  Map? registrationCardPhoto;
-  Map? licensePhoto;
+  Rxn<Map> taxTokenPhoto = Rxn<Map>();
+  Rxn<Map> registrationCardPhoto = Rxn<Map>();
+  Rxn<Map> licensePhoto = Rxn<Map>();
 
-  Map? frontView;
-  Map? sideView;
-  Map? backView;
-  Map? interiorView;
+  Rxn<Map> frontView = Rxn<Map>();
+  Rxn<Map> sideView = Rxn<Map>();
+  Rxn<Map> backView = Rxn<Map>();
+  Rxn<Map> interiorView = Rxn<Map>();
 
   void checkValid() {}
 
@@ -77,31 +77,41 @@ class RegisterVehicleController extends GetxController {
     return null;
   }
 
-  void filePICK(String key) async {
-    switch (key) {
-      case "tax":
-        taxTokenPhoto = await pickFile();
-        break;
-      case "reg":
-        registrationCardPhoto = await pickFile();
-        break;
-      case "lic":
-        licensePhoto = await pickFile();
-        break;
-      case "front":
-        frontView = await pickFile();
-        break;
-      case "side":
-        sideView = await pickFile();
-        break;
-      case "back":
-        backView = await pickFile();
-        break;
-      case "interior":
-        interiorView = await pickFile();
-        break;
-    }
+void filePICK(String key) async {
+  final file = await pickFile();
+
+  if (file == null) return;
+
+  switch (key) {
+    case "tax":
+      taxTokenPhoto.value = file;
+      break;
+
+    case "reg":
+      registrationCardPhoto.value = file;
+      break;
+
+    case "lic":
+      licensePhoto.value = file;
+      break;
+
+    case "front":
+      frontView.value = file;
+      break;
+
+    case "side":
+      sideView.value = file;
+      break;
+
+    case "back":
+      backView.value = file;
+      break;
+
+    case "interior":
+      interiorView.value = file;
+      break;
   }
+}
 
   bool checkRequiredFiles() {
     // Map of file variable to its friendly name

@@ -278,6 +278,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   // Social Button
+  // ignore: unused_element
   Widget _socialButton({
     required String icon,
     required String text,

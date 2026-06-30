@@ -9,7 +9,6 @@ class ConfirmBookingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -109,7 +108,9 @@ class ConfirmBookingView extends StatelessWidget {
             _infoBox(
               'Time',
               DateFormat('hh-mm a').format(
-                DateTime.parse(data["startTime"] ?? "2000-01-01T00:00:00.000Z"),
+                DateTime.parse(
+                  data["startTime"] ?? "2000-01-01T00:00:00.000Z",
+                ).toUtc().add(const Duration(hours: 6)),
               ),
             ),
 
@@ -141,7 +142,11 @@ class ConfirmBookingView extends StatelessWidget {
               child: Column(
                 children: [
                   _fareRow('Driver Fare', '৳', data["fare"].toStringAsFixed(2)),
-                  _fareRow('Service Fee', '৳', (data["fare"] * 0.1).toStringAsFixed(2)),
+                  _fareRow(
+                    'Service Fee',
+                    '৳',
+                    (data["fare"] * 0.1).toStringAsFixed(2),
+                  ),
                   const Divider(),
                   _fareRow(
                     'Total',

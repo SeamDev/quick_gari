@@ -427,6 +427,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _socialCircle(String asset) {
     return Container(
       width: 48,

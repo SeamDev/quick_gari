@@ -126,7 +126,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                       if (v == null || v.isEmpty) return "Required";
                       return null;
                     },
-                  ), 
+                  ),
                   // AC Switch
                   // Row(
                   //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -350,27 +350,81 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
       ),
     );
   }
+Widget uploadButton(String label, String key) {
+  return Obx(() {
+    Map? file;
 
-  Widget uploadButton(String label, String key) {
+    switch (key) {
+      case "tax":
+        file = controller.taxTokenPhoto.value;
+        break;
+      case "reg":
+        file = controller.registrationCardPhoto.value;
+        break;
+      case "lic":
+        file = controller.licensePhoto.value;
+        break;
+      case "front":
+        file = controller.frontView.value;
+        break;
+      case "side":
+        file = controller.sideView.value;
+        break;
+      case "back":
+        file = controller.backView.value;
+        break;
+      case "interior":
+        file = controller.interiorView.value;
+        break;
+    }
+
     return GestureDetector(
       onTap: () async => controller.filePICK(key),
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFF00804B)),
           color: const Color(0xFFE8F7EF),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-            const Icon(Icons.cloud_upload, color: Color(0xFF00804B)),
+
+            if (file != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.memory(
+                  file["bytes"],
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  file != null ? "Change $label" : label,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const Icon(
+                  Icons.cloud_upload,
+                  color: Color(0xFF00804B),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
-  }
+  });
+}
 }

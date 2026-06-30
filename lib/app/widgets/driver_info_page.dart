@@ -170,7 +170,7 @@ class DriverInfoContainer extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Passenger : $name",
+                                  "${AppConfig().user.isCarOwner ? "Driver" : "Passenger"} : $name",
                                   style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w600,

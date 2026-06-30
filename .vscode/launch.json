@@ -20,6 +20,17 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "Flutter Chrome Offline",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "chrome",
+            "toolArgs": [
+                "--no-pub",
+                "--no-web-resources-cdn",
+                "--dart-define=FLUTTER_WEB_AUTO_DETECT_FONTS=false"
+            ]
         }
     ]
 }
