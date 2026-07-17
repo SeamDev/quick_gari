@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class RideController extends GetxController {
   bool isLoading = true;

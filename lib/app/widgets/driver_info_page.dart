@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/service/api_service.dart';
-import 'package:quick_gari/app/service/call_service.dart';
-import 'package:quick_gari/app/service/message_service.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
+import 'package:quick_gari/app/services/api_service.dart';
+import 'package:quick_gari/app/services/external_app_open_service.dart';
 import 'package:quick_gari/app/widgets/otp_input.dart';
 
 class DriverInfoContainer extends StatelessWidget {
   final String tripType;
   final String carImage;
   final String id;
+  final String driverID;
   final String vehicleName;
   final String image;
   final String name;
@@ -39,6 +40,7 @@ class DriverInfoContainer extends StatelessWidget {
     this.date = "N/A",
     this.startTime = "N/A",
     this.id = "N/A",
+    this.driverID = "N/A",
     this.isVerified = false,
     required this.refresh,
   });
@@ -246,7 +248,7 @@ class DriverInfoContainer extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          SupportService.call(phone);
+                          ExternalAppOpenService.call(phone);
                         },
                         icon: const Icon(Icons.call),
                         label: const Text("Call Driver"),
@@ -268,9 +270,13 @@ class DriverInfoContainer extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          MessageService.sendMessage(
-                            phoneNumber: phone,
-                            message: "Hello Driver",
+                          Get.toNamed(
+                            Routes.CHAT,
+                            arguments: {
+                              'type': tripType,
+                              'Id': id,
+                              'driverId':driverID
+                            },
                           );
                         },
                         icon: const Icon(Icons.message),

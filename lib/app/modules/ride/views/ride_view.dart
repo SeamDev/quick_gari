@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 import '../controllers/ride_controller.dart';
 
 class RideView extends GetView<RideController> {

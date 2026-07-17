@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   final String phoneNumber;

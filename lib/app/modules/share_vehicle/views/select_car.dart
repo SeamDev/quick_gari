@@ -3,7 +3,7 @@ import 'package:get/route_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 import 'package:quick_gari/app/widgets/otp_input.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 

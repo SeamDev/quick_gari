@@ -23,4 +23,8 @@ class Config {
   static const String shareVehicleAPI = "/share-vehicle";
   static const String shareVAvailableAPI = "/share-vehicle/available";
   static const String shareVDriverAPI = "/share-vehicle/driver";
+
+  //Socket - Chat
+  static const String chatAPI = "/chat";
+  //Socket - Notificaation
 }

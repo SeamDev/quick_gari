@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class PaymentView extends StatefulWidget {
   final String? name;

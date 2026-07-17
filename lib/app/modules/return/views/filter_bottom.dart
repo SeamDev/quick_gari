@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 showEditableAddressSheet(BuildContext context, void Function() refresh) {
   final startCtrl = TextEditingController();

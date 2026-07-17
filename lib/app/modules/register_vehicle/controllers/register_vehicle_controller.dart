@@ -2,7 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class RegisterVehicleController extends GetxController {
   // =============================
@@ -33,14 +33,14 @@ class RegisterVehicleController extends GetxController {
   // FILE VARIABLES
   // =============================
 
-  Rxn<Map> taxTokenPhoto = Rxn<Map>();
-  Rxn<Map> registrationCardPhoto = Rxn<Map>();
-  Rxn<Map> licensePhoto = Rxn<Map>();
+  Rxn<Map<String, dynamic>> taxTokenPhoto = Rxn<Map<String, dynamic>>();
+  Rxn<Map<String, dynamic>> registrationCardPhoto = Rxn<Map<String, dynamic>>();
+  Rxn<Map<String, dynamic>> licensePhoto = Rxn<Map<String, dynamic>>();
 
-  Rxn<Map> frontView = Rxn<Map>();
-  Rxn<Map> sideView = Rxn<Map>();
-  Rxn<Map> backView = Rxn<Map>();
-  Rxn<Map> interiorView = Rxn<Map>();
+  Rxn<Map<String, dynamic>> frontView = Rxn<Map<String, dynamic>>();
+  Rxn<Map<String, dynamic>> sideView = Rxn<Map<String, dynamic>>();
+  Rxn<Map<String, dynamic>> backView = Rxn<Map<String, dynamic>>();
+  Rxn<Map<String, dynamic>> interiorView = Rxn<Map<String, dynamic>>();
 
   void checkValid() {}
 
@@ -48,7 +48,7 @@ class RegisterVehicleController extends GetxController {
   // FILE PICKER FUNCTION
   // =============================
 
-  Future<Map?> pickFile() async {
+  Future<Map<String, dynamic>?> pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
       withData: true, // important
@@ -68,54 +68,53 @@ class RegisterVehicleController extends GetxController {
         }
 
         return {
-              "bytes": imageBytes,
-              "extension": result.files.first.extension ?? "jpg",
-            }
-            as Map<String, dynamic>;
+          "bytes": imageBytes,
+          "extension": result.files.first.extension ?? "jpg",
+        };
       }
     }
     return null;
   }
 
-void filePICK(String key) async {
-  final file = await pickFile();
+  void filePICK(String key) async {
+    final file = await pickFile();
 
-  if (file == null) return;
+    if (file == null) return;
 
-  switch (key) {
-    case "tax":
-      taxTokenPhoto.value = file;
-      break;
+    switch (key) {
+      case "tax":
+        taxTokenPhoto.value = file;
+        break;
 
-    case "reg":
-      registrationCardPhoto.value = file;
-      break;
+      case "reg":
+        registrationCardPhoto.value = file;
+        break;
 
-    case "lic":
-      licensePhoto.value = file;
-      break;
+      case "lic":
+        licensePhoto.value = file;
+        break;
 
-    case "front":
-      frontView.value = file;
-      break;
+      case "front":
+        frontView.value = file;
+        break;
 
-    case "side":
-      sideView.value = file;
-      break;
+      case "side":
+        sideView.value = file;
+        break;
 
-    case "back":
-      backView.value = file;
-      break;
+      case "back":
+        backView.value = file;
+        break;
 
-    case "interior":
-      interiorView.value = file;
-      break;
+      case "interior":
+        interiorView.value = file;
+        break;
+    }
   }
-}
 
   bool checkRequiredFiles() {
     // Map of file variable to its friendly name
-    final Map<dynamic, String> files = {
+    final files = <Rxn<Map<String, dynamic>>, String>{
       taxTokenPhoto: "Tax Token Photo",
       registrationCardPhoto: "Registration Card Photo",
       licensePhoto: "License Photo",
@@ -125,15 +124,11 @@ void filePICK(String key) async {
       interiorView: "Interior View",
     };
 
-    for (var entry in files.entries) {
-      final file = entry.key;
-      final name = entry.value;
-
-      // Check null or empty (if it's a String path)
-      if (file == null || (file is String && file.trim().isEmpty)) {
+    for (final entry in files.entries) {
+      if (entry.key.value == null) {
         Get.snackbar(
           "Required",
-          "$name is required",
+          "${entry.value} is required",
           snackPosition: SnackPosition.BOTTOM,
         );
         return false;
@@ -145,10 +140,15 @@ void filePICK(String key) async {
   void uploadVehicle() async {
     if (!checkRequiredFiles()) return;
     Map body = {
-      "taxTokenPhoto": taxTokenPhoto,
-      "drivingLicensePhoto": licensePhoto,
-      "images": [frontView, sideView, backView, interiorView],
-      "registrationCardPhoto": registrationCardPhoto,
+      "taxTokenPhoto": taxTokenPhoto.value,
+      "drivingLicensePhoto": licensePhoto.value,
+      "images": [
+        frontView.value,
+        sideView.value,
+        backView.value,
+        interiorView.value,
+      ],
+      "registrationCardPhoto": registrationCardPhoto.value,
       "data": {
         "carName": fullName,
         "features": {
@@ -171,6 +171,9 @@ void filePICK(String key) async {
     if (res) {
       ApiService.getUser();
       Get.back();
-    } else {}
+      Get.snackbar("Status", "Vehicle Registration Successful");
+    } else {
+      Get.snackbar("Status", "Vehicle Registration Unsuccessful");
+    }
   }
 }

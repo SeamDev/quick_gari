@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_service.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
 
 class AuthController extends GetxController {
   bool isSplash = true;

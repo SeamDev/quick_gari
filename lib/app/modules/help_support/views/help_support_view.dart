@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/service/call_service.dart';
+import 'package:quick_gari/app/services/external_app_open_service.dart';
 
 import '../controllers/help_support_controller.dart';
 
@@ -31,23 +31,26 @@ class HelpSupportView extends GetView<HelpSupportController> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// Header Card
             Container(
               padding: const EdgeInsets.all(25),
-              height: 220,
+              constraints: const BoxConstraints(minHeight: 220),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 color: const Color(0xffF5FBF6),
                 border: Border.all(color: Colors.grey.shade200),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "We’re Here to Help!",
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: green,
                             fontSize: 26,
@@ -56,13 +59,16 @@ class HelpSupportView extends GetView<HelpSupportController> {
                         ),
                         const SizedBox(height: 18),
                         const Text(
-                          "Facing any issue while using\nQuickGari? Contact us anytime.\nWe’re always ready to assist\nyou with the best support.",
+                          "Facing any issue while using QuickGari? "
+                          "Contact us anytime. We’re always ready to assist "
+                          "you with the best support.",
                           style: TextStyle(fontSize: 18, height: 1.5),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.support_agent, size: 95, color: green),
+                  const SizedBox(width: 15),
+                  Icon(Icons.support_agent, size: 75, color: green),
                 ],
               ),
             ),
@@ -89,14 +95,14 @@ class HelpSupportView extends GetView<HelpSupportController> {
                   Icons.email,
                   "Email",
                   "quickgari@gmail.com",
-                  () => SupportService.email(email: "quickgari@gmail.com"),
+                  () => ExternalAppOpenService.email(email: "quickgari@gmail.com"),
                 ),
                 const SizedBox(width: 15),
                 contactCard(
                   Icons.phone,
                   "Hotline",
                   "+880178061328",
-                  () => SupportService.call("0178061328"),
+                  () => ExternalAppOpenService.call("0178061328"),
                 ),
               ],
             ),
@@ -136,7 +142,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   Widget sectionTitle(String text) {
     return Row(
       children: [
-        Expanded(child: Divider(color: green.withOpacity(.25))),
+        Expanded(child: Divider(color: green.withValues(alpha: .25))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Text(
@@ -148,7 +154,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
             ),
           ),
         ),
-        Expanded(child: Divider(color: green.withOpacity(.25))),
+        Expanded(child: Divider(color: green.withValues(alpha: .25))),
       ],
     );
   }
@@ -212,7 +218,10 @@ class HelpSupportView extends GetView<HelpSupportController> {
               const SizedBox(height: 10),
               Text(
                 title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 5),
               Text(value, style: TextStyle(color: green, fontSize: 15)),

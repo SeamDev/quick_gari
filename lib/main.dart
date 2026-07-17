@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+//import 'package:quick_gari/app/service/background_service.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
+import 'package:quick_gari/app/utils/initial_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
+  //await initializeBackgroundService();
   runApp(const MyApp());
 }
 
@@ -17,6 +20,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quick Gari',
+      initialBinding: InitialBinding(),
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       //home: NavbarView(),

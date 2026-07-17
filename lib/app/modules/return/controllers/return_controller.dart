@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class ReturnController extends GetxController {
   bool isLoading = true;
@@ -11,15 +11,7 @@ class ReturnController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   void getReturnList() async {
     data = await ApiService.getAllReturnTrip();

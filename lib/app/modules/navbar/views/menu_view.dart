@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
 
 class MenuView extends GetView<NavbarController> {
   const MenuView({super.key});

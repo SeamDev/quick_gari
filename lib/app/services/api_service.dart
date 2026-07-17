@@ -6,9 +6,9 @@ import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/auth/views/verify.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_config.dart';
-import 'package:quick_gari/app/service/dio_logger.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/utils/api_config.dart';
+import 'package:quick_gari/app/utils/dio_logger.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
 
 bool firstTry = false, secondTry = false;
 
@@ -112,7 +112,7 @@ class ApiService {
   // ==========================================
   static Future<bool> g() async {
     try {
-      var url = Config.baseUrl + Config.apiVersion + Config.loginAPI;
+      var url = "${Config.baseUrl}${Config.apiVersion}";
       var response = await dio.post(url, data: {});
       return response.statusCode == 200;
     } catch (e) {
@@ -849,7 +849,7 @@ class ApiService {
       return e.response?.data;
     } catch (e) {
       debugPrint("ERROR: $e");
-      return {"success": false,'message': 'No Dio Error'};
+      return {"success": false, 'message': 'No Dio Error'};
     }
   }
 
@@ -941,6 +941,63 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return {'success': false};
+    }
+  }
+
+  /// Chat
+  // Create Chat
+  static Future<bool> createChat(String type, String id) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/chat/conversation/$type/$id";
+      var response = await dio.post(url);
+      return response.statusCode == 201;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  // getChat
+  static Future<Map<String, dynamic>> getChat(
+    String type,
+    String id, {
+    int limit = 50,
+  }) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/chat/conversation/$type/$id?limit=$limit";
+      var response = await dio.get(url);
+      return response.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {"isActive": false, "messages": []};
+    }
+  }
+
+  // getChat
+  static Future<bool> sendMessage(
+    String type,
+    String id,
+    String receiver,
+    String message,
+  ) async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/chat/send";
+      var response = await dio.post(
+        url,
+        data: {
+          "contextType": type,
+          "contextId": id,
+          "receiverId": receiver,
+          "message": message,
+        },
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
     }
   }
 }

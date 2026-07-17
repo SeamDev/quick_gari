@@ -24,6 +24,7 @@ abstract class Routes {
   static const HISTORY = _Paths.HISTORY;
   static const ABOUT_US = _Paths.ABOUT_US;
   static const HELP_SUPPORT = _Paths.HELP_SUPPORT;
+  static const CHAT = _Paths.CHAT;
 }
 
 abstract class _Paths {
@@ -46,4 +47,5 @@ abstract class _Paths {
   static const HISTORY = '/history';
   static const ABOUT_US = '/about-us';
   static const HELP_SUPPORT = '/help-support';
+  static const CHAT = '/chat';
 }

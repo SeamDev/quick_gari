@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/service/api_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 
 class HistoryController extends GetxController {
   RxList<Map<String, dynamic>> dataRide = <Map<String, dynamic>>[].obs;

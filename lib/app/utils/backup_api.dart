@@ -6,9 +6,9 @@ import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/modules/auth/views/verify.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/service/api_config.dart';
-import 'package:quick_gari/app/service/dio_logger.dart';
-import 'package:quick_gari/app/service/hive_service.dart';
+import 'package:quick_gari/app/utils/api_config.dart';
+import 'package:quick_gari/app/utils/dio_logger.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
 
 // ==========================================
 // 1. DIO INITIALIZATION & INTERCEPTOR SETUP

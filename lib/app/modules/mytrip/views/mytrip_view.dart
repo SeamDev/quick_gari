@@ -41,7 +41,7 @@ class TripView extends GetView<WalletController> {
                           ? controller.dataReturn[index]
                           : controller.dataRide[index -
                                 controller.dataReturn.length];
-
+                      //print(item);
                       return DriverInfoContainer(
                         refresh: controller.fetchData,
                         tripType: isReturn ? "Return" : "Ride",
@@ -73,6 +73,7 @@ class TripView extends GetView<WalletController> {
                         carImage:
                             item["car"]?["features"]?["images"]?[0] ?? "N/A",
                         id: item["_id"] ?? "N/A",
+                        driverID: AppConfig().user.isCarOwner ? (item["user"]?["_id"]) ?? "N/A" : item["driver"]?["_id"] ?? "N/A",
                         status: item["status"] ?? "N/A",
                         date: item["startTime"] ?? "N/A",
                         isVerified:
