@@ -1,0 +1,91 @@
+class NotificationResponse {
+  final bool success;
+  final int statusCode;
+  final String message;
+  final List<NotificationModel> data;
+
+  NotificationResponse({
+    required this.success,
+    required this.statusCode,
+    required this.message,
+    required this.data,
+  });
+
+  factory NotificationResponse.fromJson(Map<String, dynamic> json) {
+    return NotificationResponse(
+      success: json['success'] ?? false,
+      statusCode: json['statusCode'] ?? 0,
+      message: json['message'] ?? '',
+      data:
+          (json['data'] as List<dynamic>?)
+              ?.map((e) => NotificationModel.fromJson(e))
+              .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'statusCode': statusCode,
+      'message': message,
+      'data': data.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class NotificationModel {
+  final String id;
+  final String userId;
+  final String audience;
+  final String type;
+  final String message;
+  final String rideId;
+  final bool isRead;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int v;
+
+  NotificationModel({
+    required this.id,
+    required this.userId,
+    required this.audience,
+    required this.type,
+    required this.message,
+    required this.rideId,
+    required this.isRead,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.v,
+  });
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json['_id'] ?? '',
+      userId: json['userId'] ?? '',
+      audience: json['audience'] ?? '',
+      type: json['type'] ?? '',
+      message: json['message'] ?? '',
+      rideId: json['rideId'] ?? '',
+      isRead: json['isRead'] ?? false,
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      v: json['__v'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'userId': userId,
+      'audience': audience,
+      'type': type,
+      'message': message,
+      'rideId': rideId,
+      'isRead': isRead,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      '__v': v,
+    };
+  }
+}

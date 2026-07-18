@@ -172,7 +172,7 @@ class DriverInfoContainer extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${AppConfig().user.isCarOwner ? "Driver" : "Passenger"} : $name",
+                                  "${AppConfig().user.isCarOwner ? "Passenger" : "Driver"} : $name",
                                   style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w600,
@@ -221,9 +221,11 @@ class DriverInfoContainer extends StatelessWidget {
                         icon: Icons.access_time,
                         iconColor: Colors.orange,
                         title: "Date & Time",
-                        value: DateFormat(
-                          'yyyy-MM-dd hh:mm a',
-                        ).format(DateTime.parse(date)),
+                        value: DateFormat('yyyy-MM-dd hh:mm a').format(
+                          DateTime.parse(
+                            date,
+                          ).toUtc().add(const Duration(hours: 6)),
+                        ),
                       ),
 
                       const SizedBox(height: 16),
@@ -275,7 +277,7 @@ class DriverInfoContainer extends StatelessWidget {
                             arguments: {
                               'type': tripType,
                               'Id': id,
-                              'driverId':driverID
+                              'driverId': driverID,
                             },
                           );
                         },

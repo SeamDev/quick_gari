@@ -52,6 +52,7 @@ class ChatControllerGet extends GetxController {
     chatSocket.onTyping = () => showTyping();
     chatSocket.onStopTyping = () => stopTyping();
     chatSocket.onNewMessage = _onNewMessage;
+    chatSocket.onRefreash = () => _refresh();
 
     ////
     super.onInit();
@@ -63,6 +64,7 @@ class ChatControllerGet extends GetxController {
     chatSocket.onTyping = null;
     chatSocket.onStopTyping = null;
     chatSocket.onNewMessage = null;
+    chatSocket.onRefreash = null; 
 
     super.onClose();
   }
@@ -98,6 +100,21 @@ class ChatControllerGet extends GetxController {
 
   // Api
 
+  void _refresh() async {
+    data.value = await ApiService.getChat(type, id);
+    final List<dynamic> messages = data["data"]["messages"];
+
+    for (final item in messages) {
+      final msg = core.TextMessage(
+        id: item["_id"],
+        authorId: item["senderId"]["_id"] == AppConfig().user.id ? '1' : '2',
+        text: item["message"],
+        createdAt: DateTime.parse(item["createdAt"]),
+      );
+      await chatController.insertMessage(msg);
+    }
+  }
+
   void createChat() async {
     isLoading.value = true;
     if (await ApiService.createChat(type, id)) {
@@ -112,8 +129,6 @@ class ChatControllerGet extends GetxController {
           createdAt: DateTime.parse(item["createdAt"]),
         );
         await chatController.insertMessage(msg);
-
-        // Add to your chat controller
       }
     } else {
       Get.back();
@@ -140,5 +155,4 @@ class ChatControllerGet extends GetxController {
     await chatController.insertMessage(message);
     await chatController.scrollToMessage(message.id);
   }
-
 }

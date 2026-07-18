@@ -5,12 +5,10 @@ import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
 
 class RideProposalView extends StatelessWidget {
   final String id;
-  final String status;
   final String? driverID;
   RideProposalView({
     super.key,
     required this.id,
-    required this.status,
     this.driverID,
   });
 
@@ -75,7 +73,7 @@ class RideProposalView extends StatelessWidget {
                               data,
                               controller.mainList,
                               id,
-                              status,
+                              controller.dataList["status"] ?? "N/A",
                             );
                           },
                         ),

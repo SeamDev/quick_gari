@@ -983,8 +983,7 @@ class ApiService {
     String message,
   ) async {
     try {
-      var url =
-          "${Config.baseUrl}${Config.apiVersion}/chat/send";
+      var url = "${Config.baseUrl}${Config.apiVersion}/chat/send";
       var response = await dio.post(
         url,
         data: {
@@ -1000,4 +999,81 @@ class ApiService {
       return false;
     }
   }
+
+  ///                          Notification
+  /// getNotification
+  static Future<Map<String, dynamic>> getNotifications() async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/notifications";
+      var response = await dio.get(url);
+      return response.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
+  /// getUnreadCount
+  static Future<int> getUnreadNotifications() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/notifications/unread-count";
+      var response = await dio.get(url);
+      return response.data["data"];
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return 0;
+    }
+  }
+
+  // set FCM
+  static Future<bool> postFCM(String token) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}";
+      var response = await dio.patch(url, data: {"fcmToken": token});
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+  // set FCM
+  static Future<bool> deleteFCM(String token) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}";
+      var response = await dio.delete(url, data: {"fcmToken": token});
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+  // MArk as read by id
+  static Future<bool> markNotificationAsRead(String id) async {
+  try {
+    final url =
+        "${Config.baseUrl}${Config.apiVersion}/notifications/mark-as-read/$id";
+
+    final response = await dio.patch(url);
+
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint("ERROR: $e");
+    return false;
+  }
+}
+// mark as read all
+static Future<bool> markAllNotificationsAsRead() async {
+  try {
+    final url =
+        "${Config.baseUrl}${Config.apiVersion}/notifications/mark-all-as-read";
+
+    final response = await dio.patch(url);
+
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint("ERROR: $e");
+    return false;
+  }
+}
 }

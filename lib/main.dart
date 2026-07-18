@@ -1,14 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-//import 'package:quick_gari/app/service/background_service.dart';
 import 'package:quick_gari/app/services/hive_service.dart';
 import 'package:quick_gari/app/utils/initial_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
-  //await initializeBackgroundService();
+
+  //await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

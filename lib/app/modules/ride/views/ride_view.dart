@@ -166,7 +166,6 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                 : Get.to(
                     () => RideProposalView(
                       id: data["_id"] ?? "00",
-                      status: data["status"] ?? "null",
                       driverID: data["driver"],
                     ),
                   );

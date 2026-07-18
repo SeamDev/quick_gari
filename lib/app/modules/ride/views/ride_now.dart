@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/ride_now_controller.dart';
-import 'package:quick_gari/app/modules/ride/views/rent.dart';
+import 'package:quick_gari/app/modules/ride/views/confirm_booking.dart';
 
 class CarDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -210,7 +210,7 @@ class CarDetailPage extends StatelessWidget {
                             ),
                           ),
                           onPressed: () =>
-                              Get.to(() => RequestForRentPage(data, mainList,id,status)),
+                              Get.to(() => ConfirmBooking(data, mainList,id,status)),
                           child: const Text(
                             'Ride Now',
                             style: TextStyle(fontSize: 22, color: Colors.white),

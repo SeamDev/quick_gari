@@ -43,6 +43,8 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
 
   VoidCallback? onTyping;
   VoidCallback? onStopTyping;
+  VoidCallback? onRefreash;
+
   void Function(Map<String, dynamic> message)? onNewMessage;
 
   void _registerSocketEvents() {
@@ -65,15 +67,21 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
       debugPrint('Socket disconnected');
     });
 
+    socket.onReconnect((_) {
+      debugPrint('ReConnected');
+      Get.snackbar("Network", "Network Reconnect Successful !");
+      onRefreash?.call();
+    });
+
     socket.onConnectError((error) {
       debugPrint('Socket error: $error');
+      Get.snackbar("Network", "Network Connection Failed !");
     });
   }
 
   void _onNewMessage(dynamic data) {
     debugPrint('New message: $data');
-      onNewMessage?.call(Map<String, dynamic>.from(data));
-
+    onNewMessage?.call(Map<String, dynamic>.from(data));
   }
 
   void _onTyping(dynamic data) {

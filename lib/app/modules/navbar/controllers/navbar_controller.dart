@@ -1,23 +1,26 @@
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/services/chat_socket_service.dart';
+import 'package:quick_gari/app/services/notification_service.dart';
 
 class NavbarController extends GetxController {
   final _currentIndex = 0.obs;
 
   int get currentIndex => _currentIndex.value;
 
-  final ChatSocketService chatSocket = Get.find<ChatSocketService>();
+  final ChatSocketService _chatSocket = Get.find<ChatSocketService>();
+  final NotificationService _service = Get.find<NotificationService>();
 
   @override
   void onInit() {
     super.onInit();
-    chatSocket.init();
+    _service.initialize();
+    _chatSocket.init();
   }
 
   @override
   void onClose() {
-    chatSocket.unInit();
+    _chatSocket.unInit();
     super.onClose();
   }
 

@@ -26,7 +26,7 @@ class SocketManager {
             'Authorization': 'Bearer ${HiveService.getToken()}',
           })
           .disableAutoConnect()
-          .disableReconnection()
+          .enableAutoConnect()
           .build(),
     );
 

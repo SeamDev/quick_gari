@@ -3,12 +3,12 @@ import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/rent_controller.dart';
 import 'package:quick_gari/app/widgets/payment_widgets.dart';
 
-class RequestForRentPage extends StatelessWidget {
+class ConfirmBooking extends StatelessWidget {
   final Map<String, dynamic> data;
   final List<String> mainList;
   final String id;
   final String status;
-  RequestForRentPage(
+  ConfirmBooking(
     this.data,
     this.mainList,
     this.id,
@@ -134,7 +134,7 @@ class RequestForRentPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Date          :  ${mainList[3]}",
+                "Date          :  ${mainList[3].split(' ')[0]}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
@@ -147,7 +147,7 @@ class RequestForRentPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Start Time :  ${mainList[2]}",
+                "Start Time :  ${mainList[2].split(' ').sublist(1).join(' ')}",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
