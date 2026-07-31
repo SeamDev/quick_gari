@@ -41,7 +41,7 @@ class TripView extends GetView<WalletController> {
                           ? controller.dataReturn[index]
                           : controller.dataRide[index -
                                 controller.dataReturn.length];
-                      //print(item);
+                      print(item);
                       return DriverInfoContainer(
                         refresh: controller.fetchData,
                         tripType: isReturn ? "Return" : "Ride",
@@ -81,6 +81,7 @@ class TripView extends GetView<WalletController> {
                                 ? "retfurnOtpVerified"
                                 : "rideOtpVerified"] ??
                             false,
+                            isPaymentComplete: item["payment"] == "APPROVED",
                       );
                     },
                   ),

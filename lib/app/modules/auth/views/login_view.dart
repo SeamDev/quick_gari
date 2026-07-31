@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/modules/auth/views/forget_password.dart';
 import 'package:quick_gari/app/modules/auth/views/register_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/services/api_service.dart';
@@ -125,9 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
                   onTap: () {
-                    // Navigate to forgot password screen if needed
-                     Clipboard.setData(ClipboardData(text: "01570269334"));
-                    Get.snackbar("Forgot", "Call Admin . Number Copied !");
+                    Get.to(()=> ForgetPassword());
                   },
                   child: const Text(
                     "Forget password",

@@ -23,6 +23,7 @@ class DriverInfoContainer extends StatelessWidget {
   final String date;
   final String startTime;
   final bool isVerified;
+  final bool isPaymentComplete;
   final Function refresh;
 
   const DriverInfoContainer({
@@ -42,6 +43,7 @@ class DriverInfoContainer extends StatelessWidget {
     this.id = "N/A",
     this.driverID = "N/A",
     this.isVerified = false,
+    this.isPaymentComplete = false,
     required this.refresh,
   });
 
@@ -244,7 +246,7 @@ class DriverInfoContainer extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 /// BUTTONS
-                Row(
+                if(isPaymentComplete)Row(
                   children: [
                     /// CALL
                     Expanded(

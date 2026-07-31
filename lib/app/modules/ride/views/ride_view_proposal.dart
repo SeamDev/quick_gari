@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/ride/controllers/ride_proposal_controller.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_now.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_car_detail.dart';
 
 class RideProposalView extends StatelessWidget {
   final String id;

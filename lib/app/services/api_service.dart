@@ -140,6 +140,7 @@ class ApiService {
         HiveService.setToken(data["data"]["accessToken"]);
         HiveService.setRToken(data["data"]["refreshToken"]);
         await ApiService.getUser();
+        await ApiService.getUserSettings();
         return response.data;
       } else {
         debugPrint("Login failed");
@@ -289,7 +290,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        AppConfig().load(Map<String, dynamic>.from(data["data"]));
+        AppConfig().loadUser(Map<String, dynamic>.from(data["data"]));
         return true;
       }
       return false;
@@ -299,6 +300,24 @@ class ApiService {
     }
   }
 
+  // Get User Settings
+  static Future<bool> getUserSettings() async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/user/settings";
+      var response = await dio.get(url);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        AppConfig().loadSetting(Map<String, dynamic>.from(data["data"]));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  // payment
   static Future<Map> postPayment(Map<String, dynamic> body) async {
     try {
       var url = "${Config.baseUrl}${Config.apiVersion}/payment/submit";
@@ -309,6 +328,45 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return {'success': false};
+    }
+  }
+
+  // sent reset password otp
+  static Future<bool> sendResetOTP(String email) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/auth/forgot-password";
+      var response = await dio.post(
+        url,
+        options: Options(extra: {'requiresAuth': false}),
+        data: {"email": email},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
+  }
+
+  // change password otp
+  static Future<Map<String, dynamic>> changePassword(
+    String email,
+    String otp,
+    String password,
+  ) async {
+    try {
+      var url = "${Config.baseUrl}${Config.apiVersion}/auth/reset-password";
+      var response = await dio.post(
+        url,
+        options: Options(extra: {'requiresAuth': false}),
+        data: {"email": email, "otp": otp, "newPassword": password},
+      );
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint(e.toString());
+      return e.response?.data ?? {};
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
     }
   }
 
@@ -1037,6 +1095,7 @@ class ApiService {
       return false;
     }
   }
+
   // set FCM
   static Future<bool> deleteFCM(String token) async {
     try {
@@ -1048,32 +1107,34 @@ class ApiService {
       return false;
     }
   }
+
   // MArk as read by id
   static Future<bool> markNotificationAsRead(String id) async {
-  try {
-    final url =
-        "${Config.baseUrl}${Config.apiVersion}/notifications/mark-as-read/$id";
+    try {
+      final url =
+          "${Config.baseUrl}${Config.apiVersion}/notifications/mark-as-read/$id";
 
-    final response = await dio.patch(url);
+      final response = await dio.patch(url);
 
-    return response.statusCode == 200;
-  } catch (e) {
-    debugPrint("ERROR: $e");
-    return false;
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
   }
-}
-// mark as read all
-static Future<bool> markAllNotificationsAsRead() async {
-  try {
-    final url =
-        "${Config.baseUrl}${Config.apiVersion}/notifications/mark-all-as-read";
 
-    final response = await dio.patch(url);
+  // mark as read all
+  static Future<bool> markAllNotificationsAsRead() async {
+    try {
+      final url =
+          "${Config.baseUrl}${Config.apiVersion}/notifications/mark-all-as-read";
 
-    return response.statusCode == 200;
-  } catch (e) {
-    debugPrint("ERROR: $e");
-    return false;
+      final response = await dio.patch(url);
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
   }
-}
 }

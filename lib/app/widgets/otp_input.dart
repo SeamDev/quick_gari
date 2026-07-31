@@ -16,6 +16,9 @@ class OtpInputWidget extends StatefulWidget {
   /// Validation
   final String? Function(String value)? validator;
 
+  final String text;
+  final Color bgColor;
+
   const OtpInputWidget({
     super.key,
     this.length = 6,
@@ -23,6 +26,8 @@ class OtpInputWidget extends StatefulWidget {
     this.onCompleted,
     this.onSubmit,
     this.validator,
+    this.text = "Submit",
+    this.bgColor = Colors.green,
   });
 
   @override
@@ -98,7 +103,7 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
         focusNode: focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        
+
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(index == 0 ? widget.length : 1),
@@ -184,11 +189,14 @@ class _OtpInputWidgetState extends State<OtpInputWidget> {
           child: ElevatedButton(
             onPressed: validateAndSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: widget.bgColor,
               foregroundColor: Colors.white,
               textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            child: const Text("Submit"),
+            child: Text(widget.text),
           ),
         ),
       ],

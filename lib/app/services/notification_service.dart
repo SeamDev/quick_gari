@@ -20,6 +20,19 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
     await fetchNotifications();
   }
 
+  Future<void> unInit() async {
+    if (!_initialized) return;
+
+    _initialized = false;
+
+    WidgetsBinding.instance.removeObserver(this);
+
+    notificationResponse = null;
+    NotificationModel.fromJson({});
+    NotificationResponse.fromJson({});
+    notifications.clear();
+  }
+
   Future<void> fetchNotifications() async {
     try {
       isLoading.value = true;
@@ -93,8 +106,6 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   }
 
   ///                  Fire Base FCM
-  
-  
 
   ///                  Dispose
 

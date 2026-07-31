@@ -25,16 +25,18 @@ class AuthController extends GetxController {
     if (token == null) {
       if (await HiveService.getToken() != null &&
           await ApiService.refreshToken() &&
-          await ApiService.getUser()) {
+          await ApiService.getUser() &&
+          await getExtraSetting()) {
         Get.offAllNamed(Routes.NAVBAR);
       }
     } else {
-      if (await ApiService.getUser()) {
+      if (await ApiService.getUser() && await getExtraSetting()) {
         Get.offAllNamed(Routes.NAVBAR);
       } else {
         if (await HiveService.getToken() != null &&
             await ApiService.refreshToken() &&
-            await ApiService.getUser()) {
+            await ApiService.getUser() &&
+            await getExtraSetting()) {
           Get.offAllNamed(Routes.NAVBAR);
         }
       }
@@ -42,5 +44,10 @@ class AuthController extends GetxController {
     isSplash = false;
     await Future.delayed(Duration(seconds: 2));
     update();
+  }
+
+  Future<bool> getExtraSetting() async {
+    if (!await ApiService.getUserSettings()) return false;
+    return true;
   }
 }

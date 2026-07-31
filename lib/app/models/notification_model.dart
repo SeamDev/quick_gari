@@ -68,8 +68,12 @@ class NotificationModel {
       message: json['message'] ?? '',
       rideId: json['rideId'] ?? '',
       isRead: json['isRead'] ?? false,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt:
+          DateTime.tryParse(json['updatedAt']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
       v: json['__v'] ?? 0,
     );
   }

@@ -240,7 +240,7 @@ class ApiService1 {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        AppConfig().load(Map<String, dynamic>.from(data["data"]));
+        AppConfig().loadUser(Map<String, dynamic>.from(data["data"]));
         return true;
       }
       return false;

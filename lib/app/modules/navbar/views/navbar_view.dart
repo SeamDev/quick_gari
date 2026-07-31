@@ -7,7 +7,7 @@ import 'package:quick_gari/app/modules/home/views/home_view.dart';
 import 'package:quick_gari/app/modules/navbar/views/menu_view.dart';
 import 'package:quick_gari/app/modules/offer/views/offer_view.dart';
 import 'package:quick_gari/app/modules/profile/views/profile_view.dart';
-import 'package:quick_gari/app/modules/mytrip/views/mytrip_view.dart';
+import 'package:quick_gari/app/modules/yourtrip/views/mytrip_view.dart';
 
 import '../controllers/navbar_controller.dart';
 

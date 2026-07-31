@@ -9,18 +9,20 @@ class NavbarController extends GetxController {
   int get currentIndex => _currentIndex.value;
 
   final ChatSocketService _chatSocket = Get.find<ChatSocketService>();
-  final NotificationService _service = Get.find<NotificationService>();
+  final NotificationService _notificationService =
+      Get.find<NotificationService>();
 
   @override
   void onInit() {
     super.onInit();
-    _service.initialize();
     _chatSocket.init();
+    _notificationService.initialize();
   }
 
   @override
   void onClose() {
     _chatSocket.unInit();
+    _notificationService.unInit();
     super.onClose();
   }
 

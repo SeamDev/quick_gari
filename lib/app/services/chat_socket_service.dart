@@ -69,13 +69,11 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
 
     socket.onReconnect((_) {
       debugPrint('ReConnected');
-      Get.snackbar("Network", "Network Reconnect Successful !");
       onRefreash?.call();
     });
 
     socket.onConnectError((error) {
       debugPrint('Socket error: $error');
-      Get.snackbar("Network", "Network Connection Failed !");
     });
   }
 

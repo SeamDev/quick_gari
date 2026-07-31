@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quick_gari/app/services/chat_socket_service.dart';
-import 'package:quick_gari/app/services/fcm_service.dart';
+//import 'package:quick_gari/app/services/fcm_service.dart';
 import 'package:quick_gari/app/services/notification_service.dart';
 
 class InitialBinding extends Bindings {

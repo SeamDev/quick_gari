@@ -83,11 +83,11 @@ class _SignupScreenState extends State<SignupScreen> {
       );
       return;
     }
-    if(password.length <8 ){
+    if(password.length < 8 ){
       
       Get.snackbar(
         "Error",
-        "Password length must b greater than 7",
+        "Password length must be 9",
         snackPosition: SnackPosition.BOTTOM,
       );
       return;

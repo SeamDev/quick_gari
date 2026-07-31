@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
 import 'package:quick_gari/app/services/api_service.dart';
+import 'package:quick_gari/app/widgets/otp_input.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -113,11 +114,16 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             const SizedBox(height: 30),
 
             // OTP Boxes
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(6, (index) {
-                return _otpBox(index);
-              }),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: List.generate(6, (index) {
+            //     return _otpBox(index);
+            //   }),
+            // ),
+            OtpInputWidget(
+              text: "Verify",
+              bgColor: Color(0xFF00A86B),
+              onSubmit: (value) => verifyOTP(value),
             ),
 
             const SizedBox(height: 25),
@@ -145,56 +151,56 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             const SizedBox(height: 30),
 
             // Verify Button
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: () {
-                  verifyOTP(otpCode);
-                  // call verify api here
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00A86B),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  "Verify",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
+            // SizedBox(
+            //   width: double.infinity,
+            //   height: 55,
+            //   child: ElevatedButton(
+            //     onPressed: () {
+            //       verifyOTP(otpCode);
+            //       // call verify api here
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color(0xFF00A86B),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(14),
+            //       ),
+            //     ),
+            //     child: const Text(
+            //       "Verify",
+            //       style: TextStyle(fontSize: 16, color: Colors.white),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
     );
   }
 
-  Widget _otpBox(int index) {
-    return SizedBox(
-      width: 48,
-      height: 55,
-      child: TextField(
-        controller: controllers[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        decoration: InputDecoration(
-          counterText: "",
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 5) {
-            FocusScope.of(context).nextFocus();
-          }
-          if (value.isEmpty && index > 0) {
-            FocusScope.of(context).previousFocus();
-          }
-        },
-      ),
-    );
-  }
+  // Widget _otpBox(int index) {
+  //   return SizedBox(
+  //     width: 48,
+  //     height: 55,
+  //     child: TextField(
+  //       controller: controllers[index],
+  //       keyboardType: TextInputType.number,
+  //       textAlign: TextAlign.center,
+  //       maxLength: 1,
+  //       decoration: InputDecoration(
+  //         counterText: "",
+  //         filled: true,
+  //         fillColor: Colors.white,
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //       ),
+  //       onChanged: (value) {
+  //         if (value.isNotEmpty && index < 5) {
+  //           FocusScope.of(context).nextFocus();
+  //         }
+  //         if (value.isEmpty && index > 0) {
+  //           FocusScope.of(context).previousFocus();
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 }
