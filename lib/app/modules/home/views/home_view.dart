@@ -46,107 +46,109 @@ class HomeView extends GetView<HomeController> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Column(
-          spacing: 20,
-          children: [
-            const SizedBox(height: 10),
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(225, 190, 175, 0.35),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "Call  For Booking ",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 20,
+            children: [
+              const SizedBox(height: 10),
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(225, 190, 175, 0.35),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          "Call  For Booking ",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
+                    IconButton(
+                      onPressed: () => _launchDialer('+8801780613284'),
+                      icon: Image.asset("assets/call.png"),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  fixedSize: Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  IconButton(
-                    onPressed: () => _launchDialer('+8801780613284'),
-                    icon: Image.asset("assets/call.png"),
+                ),
+                onPressed: () => Get.toNamed(Routes.RIDE),
+                child: const Text(
+                  'Rent For Ride',
+                  style: TextStyle(fontSize: 22, color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  fixedSize: Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ],
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F4F),
-                fixedSize: Size(250, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                ),
+                onPressed: () => Get.toNamed(Routes.EMERGENCY),
+                child: const Text(
+                  'Load',
+                  style: TextStyle(fontSize: 22, color: Colors.white),
                 ),
               ),
-              onPressed: () => Get.toNamed(Routes.RIDE),
-              child: const Text(
-                'Rent For Ride',
-                style: TextStyle(fontSize: 22, color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F4F),
-                fixedSize: Size(250, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  fixedSize: Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () => Get.toNamed(Routes.EMERGENCY),
+                child: const Text(
+                  'Emergency',
+                  style: TextStyle(fontSize: 22, color: Colors.white),
                 ),
               ),
-              onPressed: () => Get.toNamed(Routes.EMERGENCY),
-              child: const Text(
-                'Load',
-                style: TextStyle(fontSize: 22, color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F4F),
-                fixedSize: Size(250, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  fixedSize: Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () => Get.toNamed(Routes.RETURN),
+                child: const Text(
+                  'Empty Return Vehicle',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
               ),
-              onPressed: () => Get.toNamed(Routes.EMERGENCY),
-              child: const Text(
-                'Emergency',
-                style: TextStyle(fontSize: 22, color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F4F),
-                fixedSize: Size(250, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  fixedSize: const Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () => Get.toNamed(Routes.SHARE_VEHICLE),
+                child: const Text(
+                  'Share Vehicle',
+                  style: TextStyle(fontSize: 22, color: Colors.white),
                 ),
               ),
-              onPressed: () => Get.toNamed(Routes.RETURN),
-              child: const Text(
-                'Empty Return Vehicle',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007F4F),
-                fixedSize: const Size(250, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: () => Get.toNamed(Routes.SHARE_VEHICLE),
-              child: const Text(
-                'Share Vehicle',
-                style: TextStyle(fontSize: 22, color: Colors.white),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -6,11 +6,7 @@ import 'package:quick_gari/app/modules/ride/views/ride_car_detail.dart';
 class RideProposalView extends StatelessWidget {
   final String id;
   final String? driverID;
-  RideProposalView({
-    super.key,
-    required this.id,
-    this.driverID,
-  });
+  RideProposalView({super.key, required this.id, this.driverID});
 
   late final RideProposalController controller = Get.put(
     RideProposalController(id),
@@ -41,7 +37,8 @@ class RideProposalView extends StatelessWidget {
         builder: (_) {
           return controller.isLoading
               ? Center(child: CircularProgressIndicator(color: Colors.green))
-              : controller.dataList["proposals"].isEmpty
+              : (controller.dataList["proposals"] == null ||
+                    controller.dataList["proposals"].isEmpty)
               ? Center(child: Text("Please wait , Driver will respond shortly"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),

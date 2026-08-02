@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/services/hive_service.dart';
+import 'package:quick_gari/app/services/notification_service.dart';
 import 'package:quick_gari/app/utils/initial_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
-
+  await NotificationService().localNotificationInitialize();
   //await Firebase.initializeApp();
   runApp(const MyApp());
 }

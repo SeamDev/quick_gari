@@ -1,18 +1,18 @@
-class NotificationResponse {
+class NotificationResponseModel {
   final bool success;
   final int statusCode;
   final String message;
   final List<NotificationModel> data;
 
-  NotificationResponse({
+  NotificationResponseModel({
     required this.success,
     required this.statusCode,
     required this.message,
     required this.data,
   });
 
-  factory NotificationResponse.fromJson(Map<String, dynamic> json) {
-    return NotificationResponse(
+  factory NotificationResponseModel.fromJson(Map<String, dynamic> json) {
+    return NotificationResponseModel(
       success: json['success'] ?? false,
       statusCode: json['statusCode'] ?? 0,
       message: json['message'] ?? '',

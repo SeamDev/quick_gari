@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
 import '../controllers/notification_controller.dart';
 
 class NotificationView extends GetView<NotificationController> {
@@ -49,29 +48,18 @@ class NotificationView extends GetView<NotificationController> {
             separatorBuilder: (_, __) => const SizedBox(height: 15),
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
-
+              bool  isClickAble =controller.notificationType.contains(notification.type);
               return InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () async {
-                  if (!notification.isRead) {
-                    await controller.markAsRead(notification.id);
-                  }
-                  Get.back();
-                  if (notification.rideId != '') {
-                    Get.to(
-                      () => RideProposalView(
-                        id: notification.rideId,
-                        driverID: "6a53c71e3d7ef654a03e065a",
-                      ),
-                    );
-                  }
-
+                  await controller.notificationRedirect(notification);
                 },
                 child: _notificationCard(
                   title: notification.type.replaceAll('_', ' '),
                   message: notification.message,
                   time: _timeAgo(notification.createdAt),
                   highlight: !notification.isRead,
+                  isClickAble: isClickAble
                 ),
               );
             },
@@ -86,6 +74,7 @@ class NotificationView extends GetView<NotificationController> {
     required String message,
     required String time,
     bool highlight = false,
+    bool isClickAble = false
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -99,9 +88,17 @@ class NotificationView extends GetView<NotificationController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if(isClickAble) Icon(Icons.chevron_right, color: Colors.grey),
+            ],
           ),
           const SizedBox(height: 6),
           Text(

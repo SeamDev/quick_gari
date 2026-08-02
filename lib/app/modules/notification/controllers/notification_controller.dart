@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quick_gari/app/models/notification_model.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
 import 'package:quick_gari/app/services/notification_service.dart';
 
 class NotificationController extends GetxController {
@@ -10,6 +11,8 @@ class NotificationController extends GetxController {
   RxBool get isLoading => _service.isLoading;
 
   int get unreadCount => notifications.where((e) => !e.isRead).length;
+
+  List<String> notificationType = ["NEW_PROPOSAL"];
 
   @override
   void onInit() {
@@ -28,5 +31,31 @@ class NotificationController extends GetxController {
 
   Future<void> markAllAsRead() async {
     await _service.markAllAsRead();
+  }
+
+  // Notifications Type wise redirect
+  Future<void> notificationRedirect(NotificationModel notification) async {
+    // if not read mark as read
+    if (!notification.isRead) {
+      await markAsRead(notification.id);
+    }
+    // Handle Notification Type
+    switch (notification.type) {
+      case "NEW_PROPOSAL":
+        Get.to(
+          () => RideProposalView(
+            id: notification.rideId,
+            driverID: "6a53c71e3d7ef654a03e065a",
+          ),
+        );
+        break;
+      case "PAYMENT_APPROVED":
+        NotificationService().showNotification();
+        break;
+      default:
+        break;
+    }
+
+    return;
   }
 }

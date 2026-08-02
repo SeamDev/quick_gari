@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/models/notification_model.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
 import 'package:quick_gari/app/services/api_service.dart';
 
 class NotificationService extends GetxService with WidgetsBindingObserver {
@@ -9,7 +13,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   final RxBool isLoading = false.obs;
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
-  NotificationResponse? notificationResponse;
+  NotificationResponseModel? notificationResponse;
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -29,7 +33,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
 
     notificationResponse = null;
     NotificationModel.fromJson({});
-    NotificationResponse.fromJson({});
+    NotificationResponseModel.fromJson({});
     notifications.clear();
   }
 
@@ -39,7 +43,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
 
       final response = await ApiService.getNotifications();
 
-      notificationResponse = NotificationResponse.fromJson(response);
+      notificationResponse = NotificationResponseModel.fromJson(response);
 
       notifications.assignAll(notificationResponse?.data ?? []);
     } catch (e) {
@@ -103,6 +107,86 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
     }
 
     return success;
+  }
+
+  ///                  Local Notification
+
+  // ignore: non_constant_identifier_names
+  final FlutterLocalNotificationsPlugin _notification_plugin =
+      FlutterLocalNotificationsPlugin();
+  Future<void> localNotificationInitialize() async {
+    // For Android
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings("@mipmap/ic_launcher");
+
+    // Combine settings
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: androidSettings);
+
+    await _notification_plugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (details) =>
+          handleReceiveNotification(details),
+    );
+
+    // Check notification permission
+    final android = _notification_plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    final isGranted = await android?.areNotificationsEnabled();
+    if (isGranted != true) {
+      await android?.requestNotificationsPermission();
+    }
+  }
+
+  Future<void> showNotification({
+    int id = 0,
+    String title = "Title",
+    String body = "Body",
+  }) async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails("notification", "Notification");
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+    );
+
+    await _notification_plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
+      payload: jsonEncode({"type": title}),
+    );
+  }
+
+  Future<void> cancelNotification(int id) async {
+    await _notification_plugin.cancel(id: id);
+  }
+
+  Future<void> cancelAllNotification() async {
+    await _notification_plugin.cancelAll();
+  }
+
+  void handleReceiveNotification(NotificationResponse details) {
+    final data = jsonDecode(details.payload!);
+    switch (data["type"]) {
+      case "NEW_PROPOSAL":
+        Get.to(
+          () => RideProposalView(
+            id: details.id.toString(),
+            driverID: "6a53c71e3d7ef654a03e065a",
+          ),
+        );
+        break;
+      case "PAYMENT_APPROVED":
+        NotificationService().showNotification();
+        break;
+      default:
+        break;
+    }
   }
 
   ///                  Fire Base FCM
