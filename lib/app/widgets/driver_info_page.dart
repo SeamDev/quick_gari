@@ -12,6 +12,7 @@ class DriverInfoContainer extends StatelessWidget {
   final String carImage;
   final String id;
   final String driverID;
+  final String? passengerID;
   final String vehicleName;
   final String image;
   final String name;
@@ -42,13 +43,14 @@ class DriverInfoContainer extends StatelessWidget {
     this.startTime = "N/A",
     this.id = "N/A",
     this.driverID = "N/A",
+    this.passengerID,
     this.isVerified = false,
     this.isPaymentComplete = false,
     required this.refresh,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -223,11 +225,13 @@ class DriverInfoContainer extends StatelessWidget {
                         icon: Icons.access_time,
                         iconColor: Colors.orange,
                         title: "Date & Time",
-                        value: DateFormat('yyyy-MM-dd hh:mm a').format(
-                          DateTime.parse(
-                            date,
-                          ).toUtc().add(const Duration(hours: 6)),
-                        ),
+                        value: date != "N/A"
+                            ? DateFormat('yyyy-MM-dd hh:mm a').format(
+                                DateTime.parse(
+                                  date,
+                                ).toUtc().add(const Duration(hours: 6)),
+                              )
+                            : "N/A",
                       ),
 
                       const SizedBox(height: 16),
@@ -246,58 +250,59 @@ class DriverInfoContainer extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 /// BUTTONS
-                if(isPaymentComplete)Row(
-                  children: [
-                    /// CALL
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          ExternalAppOpenService.call(phone);
-                        },
-                        icon: const Icon(Icons.call),
-                        label: const Text("Call Driver"),
+                if (isPaymentComplete)
+                  Row(
+                    children: [
+                      /// CALL
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            ExternalAppOpenService.call(phone);
+                          },
+                          icon: const Icon(Icons.call),
+                          label: const Text("Call Driver"),
 
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(width: 12),
+                      const SizedBox(width: 12),
 
-                    /// MESSAGE
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Get.toNamed(
-                            Routes.CHAT,
-                            arguments: {
-                              'type': tripType,
-                              'Id': id,
-                              'driverId': driverID,
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.message),
-                        label: const Text("Message"),
+                      /// MESSAGE
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Get.toNamed(
+                              Routes.CHAT,
+                              arguments: {
+                                'type': tripType,
+                                'Id': id,
+                                'driverId': driverID,
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.message),
+                          label: const Text("Message"),
 
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
                 const SizedBox(height: 10),
 
@@ -337,13 +342,17 @@ class DriverInfoContainer extends StatelessWidget {
                   OtpInputWidget(
                     length: 6,
                     onSubmit: (value) async {
+                      if (tripType == "Share Vehicle") {}
                       Map<dynamic, dynamic> response =
                           await ApiService.tripVerifyOtp(
                             tripType: tripType == "Ride"
                                 ? "ride"
+                                : tripType == "Share Vehicle"
+                                ? "share-vehicle"
                                 : "return-trip",
-                            rideId: id,
+                            tripId: id,
                             otp: value,
+                            passengerID: passengerID
                           );
                       Get.snackbar("Verification", response["message"]);
                       if (response["success"]) {
@@ -360,7 +369,7 @@ class DriverInfoContainer extends StatelessWidget {
                     },
                   ),
                 ],
-                const SizedBox(height: 10),
+                if (tripType == "Share Vehicle") const SizedBox(height: 10),
               ],
             ),
           ),
@@ -397,4 +406,108 @@ class DriverInfoContainer extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget passengerCard(
+  Map<String, dynamic> passenger, {
+  Function(String otp)? onOtpSubmit,
+}) {
+  return Card(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    elevation: 3,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(child: Icon(Icons.person)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  passenger["passenger"]?["name"] ?? "",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const Divider(height: 24),
+
+          _infoRow(
+            Icons.email,
+            "Email",
+            passenger["passenger"]?["email"] ?? "",
+          ),
+          _infoRow(
+            Icons.phone,
+            "Phone",
+            passenger["passenger"]?["phoneNumber"].toString() ?? "",
+          ),
+          _infoRow(Icons.location_on, "Pickup", passenger["pickupStop"] ?? ""),
+          _infoRow(Icons.flag, "Drop", passenger["dropStop"] ?? ""),
+          _infoRow(
+            Icons.event_seat,
+            "Seats",
+            passenger["seatsBooked"].toString(),
+          ),
+          _infoRow(Icons.money, "Fare", "৳${passenger["totalFare"]}"),
+          _infoRow(
+            Icons.payments,
+            "Total Price",
+            "৳${passenger["totalPrice"]}",
+          ),
+          const SizedBox(height: 12),
+
+          if (!(passenger["bookingOtpVerified"] ?? false))
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(),
+                const SizedBox(height: 8),
+
+                const Text(
+                  "Verify Passenger OTP",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 12),
+
+                OtpInputWidget(
+                  length: 6,
+                  validator: (value) {
+                    if (value.length != 6) {
+                      return "Please enter 6 digit OTP";
+                    }
+                    return null;
+                  },
+                  onSubmit: (otp) {
+                    onOtpSubmit?.call(otp);
+                  },
+                ),
+              ],
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _infoRow(IconData icon, String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 8),
+        Text("$title: ", style: const TextStyle(fontWeight: FontWeight.w600)),
+        Expanded(child: Text(value)),
+      ],
+    ),
+  );
 }

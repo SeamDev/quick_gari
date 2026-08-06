@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "887833883982",
+    "project_id": "quick-gari",
+    "storage_bucket": "quick-gari.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887833883982:android:00fa2993a39aad5e521a1f",
+        "android_client_info": {
+          "package_name": "com.seam.quickgari"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3V5iao_MBB3kSg_iz1052IpYPiIIA0_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

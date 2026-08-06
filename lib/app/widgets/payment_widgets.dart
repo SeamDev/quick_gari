@@ -256,7 +256,7 @@ class _PaymentViewState extends State<PaymentView> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.offAllNamed(Routes.HOME);
+                      Get.offAllNamed(Routes.NAVBAR);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF007F4F),

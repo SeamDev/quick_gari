@@ -4,15 +4,14 @@ import '../controllers/register_vehicle_controller.dart';
 
 class RegisterVehicleView extends GetView<RegisterVehicleController> {
   const RegisterVehicleView({super.key});
-
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     return Scaffold(
       backgroundColor: const Color(0xFFF8F6F9),
       appBar: AppBar(
-        title: const Text(
-          "Register Vehicle",
+        title: Text(
+          controller.user.isCarOwner ? "Update Vechile" : "Register Vehicle",
           style: TextStyle(color: Colors.black),
         ),
         elevation: 0,
@@ -232,8 +231,10 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    "Register Vehicle",
+                  child: Text(
+                    controller.user.isCarOwner
+                        ? "Update Vechile"
+                        : "Register Vehicle",
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
@@ -350,81 +351,76 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
       ),
     );
   }
-Widget uploadButton(String label, String key) {
-  return Obx(() {
-    Map? file;
 
-    switch (key) {
-      case "tax":
-        file = controller.taxTokenPhoto.value;
-        break;
-      case "reg":
-        file = controller.registrationCardPhoto.value;
-        break;
-      case "lic":
-        file = controller.licensePhoto.value;
-        break;
-      case "front":
-        file = controller.frontView.value;
-        break;
-      case "side":
-        file = controller.sideView.value;
-        break;
-      case "back":
-        file = controller.backView.value;
-        break;
-      case "interior":
-        file = controller.interiorView.value;
-        break;
-    }
+  Widget uploadButton(String label, String key) {
+    return Obx(() {
+      Map? file;
 
-    return GestureDetector(
-      onTap: () async => controller.filePICK(key),
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF00804B)),
-          color: const Color(0xFFE8F7EF),
-        ),
-        child: Column(
-          children: [
+      switch (key) {
+        case "tax":
+          file = controller.taxTokenPhoto.value;
+          break;
+        case "reg":
+          file = controller.registrationCardPhoto.value;
+          break;
+        case "lic":
+          file = controller.licensePhoto.value;
+          break;
+        case "front":
+          file = controller.frontView.value;
+          break;
+        case "side":
+          file = controller.sideView.value;
+          break;
+        case "back":
+          file = controller.backView.value;
+          break;
+        case "interior":
+          file = controller.interiorView.value;
+          break;
+      }
 
-            if (file != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.memory(
-                  file["bytes"],
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
-
-            const SizedBox(height: 10),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  file != null ? "Change $label" : label,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
+      return GestureDetector(
+        onTap: () async => controller.filePICK(key),
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF00804B)),
+            color: const Color(0xFFE8F7EF),
+          ),
+          child: Column(
+            children: [
+              if (file != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.memory(
+                    file["bytes"],
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.scaleDown,
                   ),
                 ),
 
-                const Icon(
-                  Icons.cloud_upload,
-                  color: Color(0xFF00804B),
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    file != null ? "Change $label" : label,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+
+                  const Icon(Icons.cloud_upload, color: Color(0xFF00804B)),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  });
-}
+      );
+    });
+  }
 }

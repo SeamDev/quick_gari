@@ -8,13 +8,7 @@ class ConfirmBooking extends StatelessWidget {
   final List<String> mainList;
   final String id;
   final String status;
-  ConfirmBooking(
-    this.data,
-    this.mainList,
-    this.id,
-    this.status, {
-    super.key,
-  });
+  ConfirmBooking(this.data, this.mainList, this.id, this.status, {super.key});
   final RentController controller = Get.put(RentController());
   @override
   Widget build(BuildContext context) {
@@ -50,37 +44,47 @@ class ConfirmBooking extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Color.fromRGBO(226, 245, 237, 1),
+                color: const Color.fromRGBO(226, 245, 237, 1),
                 border: Border.all(color: Colors.green),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${data["car"]["carName"]} || ${data["car"]["features"]["vehicleType"]}",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${data["car"]["carName"]} || "
+                          "${data["car"]["features"]["vehicleType"]}",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          softWrap: true,
                         ),
-                      ),
-                      Text(
-                        "⭐ 4.9 (531 reviews)",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+
+                        const SizedBox(height: 4),
+
+                        const Text(
+                          "⭐ 4.9 (531 reviews)",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+
+                  const SizedBox(width: 10),
+
                   Image.network(
                     data["car"]["features"]["images"][0] ?? "assets/car3.png",
-                    width: 110,
+                    width: 100,
+                    fit: BoxFit.contain,
                   ),
                 ],
               ),

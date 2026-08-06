@@ -1,6 +1,8 @@
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 import 'package:quick_gari/app/services/chat_socket_service.dart';
+import 'package:quick_gari/app/services/hive_service.dart';
 import 'package:quick_gari/app/services/notification_service.dart';
 
 class NavbarController extends GetxController {
@@ -13,17 +15,21 @@ class NavbarController extends GetxController {
       Get.find<NotificationService>();
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     _chatSocket.init();
     _notificationService.initialize();
+
+    final token = HiveService.get("fcm") as String? ?? "";
+    await ApiService.patchFCM(token);
   }
 
-  @override
-  void onClose() {
+  Future<void> unInit() async {
     _chatSocket.unInit();
-    _notificationService.unInit();
-    super.onClose();
+    await _notificationService.unInit();
+    final token = HiveService.get("fcm") as String? ?? "";
+
+    await ApiService.deleteFCM(token);
   }
 
   set currentIndex(int index) => _currentIndex.value = index;

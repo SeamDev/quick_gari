@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:quick_gari/app/models/notification_model.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_proposal_view.dart';
 import 'package:quick_gari/app/services/notification_service.dart';
 
 class NotificationController extends GetxController {
@@ -45,7 +45,7 @@ class NotificationController extends GetxController {
         Get.to(
           () => RideProposalView(
             id: notification.rideId,
-            driverID: "6a53c71e3d7ef654a03e065a",
+            proposalID: notification.proposalID,
           ),
         );
         break;

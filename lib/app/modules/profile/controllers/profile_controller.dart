@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:quick_gari/app/config/app_config.dart';
+import 'package:quick_gari/app/services/chat_socket_service.dart';
+import 'package:quick_gari/app/services/notification_service.dart';
 
 class ProfileController extends GetxController {
   final user = AppConfig().user;
@@ -30,6 +32,9 @@ class ProfileController extends GetxController {
 
   Rxn<Uint8List> nidFront = Rxn<Uint8List>();
   Rxn<Uint8List> nidBack = Rxn<Uint8List>();
+  final ChatSocketService _chatSocket = Get.find<ChatSocketService>();
+  final NotificationService _notificationService =
+      Get.find<NotificationService>();
 
   @override
   void onInit() {
@@ -39,6 +44,11 @@ class ProfileController extends GetxController {
 
     emailController.text = user.email;
     phoneController.text = "+88${user.phoneNumber}";
+  }
+
+  void unInit() {
+    _chatSocket.unInit();
+    _notificationService.unInit();
   }
 
   void toggleAddress() {

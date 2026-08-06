@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_proposal_view.dart';
 import 'package:quick_gari/app/services/api_service.dart';
 import '../controllers/ride_controller.dart';
 
@@ -166,7 +166,6 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                 : Get.to(
                     () => RideProposalView(
                       id: data["_id"] ?? "00",
-                      driverID: data["driver"],
                     ),
                   );
           },

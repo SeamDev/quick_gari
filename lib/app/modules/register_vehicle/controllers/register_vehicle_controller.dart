@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/config/app_config.dart';
 import 'package:quick_gari/app/services/api_service.dart';
 
 class RegisterVehicleController extends GetxController {
@@ -41,6 +42,14 @@ class RegisterVehicleController extends GetxController {
   Rxn<Map<String, dynamic>> sideView = Rxn<Map<String, dynamic>>();
   Rxn<Map<String, dynamic>> backView = Rxn<Map<String, dynamic>>();
   Rxn<Map<String, dynamic>> interiorView = Rxn<Map<String, dynamic>>();
+
+  final user = AppConfig().user;
+  late final String carId;
+  @override
+  void onInit() {
+    super.onInit();
+    carId = Get.arguments ?? "0";
+  }
 
   void checkValid() {}
 
@@ -167,13 +176,28 @@ class RegisterVehicleController extends GetxController {
       },
     };
 
-    bool res = await ApiService.registerCar(body);
-    if (res) {
-      ApiService.getUser();
-      Get.back();
-      Get.snackbar("Status", "Vehicle Registration Successful");
+    bool res;
+    if (user.isCarOwner) {
+      res = await ApiService.updateCar(carId, body);
     } else {
-      Get.snackbar("Status", "Vehicle Registration Unsuccessful");
+      res = await ApiService.registerCar(body);
+    }
+    if (res) {
+      Get.back();
+      if (user.isCarOwner) Get.back();
+      Get.snackbar(
+        "Status",
+        user.isCarOwner
+            ? "Vehicle Update Successful"
+            : "Vehicle Registration Successful",
+      );
+    } else {
+      Get.snackbar(
+        "Status",
+        user.isCarOwner
+            ? "Vehicle Update Unsuccessful"
+            : "Vehicle Registration Unsuccessful",
+      );
     }
   }
 }

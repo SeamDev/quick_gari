@@ -46,8 +46,8 @@ dependencies:
   socket_io_client: ^3.1.6
   flutter_chat_ui: ^2.11.1
   flutter_chat_core: ^2.0.0
-  firebase_core: ^4.12.1
-  firebase_messaging: ^16.4.3
+  firebase_core: ^4.13.0
+  firebase_messaging: ^16.5.0
   flutter_local_notifications: ^22.0.1
 
 dev_dependencies:

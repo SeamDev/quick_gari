@@ -6,11 +6,13 @@ import 'package:quick_gari/app/services/api_service.dart';
 class WalletController extends GetxController {
   RxList<Map<String, dynamic>> dataRide = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> dataReturn = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> dataSVehicle = <Map<String, dynamic>>[].obs;
 
   RxBool isLoading = false.obs;
 
   @override
   void onInit() {
+    isLoading.value = true;
     fetchData();
     super.onInit();
   }
@@ -18,13 +20,14 @@ class WalletController extends GetxController {
   /// FETCH ALL RIDES
   Future<void> fetchData() async {
     try {
-      isLoading.value = true;
       if (AppConfig().user.isCarOwner) {
         dataReturn.value = await ApiService.getDriverActiveReturn();
         dataRide.value = await ApiService.getDriverActiveRide();
+        dataSVehicle.value = await ApiService.getDriverActiveSVehicle();
       } else {
         dataReturn.value = await ApiService.getPassengerActiveReturn();
         dataRide.value = await ApiService.getPassengerActiveRide();
+        dataSVehicle.value = await ApiService.getPassengerActiveSVehicle();
       }
     } catch (e) {
       debugPrint("Fetch Error: $e");
@@ -32,5 +35,4 @@ class WalletController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

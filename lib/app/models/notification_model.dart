@@ -41,6 +41,7 @@ class NotificationModel {
   final String type;
   final String message;
   final String rideId;
+  final String proposalID;
   final bool isRead;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -53,6 +54,7 @@ class NotificationModel {
     required this.type,
     required this.message,
     required this.rideId,
+    required this.proposalID,
     required this.isRead,
     required this.createdAt,
     required this.updatedAt,
@@ -67,6 +69,7 @@ class NotificationModel {
       type: json['type'] ?? '',
       message: json['message'] ?? '',
       rideId: json['rideId'] ?? '',
+      proposalID: json['proposalId'] ?? '',
       isRead: json['isRead'] ?? false,
       createdAt:
           DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
@@ -86,6 +89,7 @@ class NotificationModel {
       'type': type,
       'message': message,
       'rideId': rideId,
+      'proposalId': proposalID,
       'isRead': isRead,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),

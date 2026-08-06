@@ -5,8 +5,8 @@ import 'package:quick_gari/app/modules/ride/views/ride_car_detail.dart';
 
 class RideProposalView extends StatelessWidget {
   final String id;
-  final String? driverID;
-  RideProposalView({super.key, required this.id, this.driverID});
+  final String? proposalID;
+  RideProposalView({super.key, required this.id, this.proposalID});
 
   late final RideProposalController controller = Get.put(
     RideProposalController(id),
@@ -47,7 +47,7 @@ class RideProposalView extends StatelessWidget {
                     children: [
                       const SizedBox(height: 10),
 
-                      if (driverID == null)
+                      if (proposalID == null)
                         Text(
                           "${controller.dataList["proposals"].length} proposal found",
                           style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -61,8 +61,8 @@ class RideProposalView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final data =
                                 controller.dataList["proposals"][index];
-                            if (driverID != null) {
-                              if (data["car"]["user"] != driverID) {
+                            if (proposalID != null) {
+                              if (data["_id"] != proposalID) {
                                 return null;
                               }
                             }

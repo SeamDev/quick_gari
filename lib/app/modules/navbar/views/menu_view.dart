@@ -113,8 +113,9 @@ class MenuView extends GetView<NavbarController> {
             ListTile(
               leading: const Icon(Icons.logout, size: 22),
               title: const Text("Log Out", style: TextStyle(fontSize: 16)),
-              onTap: () {
-                HiveService.clear();
+              onTap: () async{
+                await HiveService.clear();
+                await controller.unInit();
                 Get.offAllNamed(Routes.AUTH, arguments: {"isInit": false});
               },
             ),

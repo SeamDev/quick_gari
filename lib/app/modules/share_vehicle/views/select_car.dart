@@ -224,7 +224,7 @@ class _SelectCarState extends State<SelectCar> {
                     child: passengerCard(
                       passenger,
                       onOtpSubmit: (otp) async {
-                        Map res = await ApiService.verifyOtpSV(
+                        Map res = await ApiService.tripverifyOtpSV(
                           widget.data["_id"],
                           passenger["passenger"]["userId"],
                           otp,
@@ -449,7 +449,7 @@ Widget passengerCard(
   Function(String otp)? onOtpSubmit,
 }) {
   return Card(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
     elevation: 3,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(

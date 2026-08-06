@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/config/app_config.dart';
-import 'package:quick_gari/app/services/notification_service.dart';
 import 'package:quick_gari/app/utils/socket_event.dart';
 // ignore: library_prefixes
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -27,6 +26,7 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
   }
 
   void unInit() {
+    if (!_initialized) return;
     _initialized = false;
 
     _typingTimer?.cancel();
@@ -93,13 +93,13 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
     onStopTyping?.call();
   }
 
-  void _onNotification(dynamic data) async{
-    await NotificationService().showNotification(
-      id: int.tryParse(data["_id"]) ?? 0 ,
-      title: data["type"],
-      body: data["message"],
-    );
-    debugPrint('Notification: $data');
+  void _onNotification(dynamic data) async {
+    // await NotificationService().showNotification(
+    //   id: int.tryParse(data["_id"]) ?? 0,
+    //   title: data["type"],
+    //   body: data["message"],
+    // );
+    // debugPrint('Notification: $data');
   }
 
   void onTextChanged({

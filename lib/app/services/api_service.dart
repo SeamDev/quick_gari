@@ -370,9 +370,7 @@ class ApiService {
     }
   }
 
-  // ==========================================
-  // Car
-  // ==========================================
+  //                         Car
 
   // Register Car (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> registerCar(Map body) async {
@@ -433,35 +431,54 @@ class ApiService {
   }
 
   // Update a Car (TOKEN AUTOMATICALLY INJECTED)
-  static Future<bool> updateCar() async {
+  static Future<bool> updateCar(String id, Map body) async {
     try {
-      var url = "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/id--";
+      var url = "${Config.baseUrl}${Config.apiVersion}${Config.carAPI}/$id";
+      Map<String, dynamic> formDataMap = {};
 
-      var response = await dio.patch(
-        url,
-        data: {
-          "taxTokenPhoto": "",
-          "drivingLicensePhoto": "",
-          "images": "",
-          "registrationCardPhoto": "",
-          "data": {
-            "carName": "Toyota Corolla 2020",
-            "features": {
-              "vehicleType": "Sedan",
-              "model": "Corolla",
-              "brand": "Toyota",
-              "fuelType": "Petrol",
-              "gearType": "Automatic",
-              "seatCapacity": 5,
-              "manufactureYear": 2020,
-            },
-            "vehicleRegistration": {
-              "registrationNumber": "DHAKA-MA-11-2234",
-              "registration": 2020,
-            },
-          },
-        },
-      );
+      // Text Data
+      formDataMap['data'] = jsonEncode(body["data"]);
+
+      // File helper
+      void addFileToMap(Map<String, dynamic>? file, String fieldName) {
+        if (file != null && file['bytes'] != null) {
+          final Uint8List bytes = file['bytes'];
+          final String ext = file['extension'] ?? 'jpg';
+          formDataMap[fieldName] = MultipartFile.fromBytes(
+            bytes,
+            filename: "$fieldName.$ext",
+          );
+        }
+      }
+
+      addFileToMap(body["taxTokenPhoto"], "taxTokenPhoto");
+      addFileToMap(body["registrationCardPhoto"], "registrationCardPhoto");
+      addFileToMap(body["drivingLicensePhoto"], "drivingLicensePhoto");
+
+      // Multiple Images
+      List images = body["images"] ?? [];
+      List<MultipartFile> imageFiles = [];
+
+      for (var img in images) {
+        if (img != null && img['bytes'] != null) {
+          final Uint8List bytes = img['bytes'];
+          final String ext = img['extension'] ?? 'jpg';
+          imageFiles.add(
+            MultipartFile.fromBytes(bytes, filename: "car_image.$ext"),
+          );
+        }
+      }
+
+      if (imageFiles.isNotEmpty) {
+        formDataMap["images"] = imageFiles;
+      }
+
+      FormData formData = FormData.fromMap(formDataMap);
+
+      var response = await dio.patch(url, data: formData);
+
+      debugPrint("Status: ${response.statusCode}");
+      debugPrint("Response: ${response.data}");
 
       return response.statusCode == 200;
     } catch (e) {
@@ -521,6 +538,19 @@ class ApiService {
     }
   }
 
+  // Get Car BY ID (TOKEN AUTOMATICALLY INJECTED)
+  static Future<Map<String, dynamic>> getCarByUserId() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/car/user/${AppConfig().user.id}";
+      var response = await dio.get(url);
+      return response.data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return {};
+    }
+  }
+
   // Get Car BY ID For Admin (TOKEN AUTOMATICALLY INJECTED)
   static Future<bool> getCarByIDForAdmin() async {
     try {
@@ -534,9 +564,7 @@ class ApiService {
     }
   }
 
-  // ==========================================
-  // Ride
-  // ==========================================
+  //                          Ride
 
   // Request For a Ride (TOKEN AUTOMATICALLY INJECTED)
   static Future<Map> rideSheet(dynamic body) async {
@@ -664,14 +692,18 @@ class ApiService {
 
   static Future<Map> tripVerifyOtp({
     required String tripType,
-    required String rideId,
+    required String tripId,
     required String otp,
+    String? passengerID,
   }) async {
     try {
       var url =
-          "${Config.baseUrl}${Config.apiVersion}/$tripType/$rideId/verify-otp";
+          "${Config.baseUrl}${Config.apiVersion}/$tripType/$tripId/verify-otp";
 
-      var response = await dio.post(url, data: {"otp": otp});
+      var response = await dio.post(
+        url,
+        data: {"otp": otp, "passengerId": passengerID},
+      );
 
       if (response.statusCode == 200) {
         return response.data;
@@ -981,14 +1013,14 @@ class ApiService {
     }
   }
 
-  static Future<Map> verifyOtpSV(
+  static Future<Map> tripverifyOtpSV(
     String shareVehicleID,
     String passengerID,
     String otp,
   ) async {
     try {
       var url =
-          "${Config.baseUrl}${Config.apiVersion}/share-vehicle/$shareVehicleID/verify-otp";
+          "${Config.baseUrl}${Config.apiVersion}//$shareVehicleID/verify-otp";
       var response = await dio.post(
         url,
         data: {"passengerId": passengerID, "otp": otp},
@@ -999,6 +1031,71 @@ class ApiService {
     } catch (e) {
       debugPrint("ERROR: $e");
       return {'success': false};
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getPassengerActiveSVehicle() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking/user/active-bookings";
+      var response = await dio.get(url);
+
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getDriverActiveSVehicle() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking/driver/active-bookings";
+      var response = await dio.get(url);
+
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>>
+  getPassengerCompleteSVehicle() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking/user/complete-bookings";
+      var response = await dio.get(url);
+
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getDriverCompleteSVehicle() async {
+    try {
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/share-vehicle-booking/driver/complete-bookings";
+      var response = await dio.get(url);
+
+      List<Map<String, dynamic>> data = response.data["data"]
+          .cast<Map<String, dynamic>>();
+
+      return data;
+    } catch (e) {
+      debugPrint("ERROR: $e");
+      return [];
     }
   }
 
@@ -1085,9 +1182,10 @@ class ApiService {
   }
 
   // set FCM
-  static Future<bool> postFCM(String token) async {
+  static Future<bool> patchFCM(String token) async {
     try {
-      var url = "${Config.baseUrl}${Config.apiVersion}";
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}/notifications/settings/update/fcm-token";
       var response = await dio.patch(url, data: {"fcmToken": token});
       return response.statusCode == 200;
     } catch (e) {
@@ -1099,7 +1197,8 @@ class ApiService {
   // set FCM
   static Future<bool> deleteFCM(String token) async {
     try {
-      var url = "${Config.baseUrl}${Config.apiVersion}";
+      var url =
+          "${Config.baseUrl}${Config.apiVersion}notifications/settings/delete/fcm-token";
       var response = await dio.delete(url, data: {"fcmToken": token});
       return response.statusCode == 200;
     } catch (e) {

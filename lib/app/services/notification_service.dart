@@ -4,7 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/models/notification_model.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_view_proposal.dart';
+import 'package:quick_gari/app/modules/ride/views/ride_proposal_view.dart';
+import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/services/api_service.dart';
 
 class NotificationService extends GetxService with WidgetsBindingObserver {
@@ -75,6 +76,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
           createdAt: notifications[index].createdAt,
           updatedAt: notifications[index].updatedAt,
           v: notifications[index].v,
+          proposalID: notifications[index].proposalID,
         );
 
         notifications.refresh();
@@ -100,6 +102,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
           createdAt: notifications[i].createdAt,
           updatedAt: notifications[i].updatedAt,
           v: notifications[i].v,
+          proposalID: notifications[i].proposalID,
         );
       }
 
@@ -117,7 +120,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   Future<void> localNotificationInitialize() async {
     // For Android
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings("@mipmap/ic_launcher");
+        AndroidInitializationSettings("icon_notification");
 
     // Combine settings
     const InitializationSettings initializationSettings =
@@ -145,11 +148,20 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
     int id = 0,
     String title = "Title",
     String body = "Body",
+    Map<String, dynamic>? payload,
+    String channelId = "notification",
+    String channelName = "Notification",
   }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails("notification", "Notification");
+    AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+          channelId,
+          channelName,
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: true,
+        );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
+    NotificationDetails notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
     );
 
@@ -158,7 +170,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
       title: title,
       body: body,
       notificationDetails: notificationDetails,
-      payload: jsonEncode({"type": title}),
+      payload: jsonEncode(payload ?? {}),
     );
   }
 
@@ -177,7 +189,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
         Get.to(
           () => RideProposalView(
             id: details.id.toString(),
-            driverID: "6a53c71e3d7ef654a03e065a",
+            proposalID: "6a53c71e3d7ef654a03e065a",
           ),
         );
         break;
@@ -185,6 +197,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
         NotificationService().showNotification();
         break;
       default:
+        Get.toNamed(Routes.NOTIFICATION);
         break;
     }
   }

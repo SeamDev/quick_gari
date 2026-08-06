@@ -13,23 +13,20 @@ class ProfileView extends GetView<ProfileController> {
     final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.black87),
-        ),
-    
+        title: const Text('Profile', style: TextStyle(color: Colors.black87)),
+
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-    
+
         actions: [
           GestureDetector(
             onTap: () {
               HiveService.clear();
-    
+              controller.unInit();
               Get.offAllNamed(Routes.AUTH, arguments: {"isInit": false});
             },
-    
+
             child: const Padding(
               padding: EdgeInsets.only(right: 16),
               child: Center(
@@ -45,192 +42,177 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ],
       ),
-    
+
       backgroundColor: Colors.white,
-    
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-    
+
         child: Column(
           children: [
             const SizedBox(height: 16),
-    
+
             CircleAvatar(
               radius: 50,
               backgroundImage: NetworkImage(controller.user.avatar),
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             Text(
               controller.user.name,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
-    
+
             const SizedBox(height: 25),
-    
+
             inputField(
               controller: controller.emailController,
               hint: controller.user.email,
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             inputField(
               controller: controller.phoneController,
               hint: "+88${controller.user.phoneNumber}",
               keyboard: TextInputType.phone,
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             Obx(
               () => DropdownButtonFormField<String>(
                 initialValue: controller.selectedGender.value,
-    
+
                 items: const [
                   DropdownMenuItem(value: "male", child: Text("Male")),
-    
+
                   DropdownMenuItem(value: "female", child: Text("Female")),
-    
+
                   DropdownMenuItem(value: "other", child: Text("Other")),
                 ],
-    
+
                 onChanged: (v) {
                   controller.changeGender(v!);
                 },
-    
+
                 decoration: fieldDecoration("Gender"),
               ),
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             OutlinedButton(
               onPressed: controller.toggleAddress,
-    
+
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 55),
-    
+
                 backgroundColor: Colors.grey[100],
-    
+
                 side: BorderSide(color: Colors.grey.shade300, width: 1),
-    
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-    
+
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
-    
+
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    
+
                 children: [
                   Text(
                     "Address",
                     style: TextStyle(color: Colors.black87, fontSize: 16),
                   ),
-    
+
                   Icon(Icons.keyboard_arrow_down, color: Colors.black54),
                 ],
               ),
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             Obx(
               () => controller.showAddress.value
                   ? Column(
                       children: [
                         title("Present Address"),
-    
+
                         addressInput(controller.presentVillage, "Village"),
-    
+
                         addressInput(controller.presentUnion, "Union"),
-    
+
                         addressInput(controller.presentUpazila, "Upazila"),
-    
-                        addressInput(
-                          controller.presentDistrict,
-                          "District",
-                        ),
-    
+
+                        addressInput(controller.presentDistrict, "District"),
+
                         Row(
                           children: [
                             Checkbox(
                               value: controller.sameAddress.value,
-    
+
                               onChanged: (v) {
                                 controller.changeSameAddress(v ?? false);
                               },
                             ),
-    
+
                             const Text("Same as Present Address"),
                           ],
                         ),
-    
+
                         title("Permanent Address"),
-    
-                        addressInput(
-                          controller.permanentVillage,
-                          "Village",
-                        ),
-    
+
+                        addressInput(controller.permanentVillage, "Village"),
+
                         addressInput(controller.permanentUnion, "Union"),
-    
-                        addressInput(
-                          controller.permanentUpazila,
-                          "Upazila",
-                        ),
-    
-                        addressInput(
-                          controller.permanentDistrict,
-                          "District",
-                        ),
+
+                        addressInput(controller.permanentUpazila, "Upazila"),
+
+                        addressInput(controller.permanentDistrict, "District"),
                       ],
                     )
                   : const SizedBox(),
             ),
-    
+
             const SizedBox(height: 16),
-    
+
             OutlinedButton(
               onPressed: controller.toggleNid,
-    
+
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 55),
-    
+
                 backgroundColor: Colors.grey[100],
-    
+
                 side: BorderSide(color: Colors.grey.shade300, width: 1),
-    
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-    
+
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
-    
+
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    
+
                 children: [
                   Text(
                     "Add Other file",
                     style: TextStyle(color: Colors.black87, fontSize: 16),
                   ),
-    
+
                   Icon(Icons.keyboard_arrow_down, color: Colors.black54),
                 ],
               ),
             ),
-    
+
             const SizedBox(height: 12),
-    
+
             Obx(
               () => controller.showNid.value
                   ? Column(
@@ -240,9 +222,9 @@ class ProfileView extends GetView<ProfileController> {
                           hint: "NID Number",
                           keyboard: TextInputType.number,
                         ),
-    
+
                         const SizedBox(height: 12),
-    
+
                         nidUploadBox(
                           "NID Front Photo",
                           controller.nidFront.value,
@@ -250,7 +232,7 @@ class ProfileView extends GetView<ProfileController> {
                             controller.pickNidImage(true);
                           },
                         ),
-    
+
                         nidUploadBox(
                           "NID Back Photo",
                           controller.nidBack.value,
