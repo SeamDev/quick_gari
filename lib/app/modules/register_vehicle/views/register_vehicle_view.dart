@@ -21,228 +21,251 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              // ================= OWNER INFO =================
-              /* buildSectionCard(
-                title: "Owner Information",
-                children: [
-                  appInput(
-                    id: "fullName",
-                    label: "Car Name",
-                    onChanged: (v) => controller.fullName = v,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Car Name required";
-                      return null;
-                    },
-                  ),
-                  appInput(
-                    id: "phone",
-                    label: "Phone Number",
-                    keyboard: TextInputType.phone,
-                    onChanged: (v) => controller.phone = v,
-                  ),
-                  appInput(
-                    id: "email",
-                    label: "Email",
-                    keyboard: TextInputType.emailAddress,
-                    onChanged: (p0) => controller.email = p0,
-                  ),
-                  appInput(id: "address", label: "Address", maxLines: 3),
-                  uploadButton("NID Card Photo (Optional)", "nid"),
-                ],
-              ), */
-
-              // ================= VEHICLE BASIC =================
-              buildSectionCard(
-                title: "Vehicle Basic Information",
-                children: [
-                  appInput(
-                    id: "fullName",
-                    label: "Car Name",
-                    onChanged: (v) => controller.fullName = v,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Car Name required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Vehicle Type",
-                    items: [
-                      "Sedan",
-                      "SUV",
-                      "Hatchback",
-                      "Convertible",
-                      "Coupe",
-                      "Pickup",
-                      "Minivan",
-                      "Crossover",
-                      "Van",
-                      "Truck",
-                      "Bus",
+        child: Obx(() {
+          return Form(
+            key: formKey,
+            child: controller.isLoading.value
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    children: [
+                      // ================= OWNER INFO =================
+                      /* buildSectionCard(
+                    title: "Owner Information",
+                    children: [
+                      appInput(
+                        id: "fullName",
+                        label: "Car Name",
+                        onChanged: (v) => controller.fullName = v,
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return "Car Name required";
+                          return null;
+                        },
+                      ),
+                      appInput(
+                        id: "phone",
+                        label: "Phone Number",
+                        keyboard: TextInputType.phone,
+                        onChanged: (v) => controller.phone = v,
+                      ),
+                      appInput(
+                        id: "email",
+                        label: "Email",
+                        keyboard: TextInputType.emailAddress,
+                        onChanged: (p0) => controller.email = p0,
+                      ),
+                      appInput(id: "address", label: "Address", maxLines: 3),
+                      uploadButton("NID Card Photo (Optional)", "nid"),
                     ],
-                    currentValue: controller.vehicleType,
-                    onChanged: (p0) => controller.vehicleType = p0,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Brand",
-                    items: [
-                      "Toyota",
-                      "Nissan",
-                      "Honda",
-                      "Suzuki",
-                      "Hyundai",
-                      "BMW",
+                  ), */
+
+                      // ================= VEHICLE BASIC =================
+                      buildSectionCard(
+                        title: "Vehicle Basic Information",
+                        children: [
+                          appInput(
+                            id: "fullName",
+                            label: "Car Name",
+                            initialValue: controller.fullName,
+                            onChanged: (v) => controller.fullName = v,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return "Car Name required";
+                              }
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Vehicle Type",
+                            items: [
+                              "Sedan",
+                              "SUV",
+                              "Hatchback",
+                              "Convertible",
+                              "Coupe",
+                              "Pickup",
+                              "Minivan",
+                              "Crossover",
+                              "Van",
+                              "Truck",
+                              "Bus",
+                            ],
+                            currentValue: controller.vehicleType,
+                            onChanged: (p0) => controller.vehicleType = p0,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Brand",
+                            items: [
+                              "Toyota",
+                              "Nissan",
+                              "Honda",
+                              "Suzuki",
+                              "Hyundai",
+                              "BMW",
+                            ],
+                            currentValue: controller.brand,
+                            onChanged: (v) => controller.brand = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          appInput(
+                            id: "model",
+                            label: "Model",
+                            initialValue: controller.model,
+                            onChanged: (p0) => controller.model = p0,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Seat Capacity",
+                            items: List.generate(12, (i) => "${i + 1}"),
+                            currentValue: controller.seatCapacity,
+                            onChanged: (v) => controller.seatCapacity = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          // AC Switch
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //   children: [
+                          //     const Text("AC Available?"),
+                          //     GetBuilder<RegisterVehicleController>(
+                          //       builder: (c) => Switch(
+                          //         activeThumbColor: const Color(0xFF00804B),
+                          //         value: controller.isAC,
+                          //         onChanged: (v) => controller.isAC = v,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          dropdownField(
+                            title: "Fuel Type",
+                            items: ['Petrol', 'Diesel', 'Hybrid', 'Electric'],
+                            currentValue: controller.fuelType,
+                            onChanged: (v) => controller.fuelType = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Gear Type",
+                            items: ["Automatic", "Manual"],
+                            currentValue: controller.gearType,
+                            onChanged: (v) => controller.gearType = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Manufacture Year",
+                            items: List.generate(
+                              26,
+                              (i) => (2000 + i).toString(),
+                            ),
+                            currentValue: controller.manufactureYear,
+                            onChanged: (v) => controller.manufactureYear = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+
+                      // ================= REGISTRATION =================
+                      buildSectionCard(
+                        title: "Vehicle Registration Details",
+                        children: [
+                          appInput(
+                            id: "registrationNumber",
+                            label: "Registration Number",
+                            initialValue: controller.registrationNumber,
+                            onChanged: (p0) =>
+                                controller.registrationNumber = p0,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          dropdownField(
+                            title: "Registration Year",
+                            items: List.generate(
+                              26,
+                              (i) => (2000 + i).toString(),
+                            ),
+                            currentValue: controller.registrationYear,
+                            onChanged: (v) => controller.registrationYear = v!,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) return "Required";
+                              return null;
+                            },
+                          ),
+                          uploadButton("Tax Token Photo", "tax"),
+                          uploadButton("Registration Card Photo", "reg"),
+                          uploadButton("Driving Licence Photo", "lic"),
+                        ],
+                      ),
+
+                      // ================= VEHICLE IMAGES =================
+                      buildSectionCard(
+                        title: "Upload Vehicle Images",
+                        children: [
+                          uploadButton("Front View", "front"),
+                          uploadButton("Side View", "side"),
+                          uploadButton("Back View", "back"),
+                          uploadButton("Interior", "interior"),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // ================= SUBMIT =================
+                      SizedBox(
+                        width: double.infinity,
+                        child: controller.isButtonLoading.value
+                            ? Center(child: CircularProgressIndicator())
+                            : ElevatedButton(
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    controller.uploadVehicle();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00804B),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                child: Text(
+                                  controller.user.isCarOwner
+                                      ? "Update Vechile"
+                                      : "Register Vehicle",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 30),
                     ],
-                    currentValue: controller.brand,
-                    onChanged: (v) => controller.brand = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
                   ),
-                  appInput(
-                    id: "model",
-                    label: "Model",
-                    onChanged: (p0) => controller.model = p0,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Seat Capacity",
-                    items: List.generate(12, (i) => "${i + 1}"),
-                    currentValue: controller.seatCapacity,
-                    onChanged: (v) => controller.seatCapacity = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  // AC Switch
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text("AC Available?"),
-                  //     GetBuilder<RegisterVehicleController>(
-                  //       builder: (c) => Switch(
-                  //         activeThumbColor: const Color(0xFF00804B),
-                  //         value: controller.isAC,
-                  //         onChanged: (v) => controller.isAC = v,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  dropdownField(
-                    title: "Fuel Type",
-                    items: ['Petrol', 'Diesel', 'Hybrid', 'Electric'],
-                    currentValue: controller.fuelType,
-                    onChanged: (v) => controller.fuelType = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Gear Type",
-                    items: ["Automatic", "Manual"],
-                    currentValue: controller.gearType,
-                    onChanged: (v) => controller.gearType = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Manufacture Year",
-                    items: List.generate(26, (i) => (2000 + i).toString()),
-                    currentValue: controller.manufactureYear,
-                    onChanged: (v) => controller.manufactureYear = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-
-              // ================= REGISTRATION =================
-              buildSectionCard(
-                title: "Vehicle Registration Details",
-                children: [
-                  appInput(
-                    id: "registrationNumber",
-                    label: "Registration Number",
-                    onChanged: (p0) => controller.registrationNumber = p0,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  dropdownField(
-                    title: "Registration Year",
-                    items: List.generate(26, (i) => (2000 + i).toString()),
-                    currentValue: controller.registrationYear,
-                    onChanged: (v) => controller.registrationYear = v!,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Required";
-                      return null;
-                    },
-                  ),
-                  uploadButton("Tax Token Photo", "tax"),
-                  uploadButton("Registration Card Photo", "reg"),
-                  uploadButton("Driving Licence Photo", "lic"),
-                ],
-              ),
-
-              // ================= VEHICLE IMAGES =================
-              buildSectionCard(
-                title: "Upload Vehicle Images",
-                children: [
-                  uploadButton("Front View", "front"),
-                  uploadButton("Side View", "side"),
-                  uploadButton("Back View", "back"),
-                  uploadButton("Interior", "interior"),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // ================= SUBMIT =================
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      controller.uploadVehicle();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00804B),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    controller.user.isCarOwner
-                        ? "Update Vechile"
-                        : "Register Vehicle",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -290,6 +313,7 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
     String? Function(String?)? validator,
     Color borderColor = Colors.black,
     String? errorText,
+    String? initialValue,
   }) {
     return GetBuilder<RegisterVehicleController>(
       id: id,
@@ -297,10 +321,12 @@ class RegisterVehicleView extends GetView<RegisterVehicleController> {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: TextFormField(
+            initialValue: initialValue,
             keyboardType: keyboard,
             maxLines: maxLines,
             onChanged: onChanged,
             validator: validator,
+
             decoration: InputDecoration(
               labelText: label,
               labelStyle: TextStyle(color: borderColor),

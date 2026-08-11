@@ -163,11 +163,7 @@ Widget vehicleCard(Map<String, dynamic> data, void Function() refresh) {
                     amount: amount,
                     id: data["_id"] ?? "",
                   )
-                : Get.to(
-                    () => RideProposalView(
-                      id: data["_id"] ?? "00",
-                    ),
-                  );
+                : Get.to(() => RideProposalView(id: data["_id"] ?? "00"));
           },
           child: Text(
             AppConfig().user.isCarOwner
@@ -234,6 +230,8 @@ showEditableAddressSheet(
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
+  bool isLoading = false;
+  
   Get.bottomSheet(
     DraggableScrollableSheet(
       initialChildSize: 0.67,
@@ -364,75 +362,128 @@ showEditableAddressSheet(
               const SizedBox(height: 24),
 
               /// Continue Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007F4F),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: () async {
-                  if (!readonly) {
-                    //validators
-                    if (startCtrl.text.isEmpty ||
-                        endCtrl.text.isEmpty ||
-                        dateCtrl.text.isEmpty ||
-                        timeCtrl.text.isEmpty) {
-                      Get.snackbar("Empty", "Fill all field");
-                      return;
-                    }
-                    //
-                    final combinedDateTime = DateTime(
-                      selectedDate.year,
-                      selectedDate.month,
-                      selectedDate.day,
-                      selectedTime.hour,
-                      selectedTime.minute,
-                    );
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF007F4F),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: isLoading
+                        // ignore: dead_code
+                        ? null
+                        : () async {
+                            if (!readonly) {
+                              if (startCtrl.text.isEmpty ||
+                                  endCtrl.text.isEmpty ||
+                                  dateCtrl.text.isEmpty ||
+                                  timeCtrl.text.isEmpty) {
+                                Get.snackbar("Empty", "Fill all field");
+                                return;
+                              }
 
-                    final requestBody = {
-                      "startLocation": startCtrl.text,
-                      "endLocation": endCtrl.text,
-                      "date":
-                          "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
-                      "startTime": combinedDateTime.toUtc().toIso8601String(),
-                    };
+                              setState(() {
+                                isLoading = true;
+                              });
 
-                    Map res = await ApiService.rideSheet(requestBody);
-                    Get.back();
-                    Get.snackbar("Bid For Fare", res['message']);
-                  } else if (amount > 0) {
-                    Get.back();
-                    return;
-                  } else {
-                    if (int.tryParse(fareCtrl.text) == null ||
-                        int.parse(fareCtrl.text) <= 0) {
-                      Get.snackbar("Fare", "Bid Fare atleast 1 and number");
-                      return;
-                    } else {
-                      final requestBody = {
-                        "rideId": id,
-                        "fare": int.parse(fareCtrl.text),
-                        "message": "Hello There i am available for this period",
-                      };
-                      Map res = await ApiService.sendProposalForRide(
-                        requestBody,
-                      );
-                      Get.back();
-                      Get.snackbar("Bid For Fare", res['message']);
-                    }
-                  }
-                  refresh();
+                              final combinedDateTime = DateTime(
+                                selectedDate.year,
+                                selectedDate.month,
+                                selectedDate.day,
+                                selectedTime.hour,
+                                selectedTime.minute,
+                              );
+
+                              final requestBody = {
+                                "startLocation": startCtrl.text,
+                                "endLocation": endCtrl.text,
+                                "date":
+                                    "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                                "startTime": combinedDateTime
+                                    .toUtc()
+                                    .toIso8601String(),
+                              };
+
+                              try {
+                                Map res = await ApiService.rideSheet(
+                                  requestBody,
+                                );
+
+                                Get.back();
+                                Get.snackbar("Bid For Fare", res['message']);
+                                refresh();
+                              } catch (e) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+
+                                Get.snackbar("Error", "Something went wrong");
+                              }
+                            } else if (amount > 0) {
+                              Get.back();
+                            } else {
+                              if (int.tryParse(fareCtrl.text) == null ||
+                                  int.parse(fareCtrl.text) <= 0) {
+                                Get.snackbar(
+                                  "Fare",
+                                  "Bid Fare atleast 1 and number",
+                                );
+                                return;
+                              }
+
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              final requestBody = {
+                                "rideId": id,
+                                "fare": int.parse(fareCtrl.text),
+                                "message":
+                                    "Hello There i am available for this period",
+                              };
+
+                              try {
+                                Map res = await ApiService.sendProposalForRide(
+                                  requestBody,
+                                );
+
+                                Get.back();
+                                Get.snackbar("Bid For Fare", res['message']);
+                                refresh();
+                              } catch (e) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+
+                                Get.snackbar("Error", "Something went wrong");
+                              }
+                            }
+                          },
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            readonly
+                                ? amount > 0
+                                      ? "Close"
+                                      : "Submit Fare"
+                                : "Continue",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                  );
                 },
-                child: Text(
-                  readonly
-                      ? amount > 0
-                            ? "Close"
-                            : "Submit Fare"
-                      : "Continue",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
               ),
             ],
           ),

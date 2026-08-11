@@ -59,10 +59,16 @@ class ShareAdmin extends GetView<ShareVehicleController> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "Add Vehicle",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: controller.isLoading.value
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Add Vehicle",
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ],

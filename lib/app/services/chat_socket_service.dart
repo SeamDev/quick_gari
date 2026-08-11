@@ -46,6 +46,8 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
   VoidCallback? onStopTyping;
   VoidCallback? onRefreash;
 
+  VoidCallback? onNewNotification;
+
   void Function(Map<String, dynamic> message)? onNewMessage;
 
   void _registerSocketEvents() {
@@ -62,7 +64,7 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
     socket.on('chat:message', _onNewMessage);
     socket.on('chat:typing', _onTyping);
     socket.on('chat:stop_typing', _onStopTyping);
-    socket.on('notification:new', _onNotification);
+    socket.on('notification:new', _onNewNotification);
 
     socket.onDisconnect((_) {
       debugPrint('Socket disconnected');
@@ -93,13 +95,9 @@ class ChatSocketService extends GetxService with WidgetsBindingObserver {
     onStopTyping?.call();
   }
 
-  void _onNotification(dynamic data) async {
-    // await NotificationService().showNotification(
-    //   id: int.tryParse(data["_id"]) ?? 0,
-    //   title: data["type"],
-    //   body: data["message"],
-    // );
-    // debugPrint('Notification: $data');
+  void _onNewNotification(dynamic data) async {
+    debugPrint('New Notification: $data');
+    onNewNotification?.call();
   }
 
   void onTextChanged({

@@ -2,13 +2,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveService {
   static const String _defaultBox = 'appBox';
-  static const String _tokenBox = 'appBox';
+  static const String _fixedBox = 'fixedBox';
 
   /// Initialize Hive
   static Future<void> init() async {
     await Hive.initFlutter();
     await Hive.openBox(_defaultBox);
-    await Hive.openBox(_tokenBox);
+    await Hive.openBox(_fixedBox);
   }
 
   /// Open custom box
@@ -36,10 +36,7 @@ class HiveService {
   }
 
   /// Delete value
-  static Future<void> delete(
-    String key, {
-    String boxName = _defaultBox,
-  }) async {
+  static Future<void> delete(String key, {String boxName = _defaultBox}) async {
     final box = Hive.box(boxName);
     await box.delete(key);
   }
@@ -51,10 +48,7 @@ class HiveService {
   }
 
   /// Check if key exists
-  static bool containsKey(
-    String key, {
-    String boxName = _defaultBox,
-  }) {
+  static bool containsKey(String key, {String boxName = _defaultBox}) {
     final box = Hive.box(boxName);
     return box.containsKey(key);
   }
@@ -63,19 +57,31 @@ class HiveService {
   static Future<void> closeBox({String boxName = _defaultBox}) async {
     await Hive.box(boxName).close();
   }
+
   ////
   ///
   ///
   static Future<void> setToken(String? value) async {
-    await Hive.box(_tokenBox).put("token", value);
+    await Hive.box(_defaultBox).put("token", value);
   }
+
   static Future<void> setRToken(String? value) async {
-    await Hive.box(_tokenBox).put("Rtoken", value);
+    await Hive.box(_defaultBox).put("Rtoken", value);
   }
+
   static Future<String?> getToken() async {
-    return await Hive.box(_tokenBox).get("token");
+    return await Hive.box(_defaultBox).get("token");
   }
+
   static Future<String?> getRToken() async {
-    return await Hive.box(_tokenBox).get("Rtoken");
+    return await Hive.box(_defaultBox).get("Rtoken");
+  }
+
+  static Future<void> setFCMToken(String? value) async {
+    await Hive.box(_fixedBox).put("fcm", value);
+  }
+
+  static Future<String?> getFCMToken() async {
+    return await Hive.box(_fixedBox).get("fcm");
   }
 }

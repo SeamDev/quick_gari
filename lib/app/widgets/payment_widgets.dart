@@ -31,6 +31,8 @@ class PaymentView extends StatefulWidget {
 class _PaymentViewState extends State<PaymentView> {
   final TextEditingController trxController = TextEditingController();
 
+  bool isLoading = false;
+
   void copyNumber() {
     Clipboard.setData(ClipboardData(text: "01570269334"));
     ScaffoldMessenger.of(
@@ -38,7 +40,7 @@ class _PaymentViewState extends State<PaymentView> {
     ).showSnackBar(const SnackBar(content: Text("Driver number copied")));
   }
 
-  void submitPayment() async {
+  Future<void> submitPayment() async {
     if (trxController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter transaction ID")),
@@ -109,17 +111,20 @@ class _PaymentViewState extends State<PaymentView> {
                     ),
                   ],
                 ),
-        
+
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Payment Number",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-        
+
                     const SizedBox(height: 10),
-        
+
                     Row(
                       children: [
                         Expanded(
@@ -134,9 +139,9 @@ class _PaymentViewState extends State<PaymentView> {
                         ),
                       ],
                     ),
-        
+
                     const Divider(height: 30),
-        
+
                     Text(
                       "Fare: ৳ ${(int.parse(widget.fare) * 1.1).toStringAsFixed(2)}",
                       style: const TextStyle(
@@ -146,7 +151,7 @@ class _PaymentViewState extends State<PaymentView> {
                       ),
                     ),
                     const Divider(height: 30),
-        
+
                     Text(
                       "**Please send the payment to this number and paste the transaction ID. Your request will remain pending until we receive confirmation.**",
                       style: const TextStyle(
@@ -166,9 +171,9 @@ class _PaymentViewState extends State<PaymentView> {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 25),
-        
+
               /// Transaction ID Field
               TextField(
                 controller: trxController,
@@ -181,15 +186,25 @@ class _PaymentViewState extends State<PaymentView> {
                   prefixIcon: const Icon(Icons.payment),
                 ),
               ),
-        
+
               const SizedBox(height: 30),
-        
+
               /// Submit Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: submitPayment,
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    
+                    await submitPayment();
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -197,10 +212,17 @@ class _PaymentViewState extends State<PaymentView> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    "Submit Payment",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Text(
+                          "Submit Payment",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],

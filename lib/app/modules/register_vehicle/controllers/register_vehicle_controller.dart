@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -44,18 +45,63 @@ class RegisterVehicleController extends GetxController {
   Rxn<Map<String, dynamic>> interiorView = Rxn<Map<String, dynamic>>();
 
   final user = AppConfig().user;
-  late final String carId;
+  late String carId;
+  Map<String, dynamic> info = {};
+  RxBool isLoading = false.obs;
+  RxBool isButtonLoading = false.obs;
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    carId = Get.arguments ?? "0";
+    info = Get.arguments ?? {};
+    carId = info["carId"] ?? "0";
+    if (user.isCarOwner) await isUpdatePage();
   }
 
-  void checkValid() {}
+  Future<void> isUpdatePage() async {
+    isLoading.value = true;
+    fullName = info["carName"];
+    vehicleType = info["vehicleType"];
+    brand = info["brand"];
+    model = info["model"];
+    seatCapacity = info["seatCapacity"].toString();
+    fuelType = info["fuelType"];
+    gearType = info["gearType"];
+    manufactureYear = info["manufactureYear"].toString();
+    registrationNumber = info["registrationNumber"].toString();
+    registrationYear = info["RegistrationYear"].toString();
+
+    taxTokenPhoto.value = await imageFromUrl(info["Taxphoto"]);
+    registrationCardPhoto.value = await imageFromUrl(info["Registrationphoto"]);
+    licensePhoto.value = await imageFromUrl(info["Drivingphoto"]);
+
+    List images = info["images"] as List;
+    if (images.isNotEmpty) frontView.value = await imageFromUrl(images[0]);
+    if (images.length >= 2) sideView.value = await imageFromUrl(images[1]);
+    if (images.length >= 3) backView.value = await imageFromUrl(images[2]);
+    if (images.length >= 4) interiorView.value = await imageFromUrl(images[3]);
+
+    isLoading.value = false;
+  }
 
   // =============================
   // FILE PICKER FUNCTION
   // =============================
+
+  Future<Map<String, dynamic>?> imageFromUrl(String url) async {
+    try {
+      final response = await Dio().get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+
+      final bytes = Uint8List.fromList(response.data!);
+
+      return {"bytes": bytes, "extension": ".jpg"};
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<Map<String, dynamic>?> pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -147,6 +193,7 @@ class RegisterVehicleController extends GetxController {
   }
 
   void uploadVehicle() async {
+    isButtonLoading.value = true;
     if (!checkRequiredFiles()) return;
     Map body = {
       "taxTokenPhoto": taxTokenPhoto.value,
@@ -182,9 +229,9 @@ class RegisterVehicleController extends GetxController {
     } else {
       res = await ApiService.registerCar(body);
     }
+    isButtonLoading.value = false;
     if (res) {
       Get.back();
-      if (user.isCarOwner) Get.back();
       Get.snackbar(
         "Status",
         user.isCarOwner

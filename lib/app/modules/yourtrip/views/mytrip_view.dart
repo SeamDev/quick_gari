@@ -99,6 +99,7 @@ class TripView extends GetView<WalletController> {
                             controller.dataSVehicle[index -
                                 controller.dataRide.length -
                                 controller.dataReturn.length];
+                        //print(item);
                         return DriverInfoContainer(
                           refresh: controller.fetchData,
                           tripType: "Share Vehicle",
@@ -125,7 +126,7 @@ class TripView extends GetView<WalletController> {
                               ? item["driver"] ?? "N/A"
                               : item["driver"]?["_id"] ?? "N/A",
 
-                          passengerID: item[key]["userId"],
+                          passengerID: item[key]?["userId"],
                           status: item["status"] ?? "N/A",
                           date: item["journeyStartedAt"] ?? "N/A",
                           isVerified: item["bookingOtpVerified"] ?? false,

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/services/hive_service.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -22,7 +21,6 @@ class ProfileView extends GetView<ProfileController> {
         actions: [
           GestureDetector(
             onTap: () {
-              HiveService.clear();
               controller.unInit();
               Get.offAllNamed(Routes.AUTH, arguments: {"isInit": false});
             },

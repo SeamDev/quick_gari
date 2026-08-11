@@ -26,7 +26,29 @@ class MyVehicleController extends GetxController {
     }
   }
 
-  void gotoUpdatePage(){
-    Get.toNamed(Routes.REGISTER_VEHICLE,arguments: vehicle["_id"]);
+  void gotoUpdatePage() {
+    final features = vehicle['features'] ?? {};
+    Get.toNamed(
+      Routes.REGISTER_VEHICLE,
+      arguments: {
+        "carId": vehicle["_id"],
+        "images": (features['images'] as List?) ?? [],
+        "carName": vehicle['carName'] ?? '',
+        "vehicleType": features['vehicleType'] ?? '',
+        "brand": features['brand'] ?? '',
+        "model": features['model'] ?? '',
+        "seatCapacity": features['seatCapacity'],
+        "fuelType": features['fuelType'],
+        "gearType": features['gearType'],
+        "manufactureYear": features['manufactureYear'] ?? '',
+        "registrationNumber":
+            vehicle['vehicleRegistration']['registrationNumber'],
+        "RegistrationYear": vehicle['vehicleRegistration']['registration'],
+        "Taxphoto": vehicle['vehicleRegistration']['taxTokenPhoto'],
+        "Registrationphoto":
+            vehicle['vehicleRegistration']['registrationCardPhoto'],
+        "Drivingphoto": vehicle['drivingLicensePhoto'],
+      },
+    );
   }
 }

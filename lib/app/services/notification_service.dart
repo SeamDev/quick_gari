@@ -14,6 +14,8 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   final RxBool isLoading = false.obs;
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
 
+  final notificationCount = 0.obs;
+
   NotificationResponseModel? notificationResponse;
 
   Future<void> initialize() async {
@@ -47,6 +49,10 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
       notificationResponse = NotificationResponseModel.fromJson(response);
 
       notifications.assignAll(notificationResponse?.data ?? []);
+      notificationCount.value = notifications
+          .where((notification) => !notification.isRead)
+          .length;
+          
     } catch (e) {
       Get.log("Notification Error: $e");
     } finally {

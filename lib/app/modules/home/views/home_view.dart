@@ -5,9 +5,8 @@ import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../controllers/home_controller.dart';
 
-class HomeView extends GetView<HomeController> {
+class HomeView extends GetView<NavbarController> {
   const HomeView({super.key});
   Future<void> _launchDialer(String phoneNumber) async {
     final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
@@ -18,7 +17,6 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final drawerX = Get.find<NavbarController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -34,12 +32,50 @@ class HomeView extends GetView<HomeController> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.NOTIFICATION),
-            icon: Icon(Icons.notifications_none_outlined, size: 30),
+          Obx(
+            () => Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  onPressed: () => Get.toNamed(Routes.NOTIFICATION),
+                  icon: Icon(
+                    controller.notificationCount.value > 0
+                        ? Icons.notifications_outlined
+                        : Icons.notifications_none_outlined,
+                    size: 30,
+                  ),
+                ),
+
+                if (controller.notificationCount.value > 0)
+                  Positioned(
+                    right: 5,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        controller.notificationCount.value > 99
+                            ? '99+'
+                            : '${controller.notificationCount.value}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
           IconButton(
-            onPressed: () => drawerX.openDrawer(),
+            onPressed: () => controller.openDrawer(),
             icon: Icon(Icons.menu, size: 30),
           ),
         ],

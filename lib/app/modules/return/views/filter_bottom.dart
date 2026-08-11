@@ -12,6 +12,8 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
+  bool isLoading = false;
+
   Get.bottomSheet(
     Container(
       padding: const EdgeInsets.all(16),
@@ -48,7 +50,6 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
             iconColor: Colors.green,
             label: "Starting Point",
             controller: startCtrl,
-            borderColor: Colors.green,
           ),
 
           const SizedBox(height: 12),
@@ -122,56 +123,70 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
 
           const SizedBox(height: 24),
 
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF007F4F),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            onPressed: () async {
-              final combinedDateTime = DateTime(
-                selectedDate.year,
-                selectedDate.month,
-                selectedDate.day,
-                selectedTime.hour,
-                selectedTime.minute,
+          StatefulBuilder(
+            builder: (context, setState) {
+              return ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF007F4F),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  final combinedDateTime = DateTime(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day,
+                    selectedTime.hour,
+                    selectedTime.minute,
+                  );
+                  if (startCtrl.text.isEmpty ||
+                      endCtrl.text.isEmpty ||
+                      startCtrl.text.isEmpty) {
+                    Get.snackbar("Info", "Fill all input field");
+                  } else {
+                    Get.back();
+                    final requestBody = {
+                      "startLocation": startCtrl.text,
+                      "endLocation": endCtrl.text,
+                      "fare": int.parse(fareCtrl.text),
+                      "date":
+                          "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
+                      "startTime": combinedDateTime.toUtc().toIso8601String(),
+                    };
+                    Map res = await ApiService.createReturnTrip(requestBody);
+                    if (res["success"]) {
+                      Get.snackbar(
+                        "Create Return",
+                        res["message"] ?? "Return Created Successfully !",
+                      );
+                      refresh();
+                    } else {
+                      Get.snackbar(
+                        "Create Return",
+                        res["message"] ??
+                            "Return Creating Failed !\nYor are not driver",
+                      );
+                    }
+                  }
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
+                    : const Text(
+                        "Continue",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
               );
-              if (startCtrl.text.isEmpty ||
-                  endCtrl.text.isEmpty ||
-                  startCtrl.text.isEmpty) {
-                Get.snackbar("Info", "Fill all input field");
-              } else {
-                Get.back();
-                final requestBody = {
-                  "startLocation": startCtrl.text,
-                  "endLocation": endCtrl.text,
-                  "fare": int.parse(fareCtrl.text),
-                  "date":
-                      "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}",
-                  "startTime": combinedDateTime.toUtc().toIso8601String(),
-                };
-                Map res = await ApiService.createReturnTrip(requestBody);
-                if (res["success"]) {
-                  Get.snackbar(
-                    "Create Return",
-                    res["message"] ?? "Return Created Successfully !",
-                  );
-                  refresh();
-                } else {
-                  Get.snackbar(
-                    "Create Return",
-                    res["message"] ??
-                        "Return Creating Failed !\nYor are not driver",
-                  );
-                }
-              }
             },
-            child: const Text(
-              "Continue",
-              style: TextStyle(fontSize: 18, color: Colors.white),
-            ),
           ),
         ],
       ),

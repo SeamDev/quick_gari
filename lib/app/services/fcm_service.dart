@@ -1,11 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:quick_gari/app/modules/ride/views/ride_proposal_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
-import 'package:quick_gari/app/services/hive_service.dart';
+import 'package:quick_gari/app/services/api_service.dart';
 import 'package:quick_gari/app/services/notification_service.dart';
 
 class FCMService {
@@ -32,21 +29,19 @@ class FCMService {
     // Permission
     await _fcm.requestPermission(alert: true, badge: true, sound: true);
 
-    // Token
-    final token = await _fcm.getToken() ?? "Empty";
+    _fcm.onTokenRefresh.listen((newToken) async {
+      await ApiService.patchFCM(newToken);
+    });
 
-    await HiveService.put("fcm", token);
-    debugPrint("FCM TOKEN: $token");
-
-    await Clipboard.setData(ClipboardData(text: token));
+    //await Clipboard.setData(ClipboardData(text: token));
 
     // Foreground message
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // Use your existing local notification
       NotificationService().showNotification(
         id: message.hashCode,
-        title: message.notification?.title ?? "Notification",
-        body: message.notification?.body ?? "",
+        title: message.notification?.title ?? "Title",
+        body: message.notification?.body ?? "Body",
         payload: message.data,
       );
     });
@@ -64,19 +59,6 @@ class FCMService {
     final data = message.data;
 
     switch (data["type"]) {
-      case "NEW_PROPOSAL":
-        Get.to(
-          () => RideProposalView(
-            id: data["rideId"] ?? "",
-            proposalID: data["proposalId"] ?? "",
-          ),
-        );
-        break;
-
-      case "PAYMENT_APPROVED":
-        // Get.to(() => PaymentView());
-        break;
-
       default:
         Get.toNamed(Routes.NOTIFICATION);
     }

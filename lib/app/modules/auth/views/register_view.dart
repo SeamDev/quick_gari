@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:quick_gari/app/modules/auth/views/login_view.dart';
 import 'package:file_picker/file_picker.dart';
 
-
 import 'package:quick_gari/app/services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -23,6 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   bool hidePassword = true;
+  bool isLoading = false;
 
   String selectedGender = "male";
   Uint8List? selectedImageBytes;
@@ -69,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   // Example register function
-  void register() async {
+  Future<void> register() async {
     final name = nameController.text.trim();
     final email = emailController.text.trim();
     final phone = phoneController.text.trim();
@@ -83,8 +83,7 @@ class _SignupScreenState extends State<SignupScreen> {
       );
       return;
     }
-    if(password.length < 8 ){
-      
+    if (password.length < 8) {
       Get.snackbar(
         "Error",
         "Password length must be 9",
@@ -345,17 +344,29 @@ class _SignupScreenState extends State<SignupScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: register,
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    await register();
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF00A86B),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    "Sign Up",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Text(
+                          "Sign Up",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
               /*

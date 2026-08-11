@@ -324,7 +324,7 @@ class ApiService {
       var response = await dio.post(url, data: body);
       return response.data;
     } on DioException catch (e) {
-      return e.response?.data;
+      return e.response?.data ?? {};
     } catch (e) {
       debugPrint("ERROR: $e");
       return {'success': false};
@@ -1182,7 +1182,7 @@ class ApiService {
   }
 
   // set FCM
-  static Future<bool> patchFCM(String token) async {
+  static Future<bool> patchFCM(String? token) async {
     try {
       var url =
           "${Config.baseUrl}${Config.apiVersion}/notifications/settings/update/fcm-token";
@@ -1195,10 +1195,10 @@ class ApiService {
   }
 
   // set FCM
-  static Future<bool> deleteFCM(String token) async {
+  static Future<bool> deleteFCM(String? token) async {
     try {
       var url =
-          "${Config.baseUrl}${Config.apiVersion}notifications/settings/delete/fcm-token";
+          "${Config.baseUrl}${Config.apiVersion}/notifications/settings/delete/fcm-token";
       var response = await dio.delete(url, data: {"fcmToken": token});
       return response.statusCode == 200;
     } catch (e) {

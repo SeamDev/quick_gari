@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/services/api_service.dart';
@@ -8,7 +9,11 @@ import 'package:quick_gari/app/services/notification_service.dart';
 class NavbarController extends GetxController {
   final _currentIndex = 0.obs;
 
+  RxInt get notificationCount => _notificationService.notificationCount;
+
   int get currentIndex => _currentIndex.value;
+
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
   final ChatSocketService _chatSocket = Get.find<ChatSocketService>();
   final NotificationService _notificationService =
@@ -17,19 +22,21 @@ class NavbarController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    _chatSocket.onNewNotification = () {
+      _notificationService.notificationCount.value++;
+    };
     _chatSocket.init();
-    _notificationService.initialize();
-
-    final token = HiveService.get("fcm") as String? ?? "";
-    await ApiService.patchFCM(token);
+    await _notificationService.initialize();
+    await ApiService.patchFCM(await _fcm.getToken());
   }
 
   Future<void> unInit() async {
     _chatSocket.unInit();
     await _notificationService.unInit();
-    final token = HiveService.get("fcm") as String? ?? "";
 
-    await ApiService.deleteFCM(token);
+    await ApiService.deleteFCM(await _fcm.getToken());
+
+    await HiveService.clear();
   }
 
   set currentIndex(int index) => _currentIndex.value = index;

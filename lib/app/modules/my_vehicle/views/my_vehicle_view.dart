@@ -25,7 +25,7 @@ class MyVehicleView extends GetView<MyVehicleController> {
           return const Center(child: CircularProgressIndicator());
         }
         if (controller.vehicle.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: Text("NO Vehicle Info Found"));
         }
 
         final vehicle = controller.vehicle;
