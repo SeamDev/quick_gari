@@ -102,7 +102,7 @@ class ChatControllerGet extends GetxController {
 
   void _refresh() async {
     data.value = await ApiService.getChat(type, id);
-    final List<dynamic> messages = data["data"]["messages"];
+    final List<dynamic> messages = data["data"]?["messages"] ?? [];
 
     for (final item in messages) {
       final msg = core.TextMessage(
@@ -119,7 +119,7 @@ class ChatControllerGet extends GetxController {
     isLoading.value = true;
     if (await ApiService.createChat(type, id)) {
       data.value = await ApiService.getChat(type, id);
-      final List<dynamic> messages = data["data"]["messages"];
+      final List<dynamic> messages = data["data"]?["messages"] ?? [];
 
       for (final item in messages) {
         final msg = core.TextMessage(

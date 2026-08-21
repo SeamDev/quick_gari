@@ -13,7 +13,6 @@ class CarDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -146,9 +145,22 @@ class CarDetailPage extends StatelessWidget {
                       child: Column(
                         children: [
                           Image.network(
-                            data["driver"]?["avatar"] ?? "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg",
+                            data["driver"]?["avatar"] ??
+                                "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg",
                             width: 100,
                             height: 100,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const SizedBox(
+                                height: 120,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.broken_image_outlined,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                           Text(
                             "Driver Name :  ${data["driver"]?["name"]}",
@@ -208,8 +220,9 @@ class CarDetailPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          onPressed: () =>
-                              Get.to(() => ConfirmBooking(data, mainList,id,status)),
+                          onPressed: () => Get.to(
+                            () => ConfirmBooking(data, mainList, id, status),
+                          ),
                           child: const Text(
                             'Ride Now',
                             style: TextStyle(fontSize: 22, color: Colors.white),
@@ -364,6 +377,18 @@ class _CarCarouselState extends State<CarCarousel> {
                 return Image.network(
                   widget.images[currentIndex],
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                      height: 120,
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

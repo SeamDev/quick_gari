@@ -71,7 +71,7 @@ class TripView extends GetView<WalletController> {
                               controller.dataReturn.length) {
                         String key = isOwner ? "user" : "driver";
                         final item = controller
-                            .dataRide[index - controller.dataReturn.length];
+                            .dataReturn[index - controller.dataRide.length];
                         return DriverInfoContainer(
                           refresh: controller.fetchData,
                           tripType: "Return",

@@ -85,6 +85,18 @@ class ConfirmBooking extends StatelessWidget {
                     data["car"]["features"]["images"][0] ?? "assets/car3.png",
                     width: 100,
                     fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        height: 120,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

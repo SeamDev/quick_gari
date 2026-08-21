@@ -47,7 +47,7 @@ class RideView extends GetView<RideController> {
         builder: (_) {
           return controller.isLoading
               ? Center(child: CircularProgressIndicator(color: Colors.green))
-              : controller.dataList.isEmpty
+              : controller.filteredList.isEmpty
               ? Center(child: Text("No Proposal Created"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -231,7 +231,7 @@ showEditableAddressSheet(
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(DateTime.now());
 
   bool isLoading = false;
-  
+
   Get.bottomSheet(
     DraggableScrollableSheet(
       initialChildSize: 0.67,

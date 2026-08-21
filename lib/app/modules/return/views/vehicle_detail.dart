@@ -27,6 +27,7 @@ class CarDetailsView extends StatelessWidget {
               '${data["car"]["carName"]}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
+
             // const SizedBox(height: 4),
 
             // Row(
@@ -36,7 +37,6 @@ class CarDetailsView extends StatelessWidget {
             //     Text('4.9 (531 reviews)', style: TextStyle(color: Colors.grey)),
             //   ],
             // ),
-
             const SizedBox(height: 16),
 
             // Car image + arrows
@@ -53,7 +53,10 @@ class CarDetailsView extends StatelessWidget {
             const SizedBox(height: 10),
 
             _featureRow('Model', '${data["car"]["features"]["model"]}'),
-            _featureRow('Seat Capacity', '${data["car"]["features"]["seatCapacity"]} seat'),
+            _featureRow(
+              'Seat Capacity',
+              '${data["car"]["features"]["seatCapacity"]} seat',
+            ),
             _featureRow('AC Available', 'Yes/No'),
             _featureRow('Fuel type', '${data["car"]["features"]["fuelType"]}'),
             _featureRow('Gear type', '${data["car"]["features"]["gearType"]}'),
@@ -78,7 +81,10 @@ class CarDetailsView extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundImage: NetworkImage( data["driver"]["avatar"] ?? "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg"),
+                    backgroundImage: NetworkImage(
+                      data["driver"]["avatar"] ??
+                          "https://www.shutterstock.com/image-vector/bus-driver-wand-icon-isolated-600nw-2600303135.jpg",
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -228,6 +234,18 @@ class _CarCarouselState extends State<CarCarousel> {
                 return Image.network(
                   widget.images[currentIndex],
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                      height: 120,
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),

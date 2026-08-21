@@ -1113,7 +1113,6 @@ class ApiService {
     }
   }
 
-  // getChat
   static Future<Map<String, dynamic>> getChat(
     String type,
     String id, {
@@ -1130,7 +1129,6 @@ class ApiService {
     }
   }
 
-  // getChat
   static Future<bool> sendMessage(
     String type,
     String id,

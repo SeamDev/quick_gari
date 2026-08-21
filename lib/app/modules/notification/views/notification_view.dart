@@ -48,18 +48,22 @@ class NotificationView extends GetView<NotificationController> {
             separatorBuilder: (_, __) => const SizedBox(height: 15),
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
-              bool  isClickAble =controller.notificationType.contains(notification.type);
+              bool isClickAble = controller.notificationType.contains(
+                notification.type,
+              );
               return InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () async {
-                  await controller.notificationRedirect(notification);
+                  await controller.notificationService.notificationRedirect(
+                    notification,
+                  );
                 },
                 child: _notificationCard(
                   title: notification.type.replaceAll('_', ' '),
                   message: notification.message,
                   time: _timeAgo(notification.createdAt),
                   highlight: !notification.isRead,
-                  isClickAble: isClickAble
+                  isClickAble: isClickAble,
                 ),
               );
             },
@@ -74,7 +78,7 @@ class NotificationView extends GetView<NotificationController> {
     required String message,
     required String time,
     bool highlight = false,
-    bool isClickAble = false
+    bool isClickAble = false,
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -97,7 +101,7 @@ class NotificationView extends GetView<NotificationController> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              if(isClickAble) Icon(Icons.chevron_right, color: Colors.grey),
+              if (isClickAble) Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
           const SizedBox(height: 6),

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:quick_gari/app/models/notification_model.dart';
+import 'package:quick_gari/app/modules/navbar/controllers/navbar_controller.dart';
 import 'package:quick_gari/app/modules/ride/views/ride_proposal_view.dart';
 import 'package:quick_gari/app/routes/app_pages.dart';
 import 'package:quick_gari/app/services/api_service.dart';
@@ -18,13 +19,14 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
 
   NotificationResponseModel? notificationResponse;
 
+  NavbarController get navController => Get.find<NavbarController>();
+
   Future<void> initialize() async {
     if (_initialized) return;
 
     _initialized = true;
     WidgetsBinding.instance.addObserver(this);
-
-    await fetchNotifications();
+    refresh();
   }
 
   Future<void> unInit() async {
@@ -52,7 +54,6 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
       notificationCount.value = notifications
           .where((notification) => !notification.isRead)
           .length;
-          
     } catch (e) {
       Get.log("Notification Error: $e");
     } finally {
@@ -71,19 +72,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
       final index = notifications.indexWhere((e) => e.id == id);
 
       if (index != -1) {
-        notifications[index] = NotificationModel(
-          id: notifications[index].id,
-          userId: notifications[index].userId,
-          audience: notifications[index].audience,
-          type: notifications[index].type,
-          message: notifications[index].message,
-          rideId: notifications[index].rideId,
-          isRead: true,
-          createdAt: notifications[index].createdAt,
-          updatedAt: notifications[index].updatedAt,
-          v: notifications[index].v,
-          proposalID: notifications[index].proposalID,
-        );
+        notifications[index] = notifications[index].copyWith(isRead: true);
 
         notifications.refresh();
       }
@@ -97,21 +86,8 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
 
     if (success) {
       for (int i = 0; i < notifications.length; i++) {
-        notifications[i] = NotificationModel(
-          id: notifications[i].id,
-          userId: notifications[i].userId,
-          audience: notifications[i].audience,
-          type: notifications[i].type,
-          message: notifications[i].message,
-          rideId: notifications[i].rideId,
-          isRead: true,
-          createdAt: notifications[i].createdAt,
-          updatedAt: notifications[i].updatedAt,
-          v: notifications[i].v,
-          proposalID: notifications[i].proposalID,
-        );
+        notifications[i] = notifications[i].copyWith(isRead: true);
       }
-
       notifications.refresh();
     }
 
@@ -123,6 +99,7 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   // ignore: non_constant_identifier_names
   final FlutterLocalNotificationsPlugin _notification_plugin =
       FlutterLocalNotificationsPlugin();
+
   Future<void> localNotificationInitialize() async {
     // For Android
     const AndroidInitializationSettings androidSettings =
@@ -187,25 +164,133 @@ class NotificationService extends GetxService with WidgetsBindingObserver {
   Future<void> cancelAllNotification() async {
     await _notification_plugin.cancelAll();
   }
+  //   Notification Redirect
 
-  void handleReceiveNotification(NotificationResponse details) {
-    final data = jsonDecode(details.payload!);
-    switch (data["type"]) {
-      case "NEW_PROPOSAL":
+  void handleReceiveNotification(NotificationResponse response) async {
+    final notification = NotificationModel.fromNotificationResponse(response);
+    Get.offAllNamed(Routes.NAVBAR);
+    await notificationRedirect(notification);
+  }
+
+  Future<void> notificationRedirect(NotificationModel notification) async {
+    // if not read mark as read
+    if (!notification.isRead) {
+      notificationCount.value--;
+      await markAsRead(notification.id);
+    }
+    print(notification.toJson());
+    // Handle Notification Type
+    switch (notification.type) {
+      case "CHAT_MESSAGE":
+        break;
+
+      case "RIDE_REQUEST":
         Get.to(
           () => RideProposalView(
-            id: details.id.toString(),
-            proposalID: "6a53c71e3d7ef654a03e065a",
+            id: notification.payload['rideId'],
+            isFromNotification: true,
           ),
         );
         break;
-      case "PAYMENT_APPROVED":
-        NotificationService().showNotification();
+
+      case "PAYMENT_SUBMITTED": // Admin
         break;
+
+      case "CAR_REGISTRATION": // Admin
+        break;
+
+      case "CAR_REGISTRATION_APPROVED":
+        Get.toNamed(Routes.MY_VEHICLE);
+        break;
+
+      case "RIDE_ACCEPTED":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "PAYMENT_VERIFIED":
+        break;
+
+      case "NEW_PROPOSAL":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            proposalID: notification.payload['proposalID'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "PROPOSAL_ACCEPTED":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            proposalID: notification.payload['proposalID'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "GOT_RETURN_TRIP_BOOKING":
+        break;
+
+      case "RIDE_TAKEN":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "RIDE_EXPIRED":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "RETURN_EXPIRED":
+        break;
+
+      case "RIDE_CANCELLED":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
+      case "PAYMENT_APPROVED":
+        navController.currentIndex = 2;
+        Get.back();
+        break;
+
+      case "PAYMENT_REJECTED":
+        break;
+
+      case "RIDE_STARTED":
+        Get.to(
+          () => RideProposalView(
+            id: notification.payload['rideId'],
+            isFromNotification: true,
+          ),
+        );
+        break;
+
       default:
-        Get.toNamed(Routes.NOTIFICATION);
+        Get.offAll(Routes.NOTIFICATION);
         break;
     }
+
+    return;
   }
 
   ///                  Fire Base FCM

@@ -76,12 +76,4 @@ class HiveService {
   static Future<String?> getRToken() async {
     return await Hive.box(_defaultBox).get("Rtoken");
   }
-
-  static Future<void> setFCMToken(String? value) async {
-    await Hive.box(_fixedBox).put("fcm", value);
-  }
-
-  static Future<String?> getFCMToken() async {
-    return await Hive.box(_fixedBox).get("fcm");
-  }
 }

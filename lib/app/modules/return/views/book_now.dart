@@ -67,6 +67,18 @@ class ConfirmBookingView extends StatelessWidget {
                         'assets/car3.png',
                     height: 45,
                     fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        height: 120,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

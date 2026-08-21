@@ -149,7 +149,6 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
                       startCtrl.text.isEmpty) {
                     Get.snackbar("Info", "Fill all input field");
                   } else {
-                    Get.back();
                     final requestBody = {
                       "startLocation": startCtrl.text,
                       "endLocation": endCtrl.text,
@@ -159,6 +158,10 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
                       "startTime": combinedDateTime.toUtc().toIso8601String(),
                     };
                     Map res = await ApiService.createReturnTrip(requestBody);
+                    setState(() {
+                      isLoading = false;
+                    });
+                    Get.back();
                     if (res["success"]) {
                       Get.snackbar(
                         "Create Return",
@@ -173,9 +176,6 @@ showEditableAddressSheet(BuildContext context, void Function() refresh) {
                       );
                     }
                   }
-                  setState(() {
-                    isLoading = false;
-                  });
                 },
                 child: isLoading
                     ? Center(

@@ -6,8 +6,9 @@ class RideController extends GetxController {
   bool isLoading = true;
   List<Map<String, dynamic>> dataList = [];
 
-// Inside RideController
-List get filteredList => dataList.where((data) => data["status"] != "ACCEPTED").toList();
+  // Inside RideController
+  List get filteredList =>
+      dataList.where((data) => data["status"] != "ACCEPTED").toList();
 
   @override
   void onInit() {

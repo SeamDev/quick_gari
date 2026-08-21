@@ -50,26 +50,32 @@ class ShareAdmin extends GetView<ShareVehicleController> {
 
                 /// Add Vehicle Button
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: controller.onSubmit,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Color.fromRGBO(21, 93, 252, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  child: Obx(() {
+                    return ElevatedButton(
+                      onPressed: controller.onSubmit,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: Color.fromRGBO(21, 93, 252, 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: controller.isLoading.value
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
+                      child: controller.isLoading.value
+                          ? Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Text(
+                              "Add Vehicle",
+                              style: TextStyle(color: Colors.white),
                             ),
-                          )
-                        : const Text(
-                            "Add Vehicle",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  ),
+                    );
+                  }),
                 ),
               ],
             ),

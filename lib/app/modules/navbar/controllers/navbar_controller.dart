@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:get/get.dart';
+import 'package:quick_gari/app/models/notification_model.dart';
 import 'package:quick_gari/app/services/api_service.dart';
 import 'package:quick_gari/app/services/chat_socket_service.dart';
 import 'package:quick_gari/app/services/hive_service.dart';
@@ -28,6 +30,22 @@ class NavbarController extends GetxController {
     _chatSocket.init();
     await _notificationService.initialize();
     await ApiService.patchFCM(await _fcm.getToken());
+  }
+
+  @override
+  void onReady() async {
+    super.onReady();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final message = await _fcm.getInitialMessage();
+      if (message == null) {
+        return;
+      }
+
+      _notificationService.notificationRedirect(
+        NotificationModel.fromRemoteMessage(message),
+      );
+    });
   }
 
   Future<void> unInit() async {

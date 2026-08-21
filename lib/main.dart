@@ -10,11 +10,12 @@ import 'package:quick_gari/app/services/notification_service.dart';
 import 'package:quick_gari/app/utils/initial_binding.dart';
 import 'package:quick_gari/firebase_options.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
-  await NotificationService().localNotificationInitialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService().localNotificationInitialize();
   FirebaseMessaging.onBackgroundMessage(FCMService.backgroundHandler);
   final fcmService = FCMService();
 
@@ -28,6 +29,7 @@ void main() async {
     }
   });
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

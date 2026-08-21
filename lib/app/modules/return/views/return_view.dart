@@ -69,7 +69,7 @@ class ReturnView extends GetView<ReturnController> {
           return controller.isLoading
               ? Center(child: CircularProgressIndicator())
               : controller.data.isEmpty
-              ? Center(child: Text("NO Return Car Found"))
+              ? Center(child: Text("No Return Car Found"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -118,6 +118,18 @@ class ReturnView extends GetView<ReturnController> {
             data["car"]?["features"]?["images"]?[0] ?? "assets/car1.png",
             height: 120,
             fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const SizedBox(
+                height: 120,
+                child: Center(
+                  child: Icon(
+                    Icons.broken_image_outlined,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                ),
+              );
+            },
           ),
 
           const SizedBox(height: 12),
@@ -135,7 +147,6 @@ class ReturnView extends GetView<ReturnController> {
             "${data["car"]?["features"]?["seatCapacity"]} Seat",
             style: TextStyle(color: Colors.black87, fontSize: 13),
           ),
-
 
           const SizedBox(height: 14),
 
@@ -214,7 +225,9 @@ class ReturnView extends GetView<ReturnController> {
                 Get.to(() => CarDetailsView(data));
               },
               child: Text(
-                data["payment"] == "ACCEPTED" ? "" : "Vehicle Details & Booking",
+                data["payment"] == "ACCEPTED"
+                    ? ""
+                    : "Vehicle Details & Booking",
                 style: TextStyle(color: Colors.white),
               ),
             ),

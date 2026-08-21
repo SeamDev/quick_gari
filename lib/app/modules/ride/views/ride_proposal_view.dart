@@ -6,7 +6,13 @@ import 'package:quick_gari/app/modules/ride/views/ride_car_detail.dart';
 class RideProposalView extends StatelessWidget {
   final String id;
   final String? proposalID;
-  RideProposalView({super.key, required this.id, this.proposalID});
+  final bool isFromNotification;
+  RideProposalView({
+    super.key,
+    required this.id,
+    this.proposalID,
+    this.isFromNotification = false,
+  });
 
   late final RideProposalController controller = Get.put(
     RideProposalController(id),
@@ -39,7 +45,7 @@ class RideProposalView extends StatelessWidget {
               ? Center(child: CircularProgressIndicator(color: Colors.green))
               : (controller.dataList["proposals"] == null ||
                     controller.dataList["proposals"].isEmpty)
-              ? Center(child: Text("Please wait , Driver will respond shortly"))
+              ? isFromNotification ? expiredCard(controller.mainList) : Center(child: Text("Please wait , Driver will respond shortly"))
               : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -63,7 +69,7 @@ class RideProposalView extends StatelessWidget {
                                 controller.dataList["proposals"][index];
                             if (proposalID != null) {
                               if (data["_id"] != proposalID) {
-                                return null;
+                                return SizedBox.shrink();
                               }
                             }
                             return vehicleCard(
@@ -103,10 +109,21 @@ Widget vehicleCard(
       children: [
         /// Car Image
         Image.network(
-          data["car"]["features"]["images"]?[0] ??
-              "assets/car1.png", // replace with your image
+          data["car"]["features"]["images"]?[0] ?? "",
           height: 120,
           fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const SizedBox(
+              height: 120,
+              child: Center(
+                child: Icon(
+                  Icons.broken_image_outlined,
+                  size: 50,
+                  color: Colors.grey,
+                ),
+              ),
+            );
+          },
         ),
 
         const SizedBox(height: 12),
@@ -204,6 +221,50 @@ Widget vehicleCard(
             "Vehicle Details & Booking",
             style: TextStyle(color: Colors.white),
           ),
+        ),
+      ],
+    ),
+  );
+}
+
+Container expiredCard(List<String> mainList) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    margin: EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFFE9F8E9),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.green),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        /// Starting Area
+        _infoRow(
+          icon: Icons.circle,
+          iconColor: Colors.green,
+          title: "Starting Area",
+          value: mainList[0],
+        ),
+
+        const SizedBox(height: 8),
+
+        /// Ending Area
+        _infoRow(
+          icon: Icons.location_on,
+          iconColor: Colors.green,
+          title: "Ending Area",
+          value: mainList[1],
+        ),
+
+        const SizedBox(height: 8),
+
+        /// Date & Time
+        _infoRow(
+          icon: Icons.calendar_month,
+          iconColor: Colors.redAccent,
+          title: "Date & Time",
+          value: mainList[2],
         ),
       ],
     ),
